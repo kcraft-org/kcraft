@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AssetObject {
     pub hash: String,
@@ -48,14 +47,24 @@ pub mod assets_utils {
         let content = std::fs::read_to_string(path).ok()?;
         let root: serde_json::Value = serde_json::from_str(&content).ok()?;
 
-        let is_virtual = root.get("virtual").and_then(|v| v.as_bool()).unwrap_or(false);
-        let map_to_resources = root.get("map_to_resources").and_then(|v| v.as_bool()).unwrap_or(false);
+        let is_virtual = root
+            .get("virtual")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        let map_to_resources = root
+            .get("map_to_resources")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
 
         let mut objects = HashMap::new();
         if let Some(objects_val) = root.get("objects").and_then(|v| v.as_object()) {
             for (key, val) in objects_val {
                 if let Some(obj) = val.as_object() {
-                    let hash = obj.get("hash").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                    let hash = obj
+                        .get("hash")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("")
+                        .to_string();
                     let size = obj.get("size").and_then(|v| v.as_i64()).unwrap_or(0);
                     objects.insert(key.clone(), AssetObject { hash, size });
                 }
@@ -87,7 +96,9 @@ pub mod assets_utils {
         let assets_dir = Path::new("assets");
         let virtual_root = assets_dir.join("virtual").join(assets_id);
 
-        let index_path = assets_dir.join("indexes").join(format!("{}.json", assets_id));
+        let index_path = assets_dir
+            .join("indexes")
+            .join(format!("{}.json", assets_id));
         if !index_path.exists() {
             return virtual_root.to_string_lossy().to_string();
         }
@@ -150,8 +161,15 @@ pub mod assets_utils {
                 }
 
                 match std::fs::copy(&original_path, &target_file_path) {
-                    Ok(_) => tracing::debug!("Copied {:?} to {:?}", original_path, target_file_path),
-                    Err(e) => tracing::warn!("Failed to copy {:?} to {:?}: {}", original_path, target_file_path, e),
+                    Ok(_) => {
+                        tracing::debug!("Copied {:?} to {:?}", original_path, target_file_path)
+                    }
+                    Err(e) => tracing::warn!(
+                        "Failed to copy {:?} to {:?}: {}",
+                        original_path,
+                        target_file_path,
+                        e
+                    ),
                 }
             }
         }

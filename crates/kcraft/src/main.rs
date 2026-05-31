@@ -15,7 +15,10 @@ fn determine_data_path() -> PathBuf {
         #[cfg(target_os = "linux")]
         {
             if let Ok(home) = std::env::var("HOME") {
-                PathBuf::from(home).join(".local").join("share").join("kcraft")
+                PathBuf::from(home)
+                    .join(".local")
+                    .join("share")
+                    .join("kcraft")
             } else {
                 PathBuf::from("kcraft_data")
             }
@@ -66,10 +69,12 @@ fn init_logging(data_path: &Path) {
 fn init_settings(data_path: &Path) -> SettingsObject {
     let config_path = data_path.join(&BUILD_CONFIG.launcher_config_file);
     let storage = IniSettingsStorage::new(config_path);
-    let settings = SettingsObject::new(Box::new(storage))
-        .expect("Failed to initialize settings");
+    let settings = SettingsObject::new(Box::new(storage)).expect("Failed to initialize settings");
 
-    settings.register_simple("InstanceDir", data_path.join("instances").to_string_lossy().to_string());
+    settings.register_simple(
+        "InstanceDir",
+        data_path.join("instances").to_string_lossy().to_string(),
+    );
     settings.register_simple("JavaPath", String::new());
     settings.register_simple("JavaMemory", 2048i32);
     settings.register_simple("Theme", "dark".to_string());
@@ -120,7 +125,13 @@ fn print_help() {
     println!("  --help                 Show this help");
 }
 
-fn parse_cli_args() -> (Option<String>, Option<String>, Option<String>, bool, Option<PathBuf>) {
+fn parse_cli_args() -> (
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    bool,
+    Option<PathBuf>,
+) {
     let args: Vec<String> = std::env::args().collect();
     let mut launch = None;
     let mut server = None;
@@ -178,7 +189,13 @@ fn print_instance_list(instances: &InstanceList) {
             } else {
                 "OK"
             };
-            println!("  [{:>3}] {:<30} {:<30} {}", i, inst.name, inst.id(), status);
+            println!(
+                "  [{:>3}] {:<30} {:<30} {}",
+                i,
+                inst.name,
+                inst.id(),
+                status
+            );
         }
     }
     println!("{:-<80}", "");
@@ -225,8 +242,16 @@ async fn main() {
     let data_path = custom_dir.unwrap_or_else(determine_data_path);
     init_logging(&data_path);
 
-    info!("{} v{}", BUILD_CONFIG.launcher_display_name, BUILD_CONFIG.version_string());
-    info!("Platform: {} {}", BUILD_CONFIG.build_platform, std::env::consts::ARCH);
+    info!(
+        "{} v{}",
+        BUILD_CONFIG.launcher_display_name,
+        BUILD_CONFIG.version_string()
+    );
+    info!(
+        "Platform: {} {}",
+        BUILD_CONFIG.build_platform,
+        std::env::consts::ARCH
+    );
     info!("Data path: {}", data_path.display());
 
     let _settings = init_settings(&data_path);
@@ -283,7 +308,10 @@ async fn main() {
         let inst = instance_ptr.write();
 
         if !inst.can_launch() {
-            eprintln!("Instance '{}' has broken version and cannot be launched", instance_id);
+            eprintln!(
+                "Instance '{}' has broken version and cannot be launched",
+                instance_id
+            );
             exit(1);
         }
 

@@ -40,20 +40,25 @@ pub struct Resource {
 impl Resource {
     pub fn new(path: &Path) -> Self {
         let metadata = path.metadata().ok();
-        let changed = metadata.as_ref()
+        let changed = metadata
+            .as_ref()
             .and_then(|m| m.modified().ok())
             .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
             .map(|d| d.as_secs() as i64)
             .unwrap_or(0);
 
-        let internal_id = path.file_name()
+        let internal_id = path
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("")
             .to_string();
 
         let resource_type = if path.is_dir() {
             ResourceType::Folder
-        } else if path.extension().is_some_and(|e| e == "zip" || e == "jar" || e == "disabled") {
+        } else if path
+            .extension()
+            .is_some_and(|e| e == "zip" || e == "jar" || e == "disabled")
+        {
             ResourceType::ZipFile
         } else if path.extension().is_some_and(|e| e == "litemod") {
             ResourceType::Litemod
@@ -80,26 +85,63 @@ impl Resource {
         r
     }
 
-    pub fn fileinfo(&self) -> &Path { &self.path }
-    pub fn date_time_changed(&self) -> i64 { self.changed_date_time }
-    pub fn internal_id(&self) -> &str { &self.internal_id }
-    pub fn resource_type(&self) -> ResourceType { self.resource_type }
-    pub fn enabled(&self) -> bool { self.enabled }
-    pub fn name(&self) -> &str { &self.name }
-    pub fn set_name(&mut self, name: &str) { self.name = name.to_string(); }
-    pub fn valid(&self) -> bool { !matches!(self.resource_type, ResourceType::Unknown) }
-    pub fn should_resolve(&self) -> bool { !self.is_resolving && !self.is_resolved }
-    pub fn is_resolving(&self) -> bool { self.is_resolving }
-    pub fn is_resolved(&self) -> bool { self.is_resolved }
-    pub fn resolution_ticket(&self) -> u32 { self.resolution_ticket }
+    pub fn fileinfo(&self) -> &Path {
+        &self.path
+    }
+    pub fn date_time_changed(&self) -> i64 {
+        self.changed_date_time
+    }
+    pub fn internal_id(&self) -> &str {
+        &self.internal_id
+    }
+    pub fn resource_type(&self) -> ResourceType {
+        self.resource_type
+    }
+    pub fn enabled(&self) -> bool {
+        self.enabled
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn set_name(&mut self, name: &str) {
+        self.name = name.to_string();
+    }
+    pub fn valid(&self) -> bool {
+        !matches!(self.resource_type, ResourceType::Unknown)
+    }
+    pub fn should_resolve(&self) -> bool {
+        !self.is_resolving && !self.is_resolved
+    }
+    pub fn is_resolving(&self) -> bool {
+        self.is_resolving
+    }
+    pub fn is_resolved(&self) -> bool {
+        self.is_resolved
+    }
+    pub fn resolution_ticket(&self) -> u32 {
+        self.resolution_ticket
+    }
 
-    pub fn set_enabled(&mut self, enabled: bool) { self.enabled = enabled; }
+    pub fn set_enabled(&mut self, enabled: bool) {
+        self.enabled = enabled;
+    }
 
     pub fn enable(&mut self, action: EnableAction) -> bool {
         match action {
-            EnableAction::Enable => { let old = self.enabled; self.enabled = true; old != self.enabled }
-            EnableAction::Disable => { let old = self.enabled; self.enabled = false; old != self.enabled }
-            EnableAction::Toggle => { self.enabled = !self.enabled; true }
+            EnableAction::Enable => {
+                let old = self.enabled;
+                self.enabled = true;
+                old != self.enabled
+            }
+            EnableAction::Disable => {
+                let old = self.enabled;
+                self.enabled = false;
+                old != self.enabled
+            }
+            EnableAction::Toggle => {
+                self.enabled = !self.enabled;
+                true
+            }
         }
     }
 
@@ -134,7 +176,9 @@ impl Resource {
     }
 
     pub fn apply_filter(&self, filter: &str) -> bool {
-        if filter.is_empty() { return true; }
+        if filter.is_empty() {
+            return true;
+        }
         let lower = filter.to_lowercase();
         self.name.to_lowercase().contains(&lower)
             || self.internal_id.to_lowercase().contains(&lower)
@@ -194,14 +238,24 @@ impl Mod {
         }
     }
 
-    pub fn version(&self) -> &str { &self.details.version }
-    pub fn homeurl(&self) -> &str { &self.details.homeurl }
-    pub fn description(&self) -> &str { &self.details.description }
-    pub fn authors(&self) -> &[String] { &self.details.authors }
+    pub fn version(&self) -> &str {
+        &self.details.version
+    }
+    pub fn homeurl(&self) -> &str {
+        &self.details.homeurl
+    }
+    pub fn description(&self) -> &str {
+        &self.details.description
+    }
+    pub fn authors(&self) -> &[String] {
+        &self.details.authors
+    }
 
     pub fn parse(&mut self) {
         let path = self.resource.fileinfo().to_path_buf();
-        if !path.exists() { return; }
+        if !path.exists() {
+            return;
+        }
 
         if path.is_dir() {
             self.parse_folder(&path);
@@ -346,11 +400,15 @@ impl Mod {
                 continue;
             }
             if in_mods && line.starts_with('[') {
-                if found { break; }
+                if found {
+                    break;
+                }
                 in_mods = false;
                 continue;
             }
-            if !in_mods { continue; }
+            if !in_mods {
+                continue;
+            }
 
             if let Some(eq_pos) = line.find('=') {
                 let key = line[..eq_pos].trim();
@@ -474,7 +532,9 @@ impl ResourcePack {
 
     pub fn parse(&mut self) {
         let path = self.resource.fileinfo().to_path_buf();
-        if !path.exists() { return; }
+        if !path.exists() {
+            return;
+        }
 
         let content = if path.is_dir() {
             let mcmeta = path.join("pack.mcmeta");
@@ -482,7 +542,9 @@ impl ResourcePack {
         } else {
             let file = std::fs::File::open(&path).ok();
             let mut archive = file.and_then(|f| zip::ZipArchive::new(f).ok());
-            archive.as_mut().and_then(|a| a.by_name("pack.mcmeta").ok())
+            archive
+                .as_mut()
+                .and_then(|a| a.by_name("pack.mcmeta").ok())
                 .and_then(|mut e| {
                     let mut s = String::new();
                     use std::io::Read;
@@ -559,7 +621,9 @@ impl TexturePack {
 
     pub fn parse(&mut self) {
         let path = self.resource.fileinfo().to_path_buf();
-        if !path.exists() { return; }
+        if !path.exists() {
+            return;
+        }
 
         let content = if path.is_dir() {
             let pack_txt = path.join("pack.txt");
@@ -567,7 +631,9 @@ impl TexturePack {
         } else {
             let file = std::fs::File::open(&path).ok();
             let mut archive = file.and_then(|f| zip::ZipArchive::new(f).ok());
-            archive.as_mut().and_then(|a| a.by_name("pack.txt").ok())
+            archive
+                .as_mut()
+                .and_then(|a| a.by_name("pack.txt").ok())
                 .and_then(|mut e| {
                     let mut s = String::new();
                     use std::io::Read;
@@ -595,12 +661,24 @@ impl<T> ResourceFolderModel<T> {
         }
     }
 
-    pub fn size(&self) -> usize { self.resources.len() }
-    pub fn is_empty(&self) -> bool { self.resources.is_empty() }
-    pub fn all(&self) -> &[T] { &self.resources }
-    pub fn at(&self, index: usize) -> Option<&T> { self.resources.get(index) }
-    pub fn at_mut(&mut self, index: usize) -> Option<&mut T> { self.resources.get_mut(index) }
-    pub fn dir(&self) -> &Path { &self.dir_path }
+    pub fn size(&self) -> usize {
+        self.resources.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.resources.is_empty()
+    }
+    pub fn all(&self) -> &[T] {
+        &self.resources
+    }
+    pub fn at(&self, index: usize) -> Option<&T> {
+        self.resources.get(index)
+    }
+    pub fn at_mut(&mut self, index: usize) -> Option<&mut T> {
+        self.resources.get_mut(index)
+    }
+    pub fn dir(&self) -> &Path {
+        &self.dir_path
+    }
 
     pub fn add(&mut self, resource: T) {
         self.resources.push(resource);
@@ -622,7 +700,9 @@ impl<T> ResourceFolderModel<T> {
 impl ResourceFolderModel<Mod> {
     pub fn load_mods(&mut self) {
         self.resources.clear();
-        if !self.dir_path.exists() { return; }
+        if !self.dir_path.exists() {
+            return;
+        }
 
         let mut entries: Vec<_> = std::fs::read_dir(&self.dir_path)
             .into_iter()
@@ -648,7 +728,9 @@ impl ResourceFolderModel<Mod> {
 impl ResourceFolderModel<ResourcePack> {
     pub fn load_resource_packs(&mut self) {
         self.resources.clear();
-        if !self.dir_path.exists() { return; }
+        if !self.dir_path.exists() {
+            return;
+        }
 
         let mut entries: Vec<_> = std::fs::read_dir(&self.dir_path)
             .into_iter()
@@ -660,7 +742,11 @@ impl ResourceFolderModel<ResourcePack> {
 
         for entry in entries {
             let path = entry.path();
-            if path.extension().is_none_or(|e| e != "zip" && e != "disabled") && !path.is_dir() {
+            if path
+                .extension()
+                .is_none_or(|e| e != "zip" && e != "disabled")
+                && !path.is_dir()
+            {
                 continue;
             }
             let rp = ResourcePack::new(&path);
@@ -674,7 +760,9 @@ impl ResourceFolderModel<ResourcePack> {
 impl ResourceFolderModel<TexturePack> {
     pub fn load_texture_packs(&mut self) {
         self.resources.clear();
-        if !self.dir_path.exists() { return; }
+        if !self.dir_path.exists() {
+            return;
+        }
 
         let mut entries: Vec<_> = std::fs::read_dir(&self.dir_path)
             .into_iter()
@@ -686,7 +774,11 @@ impl ResourceFolderModel<TexturePack> {
 
         for entry in entries {
             let path = entry.path();
-            if path.extension().is_none_or(|e| e != "zip" && e != "disabled") && !path.is_dir() {
+            if path
+                .extension()
+                .is_none_or(|e| e != "zip" && e != "disabled")
+                && !path.is_dir()
+            {
                 continue;
             }
             let tp = TexturePack::new(&path);
@@ -699,8 +791,8 @@ impl ResourceFolderModel<TexturePack> {
 
 fn read_zip_entry<R: std::io::Read>(mut entry: R) -> Result<String, String> {
     let mut content = String::new();
-    entry.read_to_string(&mut content).map_err(|e| e.to_string())?;
+    entry
+        .read_to_string(&mut content)
+        .map_err(|e| e.to_string())?;
     Ok(content)
 }
-
-

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::process::{Command, Stdio};
-use std::sync::mpsc::{self, Sender, Receiver};
+use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
 
@@ -21,7 +21,9 @@ pub enum LaunchState {
 pub trait LaunchStep: Send {
     fn execute(&mut self, task: &mut LaunchTask) -> Result<(), String>;
     fn abort(&mut self) -> bool;
-    fn can_abort(&self) -> bool { true }
+    fn can_abort(&self) -> bool {
+        true
+    }
     fn finalize(&mut self) {}
     fn proceed(&mut self) {}
     fn name(&self) -> &str;
@@ -204,9 +206,15 @@ impl LaunchStep for TextPrintStep {
         Ok(())
     }
 
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
-    fn name(&self) -> &str { "TextPrint" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn name(&self) -> &str {
+        "TextPrint"
+    }
 }
 
 pub struct CheckJavaStep {
@@ -223,7 +231,10 @@ impl CheckJavaStep {
 
 impl LaunchStep for CheckJavaStep {
     fn execute(&mut self, task: &mut LaunchTask) -> Result<(), String> {
-        task.log(&format!("Checking Java version at: {}", self.java_path), LogLevel::Launcher);
+        task.log(
+            &format!("Checking Java version at: {}", self.java_path),
+            LogLevel::Launcher,
+        );
 
         let output = Command::new(&self.java_path)
             .arg("-version")
@@ -232,7 +243,10 @@ impl LaunchStep for CheckJavaStep {
             .map_err(|e| format!("Failed to execute Java: {}", e))?;
 
         let version_str = String::from_utf8_lossy(&output.stderr);
-        task.log(&format!("Java version: {}", version_str.trim()), LogLevel::Launcher);
+        task.log(
+            &format!("Java version: {}", version_str.trim()),
+            LogLevel::Launcher,
+        );
 
         let jv = crate::JavaVersion::new(version_str.trim());
         if !jv.is_parseable() {
@@ -240,14 +254,26 @@ impl LaunchStep for CheckJavaStep {
             return Ok(());
         }
 
-        task.log(&format!("Java major version: {}", jv.major()), LogLevel::Launcher);
-        task.log(&format!("Java is 64-bit: {}", is_64bit_java(&self.java_path)), LogLevel::Launcher);
+        task.log(
+            &format!("Java major version: {}", jv.major()),
+            LogLevel::Launcher,
+        );
+        task.log(
+            &format!("Java is 64-bit: {}", is_64bit_java(&self.java_path)),
+            LogLevel::Launcher,
+        );
         Ok(())
     }
 
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "CheckJava" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "CheckJava"
+    }
 }
 
 fn is_64bit_java(java_path: &str) -> bool {
@@ -300,14 +326,25 @@ impl LaunchStep for DirectJavaLaunchStep {
         let raw_classpath = task.instance.get_class_path();
         let lib_base = if self.lib_dir.is_empty() {
             let inst_root = std::path::Path::new(&task.instance.instance_root);
-            inst_root.parent().and_then(|p| p.parent()).map(|p| p.to_string_lossy().to_string()).unwrap_or_default()
+            inst_root
+                .parent()
+                .and_then(|p| p.parent())
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_default()
         } else {
             self.lib_dir.clone()
         };
-        let classpath: Vec<String> = raw_classpath.iter().map(|p| {
-            let path = std::path::Path::new(&lib_base).join(p);
-            if path.exists() { path.to_string_lossy().to_string() } else { p.clone() }
-        }).collect();
+        let classpath: Vec<String> = raw_classpath
+            .iter()
+            .map(|p| {
+                let path = std::path::Path::new(&lib_base).join(p);
+                if path.exists() {
+                    path.to_string_lossy().to_string()
+                } else {
+                    p.clone()
+                }
+            })
+            .collect();
         let classpath_str = classpath.join(":");
 
         let main_class = task.instance.get_main_class();
@@ -324,7 +361,10 @@ impl LaunchStep for DirectJavaLaunchStep {
         );
         args.extend(mc_args);
 
-        task.log(&format!("Java Arguments:\n[{}]", args.join(", ")), LogLevel::Launcher);
+        task.log(
+            &format!("Java Arguments:\n[{}]", args.join(", ")),
+            LogLevel::Launcher,
+        );
 
         let mut cmd = Command::new(&java_path);
         cmd.args(&args)
@@ -335,13 +375,21 @@ impl LaunchStep for DirectJavaLaunchStep {
         // Set environment variables
         cmd.env("LD_LIBRARY_PATH", &native_path);
 
-        task.log(&format!("Starting Minecraft: {} {}", java_path, args.join(" ")), LogLevel::Launcher);
+        task.log(
+            &format!("Starting Minecraft: {} {}", java_path, args.join(" ")),
+            LogLevel::Launcher,
+        );
 
-        let mut child = cmd.spawn().map_err(|e| format!("Failed to launch Minecraft: {}", e))?;
+        let mut child = cmd
+            .spawn()
+            .map_err(|e| format!("Failed to launch Minecraft: {}", e))?;
 
         let pid = child.id();
         task.pid = Some(pid);
-        task.log(&format!("Minecraft process ID: {}", pid), LogLevel::Launcher);
+        task.log(
+            &format!("Minecraft process ID: {}", pid),
+            LogLevel::Launcher,
+        );
 
         let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
 
@@ -352,7 +400,9 @@ impl LaunchStep for DirectJavaLaunchStep {
             let mut buf = [0u8; 4096];
             if let Some(ref mut stdout) = child_stdout {
                 while let Ok(n) = stdout.read(&mut buf) {
-                    if n == 0 { break; }
+                    if n == 0 {
+                        break;
+                    }
                     let _ = stdout_tx.send(String::from_utf8_lossy(&buf[..n]).to_string());
                 }
             }
@@ -365,7 +415,9 @@ impl LaunchStep for DirectJavaLaunchStep {
             let mut buf = [0u8; 4096];
             if let Some(ref mut stderr) = child_stderr {
                 while let Ok(n) = stderr.read(&mut buf) {
-                    if n == 0 { break; }
+                    if n == 0 {
+                        break;
+                    }
                     let _ = stderr_tx.send(String::from_utf8_lossy(&buf[..n]).to_string());
                 }
             }
@@ -385,7 +437,10 @@ impl LaunchStep for DirectJavaLaunchStep {
 
             match child.try_wait() {
                 Ok(Some(status)) => {
-                    task.log(&format!("Minecraft exited with code: {:?}", status.code()), LogLevel::Launcher);
+                    task.log(
+                        &format!("Minecraft exited with code: {:?}", status.code()),
+                        LogLevel::Launcher,
+                    );
                     if let Some(code) = status.code() {
                         if code != 0 {
                             return Err("Game crashed.".to_string());
@@ -410,10 +465,16 @@ impl LaunchStep for DirectJavaLaunchStep {
         Ok(())
     }
 
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
     fn finalize(&mut self) {}
-    fn name(&self) -> &str { "DirectJavaLaunch" }
+    fn name(&self) -> &str {
+        "DirectJavaLaunch"
+    }
 }
 
 pub struct CreateGameFoldersStep;
@@ -440,9 +501,15 @@ impl LaunchStep for CreateGameFoldersStep {
         Ok(())
     }
 
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "CreateGameFolders" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "CreateGameFolders"
+    }
 }
 
 pub struct PreLaunchCommandStep;
@@ -465,9 +532,15 @@ impl LaunchStep for PreLaunchCommandStep {
         task.log("Pre-launch command: not configured", LogLevel::Launcher);
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
-    fn name(&self) -> &str { "PreLaunchCommand" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn name(&self) -> &str {
+        "PreLaunchCommand"
+    }
 }
 
 impl LaunchStep for PostLaunchCommandStep {
@@ -475,9 +548,15 @@ impl LaunchStep for PostLaunchCommandStep {
         task.log("Post-launch command: not configured", LogLevel::Launcher);
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
-    fn name(&self) -> &str { "PostLaunchCommand" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn name(&self) -> &str {
+        "PostLaunchCommand"
+    }
 }
 
 impl LaunchStep for LookupServerAddressStep {
@@ -485,40 +564,70 @@ impl LaunchStep for LookupServerAddressStep {
         task.log("Server address lookup: not applicable", LogLevel::Launcher);
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
-    fn name(&self) -> &str { "LookupServerAddress" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn name(&self) -> &str {
+        "LookupServerAddress"
+    }
 }
 
 impl LaunchStep for QuitAfterGameStopStep {
     fn execute(&mut self, _task: &mut LaunchTask) -> Result<(), String> {
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "QuitAfterGameStop" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "QuitAfterGameStop"
+    }
 }
 
 impl LaunchStep for UpdateStep {
     fn execute(&mut self, task: &mut LaunchTask) -> Result<(), String> {
-        task.log("Update check: not implemented (offline mode)", LogLevel::Launcher);
+        task.log(
+            "Update check: not implemented (offline mode)",
+            LogLevel::Launcher,
+        );
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
-    fn name(&self) -> &str { "Update" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn name(&self) -> &str {
+        "Update"
+    }
 }
 
 impl LaunchStep for ClaimAccountStep {
     fn execute(&mut self, task: &mut LaunchTask) -> Result<(), String> {
         if let Some(ref session) = task.session {
-            task.log(&format!("Using account: {}", session.player_name), LogLevel::Launcher);
+            task.log(
+                &format!("Using account: {}", session.player_name),
+                LogLevel::Launcher,
+            );
         }
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "ClaimAccount" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "ClaimAccount"
+    }
 }
 
 impl LaunchStep for ConfigureAuthlibInjectorStep {
@@ -526,9 +635,15 @@ impl LaunchStep for ConfigureAuthlibInjectorStep {
         task.log("Authlib-injector: not configured", LogLevel::Launcher);
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "ConfigureAuthlibInjector" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "ConfigureAuthlibInjector"
+    }
 }
 
 impl LaunchStep for ExtractNativesStep {
@@ -552,11 +667,17 @@ impl LaunchStep for ExtractNativesStep {
         for jar_path in &native_jars {
             let path = std::path::Path::new(jar_path);
             if !path.exists() {
-                task.log(&format!("Native library not found: {}", jar_path), LogLevel::Warning);
+                task.log(
+                    &format!("Native library not found: {}", jar_path),
+                    LogLevel::Warning,
+                );
                 continue;
             }
 
-            task.log(&format!("Extracting natives from: {}", jar_path), LogLevel::Launcher);
+            task.log(
+                &format!("Extracting natives from: {}", jar_path),
+                LogLevel::Launcher,
+            );
 
             let file = std::fs::File::open(path)
                 .map_err(|e| format!("Failed to open {}: {}", jar_path, e))?;
@@ -564,7 +685,8 @@ impl LaunchStep for ExtractNativesStep {
                 .map_err(|e| format!("Failed to read zip {}: {}", jar_path, e))?;
 
             for i in 0..archive.len() {
-                let mut entry = archive.by_index(i)
+                let mut entry = archive
+                    .by_index(i)
                     .map_err(|e| format!("Failed to read zip entry: {}", e))?;
 
                 if entry.is_dir() {
@@ -573,11 +695,19 @@ impl LaunchStep for ExtractNativesStep {
 
                 let name = entry.name().to_string();
                 // Only extract native library files (.so, .dll, .dylib)
-                if !name.ends_with(".so") && !name.ends_with(".dll") && !name.ends_with(".dylib") && !name.ends_with(".jnilib") {
+                if !name.ends_with(".so")
+                    && !name.ends_with(".dll")
+                    && !name.ends_with(".dylib")
+                    && !name.ends_with(".jnilib")
+                {
                     continue;
                 }
 
-                let out_path = std::path::Path::new(&native_path).join(std::path::Path::new(&name).file_name().unwrap_or(std::ffi::OsStr::new(&name)));
+                let out_path = std::path::Path::new(&native_path).join(
+                    std::path::Path::new(&name)
+                        .file_name()
+                        .unwrap_or(std::ffi::OsStr::new(&name)),
+                );
                 let mut outfile = std::fs::File::create(&out_path)
                     .map_err(|e| format!("Failed to create {}: {}", out_path.display(), e))?;
                 std::io::copy(&mut entry, &mut outfile)
@@ -585,23 +715,38 @@ impl LaunchStep for ExtractNativesStep {
             }
         }
 
-        task.log(&format!("Natives extracted to: {}", native_path), LogLevel::Launcher);
+        task.log(
+            &format!("Natives extracted to: {}", native_path),
+            LogLevel::Launcher,
+        );
         Ok(())
     }
 
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
     fn finalize(&mut self) {}
-    fn name(&self) -> &str { "ExtractNatives" }
+    fn name(&self) -> &str {
+        "ExtractNatives"
+    }
 }
 
 impl LaunchStep for ModMinecraftJarStep {
     fn execute(&mut self, _task: &mut LaunchTask) -> Result<(), String> {
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "ModMinecraftJar" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "ModMinecraftJar"
+    }
 }
 
 impl LaunchStep for PrintInstanceInfoStep {
@@ -614,25 +759,46 @@ impl LaunchStep for PrintInstanceInfoStep {
         let min_mem = task.instance.min_mem;
         let max_mem = task.instance.max_mem;
         let main_class = task.instance.get_main_class();
-        task.log("======== Minecraft Instance Info ========", LogLevel::Launcher);
+        task.log(
+            "======== Minecraft Instance Info ========",
+            LogLevel::Launcher,
+        );
         task.log(&format!("Instance: {}", name), LogLevel::Launcher);
         task.log(&format!("Root: {}", root), LogLevel::Launcher);
         task.log(&format!("Game dir: {}", game_root), LogLevel::Launcher);
         task.log(&format!("Java: {}", java_path), LogLevel::Launcher);
-        task.log(&format!("Java version: {}", java_version), LogLevel::Launcher);
-        task.log(&format!("Memory: {} - {} MB", min_mem, max_mem), LogLevel::Launcher);
+        task.log(
+            &format!("Java version: {}", java_version),
+            LogLevel::Launcher,
+        );
+        task.log(
+            &format!("Memory: {} - {} MB", min_mem, max_mem),
+            LogLevel::Launcher,
+        );
         task.log(&format!("Main class: {}", main_class), LogLevel::Launcher);
-        task.log("========================================", LogLevel::Launcher);
+        task.log(
+            "========================================",
+            LogLevel::Launcher,
+        );
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "PrintInstanceInfo" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "PrintInstanceInfo"
+    }
 }
 
 impl LaunchStep for ReconstructAssetsStep {
     fn execute(&mut self, task: &mut LaunchTask) -> Result<(), String> {
-        let assets = task.instance.components.get_profile()
+        let assets = task
+            .instance
+            .components
+            .get_profile()
             .map(|p| p.assets.clone())
             .unwrap_or_default();
         let resources_dir = task.instance.resources_dir();
@@ -642,9 +808,15 @@ impl LaunchStep for ReconstructAssetsStep {
         task.log("Assets reconstructed.", LogLevel::Launcher);
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "ReconstructAssets" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "ReconstructAssets"
+    }
 }
 
 impl LaunchStep for ScanModFoldersStep {
@@ -653,21 +825,33 @@ impl LaunchStep for ScanModFoldersStep {
         if std::path::Path::new(&mods_dir).exists() {
             if let Ok(entries) = std::fs::read_dir(&mods_dir) {
                 let count = entries.flatten().filter(|e| e.path().is_file()).count();
-                task.log(&format!("Mods folder contains {} files", count), LogLevel::Launcher);
+                task.log(
+                    &format!("Mods folder contains {} files", count),
+                    LogLevel::Launcher,
+                );
             }
         }
         let coremods_dir = task.instance.core_mods_dir();
         if std::path::Path::new(&coremods_dir).exists() {
             if let Ok(entries) = std::fs::read_dir(&coremods_dir) {
                 let count = entries.flatten().filter(|e| e.path().is_file()).count();
-                task.log(&format!("Coremods folder contains {} files", count), LogLevel::Launcher);
+                task.log(
+                    &format!("Coremods folder contains {} files", count),
+                    LogLevel::Launcher,
+                );
             }
         }
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "ScanModFolders" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "ScanModFolders"
+    }
 }
 
 impl LaunchStep for VerifyJavaInstallStep {
@@ -690,9 +874,15 @@ impl LaunchStep for VerifyJavaInstallStep {
         task.log("Java installation verified.", LogLevel::Launcher);
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { false }
-    fn name(&self) -> &str { "VerifyJavaInstall" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "VerifyJavaInstall"
+    }
 }
 
 impl LaunchStep for LauncherPartLaunchStep {
@@ -700,7 +890,13 @@ impl LaunchStep for LauncherPartLaunchStep {
         // Launcher part launch is not used in standalone mode
         Ok(())
     }
-    fn abort(&mut self) -> bool { true }
-    fn can_abort(&self) -> bool { true }
-    fn name(&self) -> &str { "LauncherPartLaunch" }
+    fn abort(&mut self) -> bool {
+        true
+    }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn name(&self) -> &str {
+        "LauncherPartLaunch"
+    }
 }

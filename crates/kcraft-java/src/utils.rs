@@ -6,9 +6,13 @@ use crate::version::JavaVersion;
 
 fn default_java_path() -> &'static str {
     #[cfg(target_os = "windows")]
-    { "javaw" }
+    {
+        "javaw"
+    }
     #[cfg(not(target_os = "windows"))]
-    { "java" }
+    {
+        "java"
+    }
 }
 
 pub fn make_java_ptr(path: String, id: String, arch: String) -> JavaInstall {
@@ -96,7 +100,11 @@ pub fn clean_environment() -> HashMap<String, String> {
         for &(strip_key, launcher_key) in &stripped {
             if key == strip_key {
                 if let Ok(launcher_val) = std::env::var(launcher_key) {
-                    let delimiter = if cfg!(target_os = "windows") { ';' } else { ':' };
+                    let delimiter = if cfg!(target_os = "windows") {
+                        ';'
+                    } else {
+                        ':'
+                    };
                     let target_items: Vec<&str> = value.split(delimiter).collect();
                     let to_remove: Vec<&str> = launcher_val.split(delimiter).collect();
 
@@ -105,7 +113,12 @@ pub fn clean_environment() -> HashMap<String, String> {
                         .filter(|item| !to_remove.contains(item))
                         .collect();
                     final_value = filtered.join(&delimiter.to_string());
-                    tracing::debug!("Env: stripped {} from {} to {}", strip_key, value, final_value);
+                    tracing::debug!(
+                        "Env: stripped {} from {} to {}",
+                        strip_key,
+                        value,
+                        final_value
+                    );
                 }
             }
         }
@@ -187,9 +200,10 @@ pub fn find_java_paths() -> Vec<String> {
     }
 
     let home = std::env::var("HOME").unwrap_or_default();
-    let sdkman_dir = std::env::var("SDKMAN_DIR")
-        .unwrap_or_else(|_| format!("{}/.sdkman", home));
-    javas.extend(scan_java_dir(&Path::new(&sdkman_dir).join("candidates/java")));
+    let sdkman_dir = std::env::var("SDKMAN_DIR").unwrap_or_else(|_| format!("{}/.sdkman", home));
+    javas.extend(scan_java_dir(
+        &Path::new(&sdkman_dir).join("candidates/java"),
+    ));
 
     let asdf_dir = std::env::var("ASDF_DATA_DIR")
         .or_else(|_| std::env::var("ASDF_DIR"))
@@ -222,8 +236,16 @@ pub fn find_java_paths() -> Vec<String> {
     if let Ok(entries) = std::fs::read_dir(library_jvm) {
         for entry in entries.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
-            javas.push(format!("{}/{}/Contents/Home/bin/java", library_jvm.display(), name));
-            javas.push(format!("{}/{}/Contents/Home/jre/bin/java", library_jvm.display(), name));
+            javas.push(format!(
+                "{}/{}/Contents/Home/bin/java",
+                library_jvm.display(),
+                name
+            ));
+            javas.push(format!(
+                "{}/{}/Contents/Home/jre/bin/java",
+                library_jvm.display(),
+                name
+            ));
         }
     }
 
@@ -231,8 +253,16 @@ pub fn find_java_paths() -> Vec<String> {
     if let Ok(entries) = std::fs::read_dir(system_jvm) {
         for entry in entries.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
-            javas.push(format!("{}/{}/Contents/Home/bin/java", system_jvm.display(), name));
-            javas.push(format!("{}/{}/Contents/Commands/java", system_jvm.display(), name));
+            javas.push(format!(
+                "{}/{}/Contents/Home/bin/java",
+                system_jvm.display(),
+                name
+            ));
+            javas.push(format!(
+                "{}/{}/Contents/Commands/java",
+                system_jvm.display(),
+                name
+            ));
         }
     }
 
@@ -268,29 +298,144 @@ pub fn find_java_paths() -> Vec<String> {
     }
 
     let registry_keys: &[(u32, &str, &str, &str)] = &[
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\Java Runtime Environment", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\Java Development Kit", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\Java Runtime Environment", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\Java Development Kit", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\JRE", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\JDK", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\JRE", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\JDK", "JavaHome", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\AdoptOpenJDK\\JRE", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\AdoptOpenJDK\\JRE", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\AdoptOpenJDK\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\AdoptOpenJDK\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\Eclipse Foundation\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\Eclipse Foundation\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\Eclipse Adoptium\\JRE", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\Eclipse Adoptium\\JRE", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\Eclipse Adoptium\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\Eclipse Adoptium\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\Microsoft\\JDK", "Path", "\\hotspot\\MSI"),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\Azul Systems\\Zulu", "InstallationPath", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\Azul Systems\\Zulu", "InstallationPath", ""),
-        (winreg::enums::KEY_WOW64_64KEY, "SOFTWARE\\BellSoft\\Liberica", "InstallationPath", ""),
-        (winreg::enums::KEY_WOW64_32KEY, "SOFTWARE\\BellSoft\\Liberica", "InstallationPath", ""),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\JavaSoft\\Java Runtime Environment",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\JavaSoft\\Java Development Kit",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\JavaSoft\\Java Runtime Environment",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\JavaSoft\\Java Development Kit",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\JavaSoft\\JRE",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\JavaSoft\\JDK",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\JavaSoft\\JRE",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\JavaSoft\\JDK",
+            "JavaHome",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\AdoptOpenJDK\\JRE",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\AdoptOpenJDK\\JRE",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\AdoptOpenJDK\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\AdoptOpenJDK\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\Eclipse Foundation\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\Eclipse Foundation\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\Eclipse Adoptium\\JRE",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\Eclipse Adoptium\\JRE",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\Eclipse Adoptium\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\Eclipse Adoptium\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\Microsoft\\JDK",
+            "Path",
+            "\\hotspot\\MSI",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\Azul Systems\\Zulu",
+            "InstallationPath",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\Azul Systems\\Zulu",
+            "InstallationPath",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_64KEY,
+            "SOFTWARE\\BellSoft\\Liberica",
+            "InstallationPath",
+            "",
+        ),
+        (
+            winreg::enums::KEY_WOW64_32KEY,
+            "SOFTWARE\\BellSoft\\Liberica",
+            "InstallationPath",
+            "",
+        ),
     ];
 
     for &(key_type, key_name, value_name, suffix) in registry_keys {

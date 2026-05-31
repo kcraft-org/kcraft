@@ -45,9 +45,13 @@ jobs:
           node-version: 20
       - name: Install Nuxt Frontend
         working-directory: crates/kcraft-gui/frontend
-        run: export NUXT_TELEMETRY_DISABLED=1 && npm ci
+        env:
+          NUXT_TELEMETRY_DISABLED: 1
+        run: npm ci
       - name: Build Nuxt Frontend
         working-directory: crates/kcraft-gui/frontend
-        run: export NUXT_TELEMETRY_DISABLED=1 && npm run generate
+        env:
+          NUXT_TELEMETRY_DISABLED: 1
+        run: npm run generate
       - name: Cargo Test
         run: cargo test --workspace --all-features

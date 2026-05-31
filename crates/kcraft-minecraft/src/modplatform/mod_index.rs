@@ -13,8 +13,7 @@ pub struct DonationData {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ExtraPackData {
     pub donate: Vec<DonationData>,
     pub issues_url: String,
@@ -23,7 +22,6 @@ pub struct ExtraPackData {
     pub discord_url: String,
     pub body: String,
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndexedVersion {
@@ -63,7 +61,9 @@ impl IndexedVersion {
 }
 
 impl Default for IndexedVersion {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -104,5 +104,7 @@ impl IndexedPack {
 }
 
 impl Default for IndexedPack {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

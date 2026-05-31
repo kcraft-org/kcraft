@@ -8,38 +8,78 @@ pub trait SettingValue: Send + Sync {
 }
 
 impl SettingValue for String {
-    fn as_any(&self) -> &dyn Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn Any { self }
-    fn clone_box(&self) -> Box<dyn SettingValue> { Box::new(self.clone()) }
-    fn to_value_string(&self) -> String { self.clone() }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+    fn clone_box(&self) -> Box<dyn SettingValue> {
+        Box::new(self.clone())
+    }
+    fn to_value_string(&self) -> String {
+        self.clone()
+    }
 }
 
 impl SettingValue for bool {
-    fn as_any(&self) -> &dyn Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn Any { self }
-    fn clone_box(&self) -> Box<dyn SettingValue> { Box::new(*self) }
-    fn to_value_string(&self) -> String { self.to_string() }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+    fn clone_box(&self) -> Box<dyn SettingValue> {
+        Box::new(*self)
+    }
+    fn to_value_string(&self) -> String {
+        self.to_string()
+    }
 }
 
 impl SettingValue for i32 {
-    fn as_any(&self) -> &dyn Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn Any { self }
-    fn clone_box(&self) -> Box<dyn SettingValue> { Box::new(*self) }
-    fn to_value_string(&self) -> String { self.to_string() }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+    fn clone_box(&self) -> Box<dyn SettingValue> {
+        Box::new(*self)
+    }
+    fn to_value_string(&self) -> String {
+        self.to_string()
+    }
 }
 
 impl SettingValue for i64 {
-    fn as_any(&self) -> &dyn Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn Any { self }
-    fn clone_box(&self) -> Box<dyn SettingValue> { Box::new(*self) }
-    fn to_value_string(&self) -> String { self.to_string() }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+    fn clone_box(&self) -> Box<dyn SettingValue> {
+        Box::new(*self)
+    }
+    fn to_value_string(&self) -> String {
+        self.to_string()
+    }
 }
 
 impl SettingValue for f64 {
-    fn as_any(&self) -> &dyn Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn Any { self }
-    fn clone_box(&self) -> Box<dyn SettingValue> { Box::new(*self) }
-    fn to_value_string(&self) -> String { self.to_string() }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+    fn clone_box(&self) -> Box<dyn SettingValue> {
+        Box::new(*self)
+    }
+    fn to_value_string(&self) -> String {
+        self.to_string()
+    }
 }
 
 pub struct Setting {
@@ -103,19 +143,35 @@ impl Setting {
     }
 
     pub fn get_bool(&self) -> bool {
-        self.value().as_any().downcast_ref::<bool>().copied().unwrap_or(false)
+        self.value()
+            .as_any()
+            .downcast_ref::<bool>()
+            .copied()
+            .unwrap_or(false)
     }
 
     pub fn get_i32(&self) -> i32 {
-        self.value().as_any().downcast_ref::<i32>().copied().unwrap_or(0)
+        self.value()
+            .as_any()
+            .downcast_ref::<i32>()
+            .copied()
+            .unwrap_or(0)
     }
 
     pub fn get_i64(&self) -> i64 {
-        self.value().as_any().downcast_ref::<i64>().copied().unwrap_or(0)
+        self.value()
+            .as_any()
+            .downcast_ref::<i64>()
+            .copied()
+            .unwrap_or(0)
     }
 
     pub fn get_f64(&self) -> f64 {
-        self.value().as_any().downcast_ref::<f64>().copied().unwrap_or(0.0)
+        self.value()
+            .as_any()
+            .downcast_ref::<f64>()
+            .copied()
+            .unwrap_or(0.0)
     }
 
     pub fn get_string(&self) -> String {

@@ -87,7 +87,10 @@ impl Default for BuildConfig {
 
 impl BuildConfig {
     pub fn version_string(&self) -> String {
-        format!("{}.{}.{}", self.version_major, self.version_minor, self.version_channel)
+        format!(
+            "{}.{}.{}",
+            self.version_major, self.version_minor, self.version_channel
+        )
     }
 
     pub fn printable_version_string(&self) -> String {

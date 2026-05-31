@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::sync::Mutex;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,15 +13,33 @@ pub enum TaskState {
 
 pub trait TaskRunner: Send {
     fn execute(&mut self) -> Result<(), String>;
-    fn abort(&mut self) -> bool { false }
-    fn can_abort(&self) -> bool { false }
-    fn status(&self) -> &str { "" }
-    fn progress(&self) -> (i64, i64) { (0, 100) }
-    fn is_multistep(&self) -> bool { false }
-    fn step_progress(&self) -> (i64, i64) { (0, 100) }
-    fn step_status(&self) -> String { String::new() }
-    fn warnings(&self) -> Vec<String> { Vec::new() }
-    fn fail_reason(&self) -> String { String::new() }
+    fn abort(&mut self) -> bool {
+        false
+    }
+    fn can_abort(&self) -> bool {
+        false
+    }
+    fn status(&self) -> &str {
+        ""
+    }
+    fn progress(&self) -> (i64, i64) {
+        (0, 100)
+    }
+    fn is_multistep(&self) -> bool {
+        false
+    }
+    fn step_progress(&self) -> (i64, i64) {
+        (0, 100)
+    }
+    fn step_status(&self) -> String {
+        String::new()
+    }
+    fn warnings(&self) -> Vec<String> {
+        Vec::new()
+    }
+    fn fail_reason(&self) -> String {
+        String::new()
+    }
 }
 
 pub struct Task {
@@ -47,24 +65,53 @@ impl Task {
         }
     }
 
-    pub fn state(&self) -> TaskState { self.state }
-    pub fn is_running(&self) -> bool { self.state == TaskState::Running }
-    pub fn is_finished(&self) -> bool {
-        matches!(self.state, TaskState::Succeeded | TaskState::Failed | TaskState::AbortedByUser)
+    pub fn state(&self) -> TaskState {
+        self.state
     }
-    pub fn was_successful(&self) -> bool { self.state == TaskState::Succeeded }
+    pub fn is_running(&self) -> bool {
+        self.state == TaskState::Running
+    }
+    pub fn is_finished(&self) -> bool {
+        matches!(
+            self.state,
+            TaskState::Succeeded | TaskState::Failed | TaskState::AbortedByUser
+        )
+    }
+    pub fn was_successful(&self) -> bool {
+        self.state == TaskState::Succeeded
+    }
 
-    pub fn status(&self) -> String { self.status.lock().unwrap().clone() }
-    pub fn progress(&self) -> (i64, i64) { *self.progress.lock().unwrap() }
-    pub fn fail_reason(&self) -> String { self.fail_reason.lock().unwrap().clone() }
-    pub fn warnings(&self) -> Vec<String> { self.warnings.lock().unwrap().clone() }
-    pub fn can_abort(&self) -> bool { self.can_abort }
+    pub fn status(&self) -> String {
+        self.status.lock().unwrap().clone()
+    }
+    pub fn progress(&self) -> (i64, i64) {
+        *self.progress.lock().unwrap()
+    }
+    pub fn fail_reason(&self) -> String {
+        self.fail_reason.lock().unwrap().clone()
+    }
+    pub fn warnings(&self) -> Vec<String> {
+        self.warnings.lock().unwrap().clone()
+    }
+    pub fn can_abort(&self) -> bool {
+        self.can_abort
+    }
 
-    pub fn set_abortable(&mut self, can_abort: bool) { self.can_abort = can_abort; }
-    pub fn set_status(&self, status: &str) { *self.status.lock().unwrap() = status.to_string(); }
-    pub fn set_progress(&self, current: i64, total: i64) { *self.progress.lock().unwrap() = (current, total); }
-    pub fn add_warning(&self, warning: &str) { self.warnings.lock().unwrap().push(warning.to_string()); }
-    pub fn set_fail_reason(&self, reason: &str) { *self.fail_reason.lock().unwrap() = reason.to_string(); }
+    pub fn set_abortable(&mut self, can_abort: bool) {
+        self.can_abort = can_abort;
+    }
+    pub fn set_status(&self, status: &str) {
+        *self.status.lock().unwrap() = status.to_string();
+    }
+    pub fn set_progress(&self, current: i64, total: i64) {
+        *self.progress.lock().unwrap() = (current, total);
+    }
+    pub fn add_warning(&self, warning: &str) {
+        self.warnings.lock().unwrap().push(warning.to_string());
+    }
+    pub fn set_fail_reason(&self, reason: &str) {
+        *self.fail_reason.lock().unwrap() = reason.to_string();
+    }
 
     pub fn abort(&self) -> bool {
         if self.can_abort {
@@ -102,7 +149,9 @@ impl Task {
 }
 
 impl Default for Task {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[allow(dead_code)]
@@ -152,8 +201,12 @@ impl TaskRunner for SequentialTask {
         true
     }
 
-    fn can_abort(&self) -> bool { true }
-    fn is_multistep(&self) -> bool { self.tasks.len() > 1 }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn is_multistep(&self) -> bool {
+        self.tasks.len() > 1
+    }
 }
 
 #[allow(dead_code)]
@@ -207,8 +260,12 @@ impl TaskRunner for ConcurrentTask {
         true
     }
 
-    fn can_abort(&self) -> bool { true }
-    fn is_multistep(&self) -> bool { self.tasks.len() > 1 }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn is_multistep(&self) -> bool {
+        self.tasks.len() > 1
+    }
 }
 
 #[allow(dead_code)]
@@ -250,6 +307,10 @@ impl TaskRunner for MultipleOptionsTask {
         true
     }
 
-    fn can_abort(&self) -> bool { true }
-    fn is_multistep(&self) -> bool { self.tasks.len() > 1 }
+    fn can_abort(&self) -> bool {
+        true
+    }
+    fn is_multistep(&self) -> bool {
+        self.tasks.len() > 1
+    }
 }

@@ -8,10 +8,26 @@ pub enum ATLPackType {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ATLModType {
-    Root, Forge, Jar, Mods, Flan, Dependency, Ic2Lib, DenLib,
-    Coremods, MCPC, Plugins, Extract, Decomp, TexturePack,
-    ResourcePack, ShaderPack, TexturePackExtract, ResourcePackExtract,
-    Millenaire, Unknown,
+    Root,
+    Forge,
+    Jar,
+    Mods,
+    Flan,
+    Dependency,
+    Ic2Lib,
+    DenLib,
+    Coremods,
+    MCPC,
+    Plugins,
+    Extract,
+    Decomp,
+    TexturePack,
+    ResourcePack,
+    ShaderPack,
+    TexturePackExtract,
+    ResourcePackExtract,
+    Millenaire,
+    Unknown,
 }
 
 impl std::str::FromStr for ATLModType {

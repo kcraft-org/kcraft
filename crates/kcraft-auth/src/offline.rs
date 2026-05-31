@@ -1,8 +1,8 @@
+use crate::{AuthFlow, Result};
 use kcraft_core::account::{
     AccountData, AccountState, AccountTaskState, AccountType, MinecraftEntitlement,
     MinecraftProfile, Skin, Token, Validity,
 };
-use crate::{AuthFlow, Result};
 
 pub struct OfflineFlow {
     username: String,

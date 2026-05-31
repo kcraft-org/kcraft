@@ -3,8 +3,8 @@ use std::sync::{Arc, RwLock};
 
 use crate::validator::Validator;
 use crate::{NetError, Result, TaskState};
-use md5::Digest;
 use kcraft_http_cache::MetaEntryPtr;
+use md5::Digest;
 use tracing::debug;
 
 pub trait Sink: Send + Sync {
@@ -43,8 +43,7 @@ impl FileSink {
 impl Sink for FileSink {
     fn init(&mut self) -> Result<TaskState> {
         if let Some(parent) = self.path.parent() {
-            std::fs::create_dir_all(parent)
-                .map_err(NetError::Io)?;
+            std::fs::create_dir_all(parent).map_err(NetError::Io)?;
         }
         let file = std::fs::OpenOptions::new()
             .create(true)
@@ -88,8 +87,7 @@ impl Sink for FileSink {
                 return Err(NetError::Validation("Validator failed".to_string()));
             }
         }
-        std::fs::rename(&self.tmp_path, &self.path)
-            .map_err(NetError::Io)?;
+        std::fs::rename(&self.tmp_path, &self.path).map_err(NetError::Io)?;
         Ok(TaskState::Succeeded)
     }
 
@@ -97,8 +95,12 @@ impl Sink for FileSink {
         self.path.exists() && self.path.metadata().map(|m| m.len() > 0).unwrap_or(false)
     }
 
-    fn as_any(&self) -> &dyn std::any::Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any { self }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 pub struct ByteArraySink {
@@ -157,8 +159,12 @@ impl Sink for ByteArraySink {
         !self.output.read().unwrap().is_empty()
     }
 
-    fn as_any(&self) -> &dyn std::any::Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any { self }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 pub struct MetaCacheSink {
@@ -222,10 +228,7 @@ impl Sink for MetaCacheSink {
         {
             let entry = self.entry.read().unwrap();
             if !entry.stale {
-                debug!(
-                    "Cache HIT: {} (etag={:?})",
-                    entry.relative_path, entry.etag
-                );
+                debug!("Cache HIT: {} (etag={:?})", entry.relative_path, entry.etag);
                 return Ok(TaskState::Succeeded);
             }
         }
@@ -293,6 +296,10 @@ impl Sink for MetaCacheSink {
         self.file_sink.has_local_data()
     }
 
-    fn as_any(&self) -> &dyn std::any::Any { self }
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any { self }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }

@@ -243,10 +243,7 @@ impl AccountData {
     }
 
     pub fn access_token(&self) -> &str {
-        self.yggdrasil_token
-            .token
-            .as_deref()
-            .unwrap_or("")
+        self.yggdrasil_token.token.as_deref().unwrap_or("")
     }
 
     pub fn profile_id(&self) -> &str {
@@ -263,13 +260,12 @@ impl AccountData {
 
     pub fn account_display_string(&self) -> String {
         match self.account_type {
-            AccountType::Msa => {
-                self.xbox_api_token
-                    .extra
-                    .get("gtg")
-                    .cloned()
-                    .unwrap_or_else(|| self.profile_name().to_string())
-            }
+            AccountType::Msa => self
+                .xbox_api_token
+                .extra
+                .get("gtg")
+                .cloned()
+                .unwrap_or_else(|| self.profile_name().to_string()),
             _ => self.user_name().to_string(),
         }
     }

@@ -13,16 +13,30 @@ pub struct GradleSpecifier {
 
 impl GradleSpecifier {
     pub fn parse(value: &str) -> Self {
-        let pattern = regex::Regex::new(
-            r"([^:@]+):([^:@]+):([^:@]+)(?::([^:@]+))?(?:@([^:@]+))?"
-        ).unwrap();
+        let pattern =
+            regex::Regex::new(r"([^:@]+):([^:@]+):([^:@]+)(?::([^:@]+))?(?:@([^:@]+))?").unwrap();
 
         if let Some(caps) = pattern.captures(value) {
-            let group_id = caps.get(1).map(|m| m.as_str().to_string()).unwrap_or_default();
-            let artifact_id = caps.get(2).map(|m| m.as_str().to_string()).unwrap_or_default();
-            let version = caps.get(3).map(|m| m.as_str().to_string()).unwrap_or_default();
-            let classifier = caps.get(4).map(|m| m.as_str().to_string()).unwrap_or_default();
-            let extension = caps.get(5).map(|m| m.as_str().to_string()).unwrap_or_else(|| "jar".to_string());
+            let group_id = caps
+                .get(1)
+                .map(|m| m.as_str().to_string())
+                .unwrap_or_default();
+            let artifact_id = caps
+                .get(2)
+                .map(|m| m.as_str().to_string())
+                .unwrap_or_default();
+            let version = caps
+                .get(3)
+                .map(|m| m.as_str().to_string())
+                .unwrap_or_default();
+            let classifier = caps
+                .get(4)
+                .map(|m| m.as_str().to_string())
+                .unwrap_or_default();
+            let extension = caps
+                .get(5)
+                .map(|m| m.as_str().to_string())
+                .unwrap_or_else(|| "jar".to_string());
 
             GradleSpecifier {
                 group_id,
@@ -84,15 +98,30 @@ impl GradleSpecifier {
             .map(|s| s.to_string())
             .unwrap_or_else(|| self.get_file_name());
         let path = self.group_id.replace('.', "/");
-        format!("{}/{}/{}/{}", path, self.artifact_id, self.version, filename)
+        format!(
+            "{}/{}/{}/{}",
+            path, self.artifact_id, self.version, filename
+        )
     }
 
-    pub fn valid(&self) -> bool { self.valid }
-    pub fn version(&self) -> &str { &self.version }
-    pub fn group_id(&self) -> &str { &self.group_id }
-    pub fn artifact_id(&self) -> &str { &self.artifact_id }
-    pub fn classifier(&self) -> &str { &self.classifier }
-    pub fn extension(&self) -> &str { &self.extension }
+    pub fn valid(&self) -> bool {
+        self.valid
+    }
+    pub fn version(&self) -> &str {
+        &self.version
+    }
+    pub fn group_id(&self) -> &str {
+        &self.group_id
+    }
+    pub fn artifact_id(&self) -> &str {
+        &self.artifact_id
+    }
+    pub fn classifier(&self) -> &str {
+        &self.classifier
+    }
+    pub fn extension(&self) -> &str {
+        &self.extension
+    }
     pub fn artifact_prefix(&self) -> String {
         format!("{}:{}", self.group_id, self.artifact_id)
     }

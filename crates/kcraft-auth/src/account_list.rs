@@ -4,7 +4,7 @@ use kcraft_core::account::{AccountData, AccountState, AccountType, Validity};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-use crate::{AuthFlow, AuthError, Result};
+use crate::{AuthError, AuthFlow, Result};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct AccountFile {
@@ -21,14 +21,20 @@ pub struct MinecraftAccount {
 
 impl MinecraftAccount {
     pub fn new(data: AccountData) -> Self {
-        MinecraftAccount { data, active: false }
+        MinecraftAccount {
+            data,
+            active: false,
+        }
     }
 
     pub fn create_offline(username: &str) -> Self {
         let mut data = AccountData::default();
         let mut flow = crate::OfflineFlow::new(username.to_string());
         let _ = flow.execute(&mut data);
-        MinecraftAccount { data, active: false }
+        MinecraftAccount {
+            data,
+            active: false,
+        }
     }
 
     pub fn is_active(&self) -> bool {
@@ -42,18 +48,20 @@ impl MinecraftAccount {
     pub fn save_to_json(&self) -> serde_json::Value {
         let mut map = serde_json::Map::new();
 
-        map.insert("type".to_string(), serde_json::Value::String(
-            match self.data.account_type {
+        map.insert(
+            "type".to_string(),
+            serde_json::Value::String(match self.data.account_type {
                 AccountType::Msa => "MSA".to_string(),
                 AccountType::AuthlibInjector => "Authlib-Injector".to_string(),
                 AccountType::Offline => "Offline".to_string(),
-            }
-        ));
+            }),
+        );
 
         if self.data.account_type == AccountType::Msa {
-            map.insert("msa-client-id".to_string(), serde_json::Value::String(
-                self.data.msa_client_id.clone()
-            ));
+            map.insert(
+                "msa-client-id".to_string(),
+                serde_json::Value::String(self.data.msa_client_id.clone()),
+            );
             if self.data.msa_token.token.is_some() {
                 map.insert("msa".to_string(), token_to_json(&self.data.msa_token));
             }
@@ -61,17 +69,24 @@ impl MinecraftAccount {
                 map.insert("utoken".to_string(), token_to_json(&self.data.user_token));
             }
             if self.data.xbox_api_token.token.is_some() {
-                map.insert("xrp-main".to_string(), token_to_json(&self.data.xbox_api_token));
+                map.insert(
+                    "xrp-main".to_string(),
+                    token_to_json(&self.data.xbox_api_token),
+                );
             }
             if self.data.mojangservices_token.token.is_some() {
-                map.insert("xrp-mc".to_string(), token_to_json(&self.data.mojangservices_token));
+                map.insert(
+                    "xrp-mc".to_string(),
+                    token_to_json(&self.data.mojangservices_token),
+                );
             }
         }
 
         if self.data.account_type == AccountType::AuthlibInjector {
-            map.insert("authlibInjectorUrl".to_string(), serde_json::Value::String(
-                self.data.authlib_injector_base_url.clone()
-            ));
+            map.insert(
+                "authlibInjectorUrl".to_string(),
+                serde_json::Value::String(self.data.authlib_injector_base_url.clone()),
+            );
         }
 
         map.insert("ygg".to_string(), token_to_json(&self.data.yggdrasil_token));
@@ -149,36 +164,83 @@ impl MinecraftAccount {
 
         if let Some(profile) = obj.get("profile") {
             if let Some(profile_obj) = profile.as_object() {
-                data.minecraft_profile.id = profile_obj.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
-                data.minecraft_profile.name = profile_obj.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                data.minecraft_profile.id = profile_obj
+                    .get("id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                data.minecraft_profile.name = profile_obj
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
                 if let Some(skin) = profile_obj.get("skin") {
                     if let Some(skin_obj) = skin.as_object() {
-                        data.minecraft_profile.skin.id = skin_obj.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
-                        data.minecraft_profile.skin.url = skin_obj.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string();
-                        data.minecraft_profile.skin.variant = skin_obj.get("variant").and_then(|v| v.as_str()).unwrap_or("classic").to_string();
-                        data.minecraft_profile.skin.data = skin_obj.get("data").and_then(|v| v.as_str()).map(|s| s.to_string());
+                        data.minecraft_profile.skin.id = skin_obj
+                            .get("id")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("")
+                            .to_string();
+                        data.minecraft_profile.skin.url = skin_obj
+                            .get("url")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("")
+                            .to_string();
+                        data.minecraft_profile.skin.variant = skin_obj
+                            .get("variant")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("classic")
+                            .to_string();
+                        data.minecraft_profile.skin.data = skin_obj
+                            .get("data")
+                            .and_then(|v| v.as_str())
+                            .map(|s| s.to_string());
                     }
                 }
                 if let Some(capes) = profile_obj.get("capes").and_then(|v| v.as_array()) {
                     for c in capes {
                         if let Some(co) = c.as_object() {
-                            data.minecraft_profile.capes.push(kcraft_core::account::Cape {
-                                id: co.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-                                url: co.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-                                alias: co.get("alias").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-                                data: None,
-                            });
+                            data.minecraft_profile
+                                .capes
+                                .push(kcraft_core::account::Cape {
+                                    id: co
+                                        .get("id")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("")
+                                        .to_string(),
+                                    url: co
+                                        .get("url")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("")
+                                        .to_string(),
+                                    alias: co
+                                        .get("alias")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("")
+                                        .to_string(),
+                                    data: None,
+                                });
                         }
                     }
                 }
-                data.minecraft_profile.current_cape = profile_obj.get("cape").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                data.minecraft_profile.current_cape = profile_obj
+                    .get("cape")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
             }
         }
 
         if let Some(entitlement) = obj.get("entitlement") {
             if let Some(eo) = entitlement.as_object() {
-                data.minecraft_entitlement.owns_minecraft = eo.get("ownsMinecraft").and_then(|v| v.as_bool()).unwrap_or(false);
-                data.minecraft_entitlement.can_play_minecraft = eo.get("canPlayMinecraft").and_then(|v| v.as_bool()).unwrap_or(false);
+                data.minecraft_entitlement.owns_minecraft = eo
+                    .get("ownsMinecraft")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
+                data.minecraft_entitlement.can_play_minecraft = eo
+                    .get("canPlayMinecraft")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
             }
         }
 
@@ -193,19 +255,30 @@ impl MinecraftAccount {
 fn token_to_json(token: &kcraft_core::account::Token) -> serde_json::Value {
     let mut map = serde_json::Map::new();
     if let Some(iat) = token.issue_instant {
-        map.insert("iat".to_string(), serde_json::Value::Number(serde_json::Number::from(iat)));
+        map.insert(
+            "iat".to_string(),
+            serde_json::Value::Number(serde_json::Number::from(iat)),
+        );
     }
     if let Some(exp) = token.not_after {
-        map.insert("exp".to_string(), serde_json::Value::Number(serde_json::Number::from(exp)));
+        map.insert(
+            "exp".to_string(),
+            serde_json::Value::Number(serde_json::Number::from(exp)),
+        );
     }
     if let Some(ref t) = token.token {
         map.insert("token".to_string(), serde_json::Value::String(t.clone()));
     }
     if let Some(ref rt) = token.refresh_token {
-        map.insert("refresh_token".to_string(), serde_json::Value::String(rt.clone()));
+        map.insert(
+            "refresh_token".to_string(),
+            serde_json::Value::String(rt.clone()),
+        );
     }
     if !token.extra.is_empty() {
-        let extra_map: serde_json::Map<String, serde_json::Value> = token.extra.iter()
+        let extra_map: serde_json::Map<String, serde_json::Value> = token
+            .extra
+            .iter()
             .map(|(k, v)| (k.clone(), serde_json::Value::String(v.clone())))
             .collect();
         map.insert("extra".to_string(), serde_json::Value::Object(extra_map));
@@ -222,13 +295,22 @@ fn token_from_json(json: &serde_json::Value) -> kcraft_core::account::Token {
     kcraft_core::account::Token {
         issue_instant: obj.get("iat").and_then(|v| v.as_i64()),
         not_after: obj.get("exp").and_then(|v| v.as_i64()),
-        token: obj.get("token").and_then(|v| v.as_str()).map(|s| s.to_string()),
-        refresh_token: obj.get("refresh_token").and_then(|v| v.as_str()).map(|s| s.to_string()),
-        extra: obj.get("extra")
+        token: obj
+            .get("token")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string()),
+        refresh_token: obj
+            .get("refresh_token")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string()),
+        extra: obj
+            .get("extra")
             .and_then(|v| v.as_object())
-            .map(|m| m.iter().map(|(k, v)| {
-                (k.clone(), v.as_str().unwrap_or("").to_string())
-            }).collect())
+            .map(|m| {
+                m.iter()
+                    .map(|(k, v)| (k.clone(), v.as_str().unwrap_or("").to_string()))
+                    .collect()
+            })
             .unwrap_or_default(),
         validity: Validity::Assumed,
         persistent: true,
@@ -314,11 +396,16 @@ impl AccountList {
     }
 
     pub fn profile_names(&self) -> Vec<String> {
-        self.accounts.iter().map(|a| a.data.profile_name().to_string()).collect()
+        self.accounts
+            .iter()
+            .map(|a| a.data.profile_name().to_string())
+            .collect()
     }
 
     pub fn any_account_is_valid(&self) -> bool {
-        self.accounts.iter().any(|a| a.data.validity == Validity::Certain)
+        self.accounts
+            .iter()
+            .any(|a| a.data.validity == Validity::Certain)
     }
 
     pub fn load(&mut self) -> Result<()> {
@@ -328,15 +415,18 @@ impl AccountList {
         let data = std::fs::read_to_string(&self.file_path)
             .map_err(|e| AuthError::Network(format!("Failed to read accounts file: {}", e)))?;
 
-        let file: AccountFile = serde_json::from_str(&data)
-            .map_err(|e| AuthError::Serialization(e.to_string()))?;
+        let file: AccountFile =
+            serde_json::from_str(&data).map_err(|e| AuthError::Serialization(e.to_string()))?;
 
         self.accounts.clear();
         self.default_account = None;
 
         for (i, json) in file.accounts.iter().enumerate() {
             if let Some(account) = MinecraftAccount::load_from_json(json) {
-                let is_active = json.get("active").and_then(|v| v.as_bool()).unwrap_or(false);
+                let is_active = json
+                    .get("active")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
                 if is_active {
                     self.default_account = Some(i);
                 }
@@ -344,14 +434,17 @@ impl AccountList {
             }
         }
 
-        debug!("Loaded {} accounts from {}", self.accounts.len(), self.file_path.display());
+        debug!(
+            "Loaded {} accounts from {}",
+            self.accounts.len(),
+            self.file_path.display()
+        );
         Ok(())
     }
 
     pub fn save(&self) -> Result<()> {
-        let accounts: Vec<serde_json::Value> = self.accounts.iter()
-            .map(|a| a.save_to_json())
-            .collect();
+        let accounts: Vec<serde_json::Value> =
+            self.accounts.iter().map(|a| a.save_to_json()).collect();
 
         let file = AccountFile {
             format_version: 3,
@@ -368,7 +461,11 @@ impl AccountList {
         kcraft_fs::write(&self.file_path, data.as_bytes())
             .map_err(|e| AuthError::Network(e.to_string()))?;
 
-        debug!("Saved {} accounts to {}", self.accounts.len(), self.file_path.display());
+        debug!(
+            "Saved {} accounts to {}",
+            self.accounts.len(),
+            self.file_path.display()
+        );
         Ok(())
     }
 

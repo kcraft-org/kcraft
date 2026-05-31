@@ -1,9 +1,9 @@
 use std::path::Path;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
-use crate::instance::MinecraftInstance;
 use crate::component::PackProfile;
+use crate::instance::MinecraftInstance;
 use crate::OpSys;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,10 @@ impl ComponentUpdate {
             if !component.loaded {
                 let result = self.load_component(component);
                 if let Err(e) = result {
-                    errors.push(format!("Failed to load component '{}': {}", component.uid, e));
+                    errors.push(format!(
+                        "Failed to load component '{}': {}",
+                        component.uid, e
+                    ));
                     if self.mode == UpdateMode::Launch {
                         return Err(errors);
                     }
@@ -107,10 +110,24 @@ impl MinecraftUpdate {
             self.instance.core_mods_dir(),
             self.instance.resource_packs_dir(),
             self.instance.jar_mods_dir(),
-            Path::new(&self.instance.game_root()).join("libraries").to_string_lossy().to_string(),
-            Path::new(&self.instance.game_root()).join("versions").to_string_lossy().to_string(),
-            Path::new(&self.instance.game_root()).join("assets").join("objects").to_string_lossy().to_string(),
-            Path::new(&self.instance.game_root()).join("assets").join("indexes").to_string_lossy().to_string(),
+            Path::new(&self.instance.game_root())
+                .join("libraries")
+                .to_string_lossy()
+                .to_string(),
+            Path::new(&self.instance.game_root())
+                .join("versions")
+                .to_string_lossy()
+                .to_string(),
+            Path::new(&self.instance.game_root())
+                .join("assets")
+                .join("objects")
+                .to_string_lossy()
+                .to_string(),
+            Path::new(&self.instance.game_root())
+                .join("assets")
+                .join("indexes")
+                .to_string_lossy()
+                .to_string(),
         ];
 
         for dir in &dirs {
@@ -230,7 +247,10 @@ impl MinecraftUpdate {
                     continue;
                 }
 
-                let url = format!("https://resources.download.minecraft.net/{}/{}", prefix, hash);
+                let url = format!(
+                    "https://resources.download.minecraft.net/{}/{}",
+                    prefix, hash
+                );
 
                 std::fs::create_dir_all(obj_path.parent().unwrap())
                     .map_err(|e| format!("Failed to create dir: {}", e))?;
@@ -269,14 +289,11 @@ fn download_file(url: &str, path: &Path) -> Result<(), String> {
         .error_for_status()
         .map_err(|e| format!("HTTP status error: {}", e))?;
 
-    let mut file = std::fs::File::create(path)
-        .map_err(|e| format!("File error: {}", e))?;
+    let mut file = std::fs::File::create(path).map_err(|e| format!("File error: {}", e))?;
 
-    let content = response.bytes()
-        .map_err(|e| format!("Read error: {}", e))?;
+    let content = response.bytes().map_err(|e| format!("Read error: {}", e))?;
 
-    std::io::copy(&mut content.as_ref(), &mut file)
-        .map_err(|e| format!("IO error: {}", e))?;
+    std::io::copy(&mut content.as_ref(), &mut file).map_err(|e| format!("IO error: {}", e))?;
 
     Ok(())
 }
