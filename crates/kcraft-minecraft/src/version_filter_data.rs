@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc, TimeZone};
+use chrono::{DateTime, TimeZone, Utc};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone)]
@@ -66,7 +66,7 @@ impl VersionFilterData {
             forge_installer_blacklist: forge_blacklist,
             legacy_cutoff_date: make_date(2014, 1, 1),
             lwjgl_whitelist: lwjgl,
-            java8_begins_date: make_date(2017, 3, 30),  // 17w13a
+            java8_begins_date: make_date(2017, 3, 30), // 17w13a
             java16_begins_date: make_date(2021, 5, 12), // 21w19a
             java17_begins_date: make_date(2021, 9, 15), // 1.18 Pre Release 2
         }

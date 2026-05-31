@@ -71,9 +71,10 @@ impl NetJob {
 
         self.state = TaskState::Running;
         let total = self.actions.len();
-        
+
         let temp_actions = std::mem::take(&mut self.actions);
-        let mut actions_opt: Vec<Option<NetActionKind>> = temp_actions.into_iter().map(Some).collect();
+        let mut actions_opt: Vec<Option<NetActionKind>> =
+            temp_actions.into_iter().map(Some).collect();
         let mut failed_indices = Vec::new();
 
         for attempt in 0..self.max_retries {
@@ -98,7 +99,7 @@ impl NetJob {
             for i in to_execute {
                 let permit = semaphore.clone().acquire_owned().await.unwrap();
                 let mut action = actions_opt[i].take().unwrap();
-                
+
                 join_handles.push(tokio::spawn(async move {
                     let res = match &mut action {
                         NetActionKind::Download(dl) => dl.execute(mode).await,
@@ -114,7 +115,7 @@ impl NetJob {
             for handle in join_handles {
                 let (i, returned_action, res) = handle.await.unwrap();
                 actions_opt[i] = Some(returned_action);
-                
+
                 if let Err(e) = res {
                     failed_indices.push(i);
                     debug!("Action {} failed (attempt {}): {}", i, attempt + 1, e);

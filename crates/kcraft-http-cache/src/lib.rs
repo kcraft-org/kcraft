@@ -116,7 +116,9 @@ impl HttpMetaCache {
     pub fn get_entry(&self, base_id: &str, path: &str) -> Option<MetaEntryPtr> {
         let bases = self.bases.read().unwrap();
         let base = bases.get(base_id)?;
-        base.entries.get(path).map(|e| Arc::new(RwLock::new(e.clone())))
+        base.entries
+            .get(path)
+            .map(|e| Arc::new(RwLock::new(e.clone())))
     }
 
     pub fn resolve_entry(
@@ -242,8 +244,8 @@ impl HttpMetaCache {
         }
         let data = std::fs::read_to_string(&self.index_path)
             .map_err(|e| format!("Failed to read cache index: {}", e))?;
-        let index: CacheIndex =
-            serde_json::from_str(&data).map_err(|e| format!("Failed to parse cache index: {}", e))?;
+        let index: CacheIndex = serde_json::from_str(&data)
+            .map_err(|e| format!("Failed to parse cache index: {}", e))?;
         let mut bases = self.bases.write().unwrap();
         for se in index.entries {
             let base_id = se.base;

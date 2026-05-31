@@ -1,38 +1,37 @@
-pub mod gradle_specifier;
-pub mod rule;
-pub mod mojang_download_info;
-pub mod library;
 pub mod agent;
-pub mod version_file;
-pub mod version_filter_data;
 pub mod assets;
-pub mod launch_profile;
 pub mod component;
+pub mod gradle_specifier;
 pub mod instance;
 pub mod instance_list;
 pub mod instance_task;
 pub mod launch;
-pub mod modplatform;
+pub mod launch_profile;
+pub mod library;
 pub mod meta;
-pub mod resource;
-pub mod update;
-pub mod world;
+pub mod modplatform;
+pub mod mojang_download_info;
 pub mod resolver;
+pub mod resource;
+pub mod rule;
+pub mod update;
+pub mod version_file;
+pub mod version_filter_data;
+pub mod world;
 
-pub use gradle_specifier::*;
-pub use rule::*;
-pub use mojang_download_info::*;
-pub use library::*;
 pub use agent::*;
-pub use version_file::*;
-pub use version_filter_data::*;
 pub use assets::*;
-pub use launch_profile::*;
 pub use component::*;
+pub use gradle_specifier::*;
 pub use instance::*;
 pub use launch::*;
+pub use launch_profile::*;
+pub use library::*;
+pub use mojang_download_info::*;
 pub use resolver::*;
-
+pub use rule::*;
+pub use version_file::*;
+pub use version_filter_data::*;
 
 #[derive(Debug, Clone)]
 pub struct AuthSession {
@@ -73,8 +72,7 @@ impl AuthSession {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum AuthSessionStatus {
     #[default]
     Undetermined,
@@ -85,7 +83,6 @@ pub enum AuthSessionStatus {
     PlayableOnline,
     GoneOrMigrated,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct JavaVersion {
@@ -101,8 +98,11 @@ impl JavaVersion {
     pub fn new(version: &str) -> Self {
         let mut jv = JavaVersion {
             string: version.to_string(),
-            major: 0, minor: 0, security: 0,
-            parseable: false, prerelease: String::new(),
+            major: 0,
+            minor: 0,
+            security: 0,
+            parseable: false,
+            prerelease: String::new(),
         };
         jv.parse();
         jv
@@ -110,7 +110,9 @@ impl JavaVersion {
 
     fn parse(&mut self) {
         let s = self.string.trim();
-        if s.is_empty() { return; }
+        if s.is_empty() {
+            return;
+        }
 
         // Try "1.X.Y" format (Java <= 8)
         if let Some(stripped) = s.strip_prefix("1.") {
@@ -118,7 +120,10 @@ impl JavaVersion {
             if let Ok(m) = parts[0].parse::<i32>() {
                 self.major = 1;
                 self.minor = m;
-                self.security = parts.get(1).and_then(|p| p.parse::<i32>().ok()).unwrap_or(0);
+                self.security = parts
+                    .get(1)
+                    .and_then(|p| p.parse::<i32>().ok())
+                    .unwrap_or(0);
                 self.parseable = true;
                 return;
             }
@@ -128,8 +133,14 @@ impl JavaVersion {
         let parts: Vec<&str> = s.splitn(3, '.').collect();
         if let Ok(m) = parts[0].parse::<i32>() {
             self.major = m;
-            self.minor = parts.get(1).and_then(|p| p.parse::<i32>().ok()).unwrap_or(0);
-            self.security = parts.get(2).and_then(|p| p.parse::<i32>().ok()).unwrap_or(0);
+            self.minor = parts
+                .get(1)
+                .and_then(|p| p.parse::<i32>().ok())
+                .unwrap_or(0);
+            self.security = parts
+                .get(2)
+                .and_then(|p| p.parse::<i32>().ok())
+                .unwrap_or(0);
             self.parseable = true;
         }
 
@@ -139,10 +150,18 @@ impl JavaVersion {
         }
     }
 
-    pub fn major(&self) -> i32 { self.major }
-    pub fn minor(&self) -> i32 { self.minor }
-    pub fn security(&self) -> i32 { self.security }
-    pub fn is_parseable(&self) -> bool { self.parseable }
+    pub fn major(&self) -> i32 {
+        self.major
+    }
+    pub fn minor(&self) -> i32 {
+        self.minor
+    }
+    pub fn security(&self) -> i32 {
+        self.security
+    }
+    pub fn is_parseable(&self) -> bool {
+        self.parseable
+    }
 
     pub fn requires_perm_gen(&self) -> bool {
         self.parseable && (self.major < 8 || (self.major == 1 && self.minor < 8))
@@ -160,10 +179,22 @@ pub enum OpSys {
 
 impl OpSys {
     pub fn current() -> Self {
-        #[cfg(target_os = "linux")] { OpSys::Linux }
-        #[cfg(target_os = "macos")] { OpSys::Osx }
-        #[cfg(target_os = "windows")] { OpSys::Windows }
-        #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))] { OpSys::Unknown }
+        #[cfg(target_os = "linux")]
+        {
+            OpSys::Linux
+        }
+        #[cfg(target_os = "macos")]
+        {
+            OpSys::Osx
+        }
+        #[cfg(target_os = "windows")]
+        {
+            OpSys::Windows
+        }
+        #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+        {
+            OpSys::Unknown
+        }
     }
 
     pub fn classifier(&self) -> &str {

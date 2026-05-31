@@ -1,13 +1,13 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use kcraft_auth::{AccountList, AuthFlow, MinecraftAccount};
 use kcraft_minecraft::instance::Instance;
 use kcraft_minecraft::instance_list::InstanceList;
 use kcraft_minecraft::launch::{
     CheckJavaStep, CreateGameFoldersStep, DirectJavaLaunchStep, LaunchTask, PrintInstanceInfoStep,
 };
-use kcraft_auth::{AccountList, MinecraftAccount, AuthFlow};
-use tauri::Emitter;
 use std::path::PathBuf;
+use tauri::Emitter;
 use tracing::info;
 
 fn data_root() -> PathBuf {
@@ -86,7 +86,7 @@ async fn add_elyby_account(username: String, token: String) -> Result<String, St
         id: kcraft_auth::generate_offline_uuid(&username),
         ..Default::default()
     };
-    
+
     let yggdrasil_token = kcraft_core::account::Token {
         token: Some(token),
         ..Default::default()
@@ -108,11 +108,14 @@ async fn add_elyby_account(username: String, token: String) -> Result<String, St
 async fn login_msa(app: tauri::AppHandle) -> Result<(), String> {
     let mut flow = kcraft_auth::MsaFlow::new_interactive(String::new());
     flow.set_verification_callback(move |uri, code, expires| {
-        let _ = app.emit("device-code", DeviceCodeEvent {
-            uri: uri.to_string(),
-            code: code.to_string(),
-            expires_in: expires,
-        });
+        let _ = app.emit(
+            "device-code",
+            DeviceCodeEvent {
+                uri: uri.to_string(),
+                code: code.to_string(),
+                expires_in: expires,
+            },
+        );
     });
 
     let mut data = kcraft_core::account::AccountData::default();
@@ -143,10 +146,7 @@ fn launch_instance(id: String) -> Result<String, String> {
 
     let inst = ptr.read();
 
-    let mut task = LaunchTask::new(Instance::new(
-        &inst.instance_root,
-        &inst.name,
-    ));
+    let mut task = LaunchTask::new(Instance::new(&inst.instance_root, &inst.name));
 
     let java = if inst.java_path.is_empty() {
         kcraft_java::find_java_paths()
@@ -162,10 +162,13 @@ fn launch_instance(id: String) -> Result<String, String> {
     task.append_step(Box::new(CreateGameFoldersStep));
 
     let mut direct = DirectJavaLaunchStep::new(&inst_dir_str);
-    
+
     let accounts_path = data_root().join("accounts.json");
     let account_list = AccountList::new(accounts_path);
-    if let Some(acc) = account_list.default_account().or_else(|| account_list.at(0)) {
+    if let Some(acc) = account_list
+        .default_account()
+        .or_else(|| account_list.at(0))
+    {
         let mut session = kcraft_minecraft::AuthSession::new(acc.data.profile_name());
         session.uuid = acc.data.profile_id().to_string();
         session.player_name = acc.data.profile_name().to_string();
@@ -185,7 +188,7 @@ fn launch_instance(id: String) -> Result<String, String> {
         }
         direct.set_session(session);
     }
-    
+
     task.append_step(Box::new(direct));
 
     task.execute()?;
@@ -195,8 +198,8 @@ fn launch_instance(id: String) -> Result<String, String> {
 
 #[tauri::command]
 async fn build_modpack(files: Vec<String>) -> Result<String, String> {
-    use kcraft_minecraft::resolver::{Resolver, DependencyNode, PackageId};
-    
+    use kcraft_minecraft::resolver::{DependencyNode, PackageId, Resolver};
+
     if files.is_empty() {
         return Err("No files provided".to_string());
     }
@@ -221,12 +224,11 @@ async fn build_modpack(files: Vec<String>) -> Result<String, String> {
     }
 
     match resolver.resolve(&roots) {
-        Ok(resolved) => {
-            Ok(format!("DAG Resolution successful: Installed {} packages with zero conflicts.", resolved.len()))
-        }
-        Err(e) => {
-            Err(format!("Resolution failed: {}", e))
-        }
+        Ok(resolved) => Ok(format!(
+            "DAG Resolution successful: Installed {} packages with zero conflicts.",
+            resolved.len()
+        )),
+        Err(e) => Err(format!("Resolution failed: {}", e)),
     }
 }
 
@@ -254,7 +256,13 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            list_instances, launch_instance, list_accounts, add_offline_account, add_elyby_account, login_msa, build_modpack
+            list_instances,
+            launch_instance,
+            list_accounts,
+            add_offline_account,
+            add_elyby_account,
+            login_msa,
+            build_modpack
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

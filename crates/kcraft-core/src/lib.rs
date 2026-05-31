@@ -1,19 +1,19 @@
-pub mod version;
 pub mod account;
-pub mod session;
 pub mod build_config;
 pub mod require;
 pub mod runtime;
+pub mod session;
 pub mod settings;
 pub mod task;
+pub mod version;
 
-pub use version::*;
 pub use account::*;
-pub use session::*;
 pub use build_config::*;
 pub use require::*;
 pub use runtime::*;
+pub use session::*;
 pub use settings::*;
+pub use version::*;
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -50,13 +50,21 @@ pub enum Platform {
 impl Platform {
     pub fn current() -> Self {
         #[cfg(target_os = "linux")]
-        { Platform::Linux }
+        {
+            Platform::Linux
+        }
         #[cfg(target_os = "macos")]
-        { Platform::Osx }
+        {
+            Platform::Osx
+        }
         #[cfg(target_os = "windows")]
-        { Platform::Windows }
+        {
+            Platform::Windows
+        }
         #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
-        { Platform::Unknown }
+        {
+            Platform::Unknown
+        }
     }
 
     pub fn classifier(&self) -> &str {

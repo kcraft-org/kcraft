@@ -1,12 +1,9 @@
-
-use kcraft_core::account::{
-    AccountData, AccountState, AccountTaskState, AccountType, Validity,
-};
+use kcraft_core::account::{AccountData, AccountState, AccountTaskState, AccountType, Validity};
 use tracing::{debug, info};
 
 use crate::parsers;
-use crate::{AuthFlow, Result};
 use crate::AuthError;
+use crate::{AuthFlow, Result};
 
 pub type VerificationCallback = Box<dyn Fn(&str, &str, i32) + Send>;
 
@@ -105,7 +102,11 @@ struct MsaTokenStep {
 
 impl crate::AuthStep for MsaTokenStep {
     fn describe(&self) -> &str {
-        if self.interactive { "MSA Login" } else { "MSA Refresh" }
+        if self.interactive {
+            "MSA Login"
+        } else {
+            "MSA Refresh"
+        }
     }
 
     fn perform(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
@@ -115,7 +116,9 @@ impl crate::AuthStep for MsaTokenStep {
                 data.msa_client_id = self.client_id.clone();
             }
             let client_id = if data.msa_client_id.is_empty() {
-                kcraft_core::build_config::BUILD_CONFIG.msa_client_id.clone()
+                kcraft_core::build_config::BUILD_CONFIG
+                    .msa_client_id
+                    .clone()
             } else {
                 data.msa_client_id.clone()
             };
@@ -125,12 +128,19 @@ impl crate::AuthStep for MsaTokenStep {
             }
 
             let client = reqwest::blocking::Client::new();
-            let resp = client.post("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode")
-                .form(&[("client_id", &client_id), ("scope", &"XboxLive.signin offline_access".to_string())])
-                .send().map_err(|e| AuthError::Network(e.to_string()))?;
-            
-            let resp_json: serde_json::Value = resp.json().map_err(|e| AuthError::InvalidResponse(e.to_string()))?;
-            
+            let resp = client
+                .post("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode")
+                .form(&[
+                    ("client_id", &client_id),
+                    ("scope", &"XboxLive.signin offline_access".to_string()),
+                ])
+                .send()
+                .map_err(|e| AuthError::Network(e.to_string()))?;
+
+            let resp_json: serde_json::Value = resp
+                .json()
+                .map_err(|e| AuthError::InvalidResponse(e.to_string()))?;
+
             let user_code = resp_json["user_code"].as_str().unwrap_or("");
             let device_code = resp_json["device_code"].as_str().unwrap_or("");
             let verification_uri = resp_json["verification_uri"].as_str().unwrap_or("");
@@ -139,7 +149,10 @@ impl crate::AuthStep for MsaTokenStep {
             if let Some(ref cb) = self.verification_callback {
                 cb(verification_uri, user_code, expires_in);
             } else {
-                info!("Please open {} and enter code: {}", verification_uri, user_code);
+                info!(
+                    "Please open {} and enter code: {}",
+                    verification_uri, user_code
+                );
             }
 
             let start = std::time::Instant::now();
@@ -149,19 +162,23 @@ impl crate::AuthStep for MsaTokenStep {
                 }
                 std::thread::sleep(std::time::Duration::from_secs(5));
 
-                let token_resp = client.post("https://login.microsoftonline.com/consumers/oauth2/v2.0/token")
+                let token_resp = client
+                    .post("https://login.microsoftonline.com/consumers/oauth2/v2.0/token")
                     .form(&[
                         ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
                         ("client_id", client_id.as_str()),
                         ("device_code", device_code),
                     ])
-                    .send().map_err(|e| AuthError::Network(e.to_string()))?;
+                    .send()
+                    .map_err(|e| AuthError::Network(e.to_string()))?;
 
                 if token_resp.status().is_success() {
-                    let token_json: serde_json::Value = token_resp.json().map_err(|e| AuthError::InvalidResponse(e.to_string()))?;
+                    let token_json: serde_json::Value = token_resp
+                        .json()
+                        .map_err(|e| AuthError::InvalidResponse(e.to_string()))?;
                     let access_token = token_json["access_token"].as_str().unwrap_or("");
                     let refresh_token = token_json["refresh_token"].as_str().unwrap_or("");
-                    
+
                     data.msa_token = kcraft_core::account::Token {
                         token: Some(access_token.to_string()),
                         refresh_token: Some(refresh_token.to_string()),
@@ -170,10 +187,14 @@ impl crate::AuthStep for MsaTokenStep {
                     };
                     break;
                 } else {
-                    let err_json: serde_json::Value = token_resp.json().unwrap_or(serde_json::Value::Null);
+                    let err_json: serde_json::Value =
+                        token_resp.json().unwrap_or(serde_json::Value::Null);
                     let err_str = err_json["error"].as_str().unwrap_or("");
                     if err_str != "authorization_pending" {
-                        return Err(AuthError::Auth(format!("Token polling failed: {}", err_str)));
+                        return Err(AuthError::Auth(format!(
+                            "Token polling failed: {}",
+                            err_str
+                        )));
                     }
                 }
             }
@@ -227,14 +248,21 @@ impl crate::AuthStep for XboxUserStep {
             )));
         }
 
-        let bytes = response.bytes().map_err(|e| AuthError::Network(e.to_string()))?;
+        let bytes = response
+            .bytes()
+            .map_err(|e| AuthError::Network(e.to_string()))?;
         let token = parsers::parse_x_token_response(&bytes).ok_or_else(|| {
             AuthError::InvalidResponse("Failed to parse Xbox user token response".to_string())
         })?;
 
         data.user_token = token;
 
-        let uhs = data.user_token.extra.get("uhs").cloned().unwrap_or_default();
+        let uhs = data
+            .user_token
+            .extra
+            .get("uhs")
+            .cloned()
+            .unwrap_or_default();
         debug!("Xbox user auth successful. uhs={}", uhs);
 
         Ok(AccountTaskState::Working)
@@ -252,9 +280,10 @@ impl crate::AuthStep for XboxAuthorizationStep {
     }
 
     fn perform(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
-        let user_token = data.user_token.token.as_deref().ok_or_else(|| {
-            AuthError::Auth("No user token for Xbox authorization".to_string())
-        })?;
+        let user_token =
+            data.user_token.token.as_deref().ok_or_else(|| {
+                AuthError::Auth("No user token for Xbox authorization".to_string())
+            })?;
 
         let body = serde_json::json!({
             "Properties": {
@@ -281,7 +310,9 @@ impl crate::AuthStep for XboxAuthorizationStep {
             )));
         }
 
-        let bytes = response.bytes().map_err(|e| AuthError::Network(e.to_string()))?;
+        let bytes = response
+            .bytes()
+            .map_err(|e| AuthError::Network(e.to_string()))?;
         let token = parsers::parse_x_token_response(&bytes).ok_or_else(|| {
             AuthError::InvalidResponse("Failed to parse XSTS token response".to_string())
         })?;
@@ -304,10 +335,17 @@ impl crate::AuthStep for LauncherLoginStep {
     }
 
     fn perform(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
-        let uhs = data.user_token.extra.get("uhs").cloned().unwrap_or_default();
-        let mc_token = data.mojangservices_token.token.as_deref().ok_or_else(|| {
-            AuthError::Auth("No Mojang services token".to_string())
-        })?;
+        let uhs = data
+            .user_token
+            .extra
+            .get("uhs")
+            .cloned()
+            .unwrap_or_default();
+        let mc_token = data
+            .mojangservices_token
+            .token
+            .as_deref()
+            .ok_or_else(|| AuthError::Auth("No Mojang services token".to_string()))?;
 
         let xtoken = format!("XBL3.0 x={};{}", uhs, mc_token);
 
@@ -331,14 +369,21 @@ impl crate::AuthStep for LauncherLoginStep {
             )));
         }
 
-        let bytes = response.bytes().map_err(|e| AuthError::Network(e.to_string()))?;
+        let bytes = response
+            .bytes()
+            .map_err(|e| AuthError::Network(e.to_string()))?;
         let token = parsers::parse_mojang_response(&bytes).ok_or_else(|| {
             AuthError::InvalidResponse("Failed to parse launcher login response".to_string())
         })?;
 
         data.yggdrasil_token = token;
 
-        let username = data.yggdrasil_token.extra.get("userName").cloned().unwrap_or_default();
+        let username = data
+            .yggdrasil_token
+            .extra
+            .get("userName")
+            .cloned()
+            .unwrap_or_default();
         debug!("Launcher login successful. username={}", username);
 
         Ok(AccountTaskState::Working)
@@ -353,15 +398,25 @@ impl crate::AuthStep for XboxProfileStep {
     }
 
     fn perform(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
-        let uhs = data.user_token.extra.get("uhs").cloned().unwrap_or_default();
-        let xbox_token = data.xbox_api_token.token.as_deref().ok_or_else(|| {
-            AuthError::Auth("No Xbox API token".to_string())
-        })?;
+        let uhs = data
+            .user_token
+            .extra
+            .get("uhs")
+            .cloned()
+            .unwrap_or_default();
+        let xbox_token = data
+            .xbox_api_token
+            .token
+            .as_deref()
+            .ok_or_else(|| AuthError::Auth("No Xbox API token".to_string()))?;
 
         let client = reqwest::blocking::Client::new();
         let response = client
             .get("https://profile.xboxlive.com/users/me/profile/settings")
-            .query(&[("settings", "GameDisplayName,PublicGamerpic,Gamerscore,Gamertag")])
+            .query(&[(
+                "settings",
+                "GameDisplayName,PublicGamerpic,Gamerscore,Gamertag",
+            )])
             .header("Authorization", format!("XBL3.0 x={};{}", uhs, xbox_token))
             .header("x-xbl-contract-version", "3")
             .send()
@@ -385,7 +440,9 @@ impl crate::AuthStep for XboxProfileStep {
                         if let Some(s_obj) = setting.as_object() {
                             if s_obj.get("id").and_then(|v| v.as_str()) == Some("Gamertag") {
                                 if let Some(gtg) = s_obj.get("value").and_then(|v| v.as_str()) {
-                                    data.xbox_api_token.extra.insert("gtg".to_string(), gtg.to_string());
+                                    data.xbox_api_token
+                                        .extra
+                                        .insert("gtg".to_string(), gtg.to_string());
                                     debug!("Xbox gamertag: {}", gtg);
                                 }
                             }
@@ -407,9 +464,10 @@ impl crate::AuthStep for EntitlementsStep {
     }
 
     fn perform(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
-        let ygg_token = data.yggdrasil_token.token.as_deref().ok_or_else(|| {
-            AuthError::Auth("No Yggdrasil token for entitlements".to_string())
-        })?;
+        let ygg_token =
+            data.yggdrasil_token.token.as_deref().ok_or_else(|| {
+                AuthError::Auth("No Yggdrasil token for entitlements".to_string())
+            })?;
 
         let client = reqwest::blocking::Client::new();
         let response = client
@@ -426,7 +484,9 @@ impl crate::AuthStep for EntitlementsStep {
             )));
         }
 
-        let bytes = response.bytes().map_err(|e| AuthError::Network(e.to_string()))?;
+        let bytes = response
+            .bytes()
+            .map_err(|e| AuthError::Network(e.to_string()))?;
         let entitlement = parsers::parse_minecraft_entitlements(&bytes).ok_or_else(|| {
             AuthError::InvalidResponse("Failed to parse entitlements".to_string())
         })?;
@@ -450,9 +510,11 @@ impl crate::AuthStep for MinecraftProfileStep {
     }
 
     fn perform(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
-        let ygg_token = data.yggdrasil_token.token.as_deref().ok_or_else(|| {
-            AuthError::Auth("No Yggdrasil token for profile".to_string())
-        })?;
+        let ygg_token = data
+            .yggdrasil_token
+            .token
+            .as_deref()
+            .ok_or_else(|| AuthError::Auth("No Yggdrasil token for profile".to_string()))?;
 
         let client = reqwest::blocking::Client::new();
         let response = client
@@ -468,7 +530,9 @@ impl crate::AuthStep for MinecraftProfileStep {
             )));
         }
 
-        let bytes = response.bytes().map_err(|e| AuthError::Network(e.to_string()))?;
+        let bytes = response
+            .bytes()
+            .map_err(|e| AuthError::Network(e.to_string()))?;
         let profile = parsers::parse_minecraft_profile(&bytes).ok_or_else(|| {
             AuthError::InvalidResponse("Failed to parse Minecraft profile".to_string())
         })?;

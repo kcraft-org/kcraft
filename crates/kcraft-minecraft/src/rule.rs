@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::OpSys;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RuleAction {
@@ -61,10 +61,24 @@ pub fn rules_from_json(rules: &[serde_json::Value]) -> Vec<Rule> {
             };
 
             if let Some(os_obj) = obj.get("os").and_then(|v| v.as_object()) {
-                let system = os_obj.get("name").and_then(|v| v.as_str()).map(|s| s.to_string());
-                let version_regex = os_obj.get("version").and_then(|v| v.as_str()).map(|s| s.to_string());
-                let arch = os_obj.get("arch").and_then(|v| v.as_str()).map(|s| s.to_string());
-                result.push(Rule::Os(OsRuleData { action, system, version_regex, arch }));
+                let system = os_obj
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+                let version_regex = os_obj
+                    .get("version")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+                let arch = os_obj
+                    .get("arch")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+                result.push(Rule::Os(OsRuleData {
+                    action,
+                    system,
+                    version_regex,
+                    arch,
+                }));
             } else {
                 result.push(Rule::Implicit(ImplicitRule { action }));
             }

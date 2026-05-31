@@ -50,8 +50,10 @@ impl Index {
 
     pub fn parse_index(&mut self, json: serde_json::Value) {
         let root = json.as_object().expect("expected object");
-        let lists_val = root.get("versionLists")
-            .and_then(|v| v.as_array()).cloned()
+        let lists_val = root
+            .get("versionLists")
+            .and_then(|v| v.as_array())
+            .cloned()
             .unwrap_or_default();
 
         for list_val in lists_val {
@@ -291,13 +293,21 @@ fn parse_meta_time(s: &str) -> Option<i64> {
 }
 
 fn parse_requires(arr: &[serde_json::Value]) -> Vec<MetaRequire> {
-    arr.iter().filter_map(|v| {
-        let obj = v.as_object()?;
-        let uid = obj.get("uid")?.as_str()?;
-        Some(MetaRequire {
-            uid: uid.to_string(),
-            equals: obj.get("equals").and_then(|v| v.as_str()).map(|s| s.to_string()),
-            suggests: obj.get("suggests").and_then(|v| v.as_str()).map(|s| s.to_string()),
+    arr.iter()
+        .filter_map(|v| {
+            let obj = v.as_object()?;
+            let uid = obj.get("uid")?.as_str()?;
+            Some(MetaRequire {
+                uid: uid.to_string(),
+                equals: obj
+                    .get("equals")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string()),
+                suggests: obj
+                    .get("suggests")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string()),
+            })
         })
-    }).collect()
+        .collect()
 }

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use crate::component::PackProfile;
 use crate::assets::assets_utils;
+use crate::component::PackProfile;
 
 #[derive(Debug, Clone)]
 pub struct InstanceSettings {
@@ -11,7 +11,9 @@ pub struct InstanceSettings {
 
 impl InstanceSettings {
     pub fn new() -> Self {
-        InstanceSettings { settings: HashMap::new() }
+        InstanceSettings {
+            settings: HashMap::new(),
+        }
     }
 
     pub fn get(&self, key: &str) -> Option<String> {
@@ -24,7 +26,9 @@ impl InstanceSettings {
 }
 
 impl Default for InstanceSettings {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub type MinecraftInstance = Instance;
@@ -119,23 +123,57 @@ impl Instance {
             let mut ini = kcraft_core::INIFile::new();
             ini.load(&content);
 
-            if let Some(v) = ini.get("name") { self.name = v.to_string(); }
-            if let Some(v) = ini.get("iconKey") { self.icon_key = v.to_string(); }
-            if let Some(v) = ini.get("notes") { self.notes = v.to_string(); }
-            if let Some(v) = ini.get("totalTimePlayed") { self.total_time_played = v.parse().unwrap_or(0); }
-            if let Some(v) = ini.get("lastLaunchTime") { self.last_launch_time = v.parse().unwrap_or(0); }
-            if let Some(v) = ini.get("JavaPath") { self.java_path = v.to_string(); }
-            if let Some(v) = ini.get("JavaVersion") { self.java_version = v.to_string(); }
-            if let Some(v) = ini.get("MinMemAlloc") { self.min_mem = v.parse().unwrap_or(512); }
-            if let Some(v) = ini.get("MaxMemAlloc") { self.max_mem = v.parse().unwrap_or(2048); }
-            if let Some(v) = ini.get("PermGen") { self.perm_gen = v.parse().unwrap_or(64); }
-            if let Some(v) = ini.get("JvmArgs") { self.jvm_args = v.to_string(); }
-            if let Some(v) = ini.get("ManagedPack") { self.managed_pack = v == "true"; }
-            if let Some(v) = ini.get("ManagedPackType") { self.managed_pack_type = v.to_string(); }
-            if let Some(v) = ini.get("ManagedPackID") { self.managed_pack_id = v.to_string(); }
-            if let Some(v) = ini.get("ManagedPackName") { self.managed_pack_name = v.to_string(); }
-            if let Some(v) = ini.get("ManagedPackVersionID") { self.managed_pack_version_id = v.to_string(); }
-            if let Some(v) = ini.get("ManagedPackVersionName") { self.managed_pack_version_name = v.to_string(); }
+            if let Some(v) = ini.get("name") {
+                self.name = v.to_string();
+            }
+            if let Some(v) = ini.get("iconKey") {
+                self.icon_key = v.to_string();
+            }
+            if let Some(v) = ini.get("notes") {
+                self.notes = v.to_string();
+            }
+            if let Some(v) = ini.get("totalTimePlayed") {
+                self.total_time_played = v.parse().unwrap_or(0);
+            }
+            if let Some(v) = ini.get("lastLaunchTime") {
+                self.last_launch_time = v.parse().unwrap_or(0);
+            }
+            if let Some(v) = ini.get("JavaPath") {
+                self.java_path = v.to_string();
+            }
+            if let Some(v) = ini.get("JavaVersion") {
+                self.java_version = v.to_string();
+            }
+            if let Some(v) = ini.get("MinMemAlloc") {
+                self.min_mem = v.parse().unwrap_or(512);
+            }
+            if let Some(v) = ini.get("MaxMemAlloc") {
+                self.max_mem = v.parse().unwrap_or(2048);
+            }
+            if let Some(v) = ini.get("PermGen") {
+                self.perm_gen = v.parse().unwrap_or(64);
+            }
+            if let Some(v) = ini.get("JvmArgs") {
+                self.jvm_args = v.to_string();
+            }
+            if let Some(v) = ini.get("ManagedPack") {
+                self.managed_pack = v == "true";
+            }
+            if let Some(v) = ini.get("ManagedPackType") {
+                self.managed_pack_type = v.to_string();
+            }
+            if let Some(v) = ini.get("ManagedPackID") {
+                self.managed_pack_id = v.to_string();
+            }
+            if let Some(v) = ini.get("ManagedPackName") {
+                self.managed_pack_name = v.to_string();
+            }
+            if let Some(v) = ini.get("ManagedPackVersionID") {
+                self.managed_pack_version_id = v.to_string();
+            }
+            if let Some(v) = ini.get("ManagedPackVersionName") {
+                self.managed_pack_version_name = v.to_string();
+            }
         }
     }
 
@@ -180,47 +218,80 @@ impl Instance {
     }
 
     pub fn bin_root(&self) -> String {
-        Path::new(&self.game_root()).join("bin").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("bin")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn get_native_path(&self) -> String {
-        Path::new(&self.instance_root).join("natives").to_string_lossy().to_string()
+        Path::new(&self.instance_root)
+            .join("natives")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn get_local_library_path(&self) -> String {
-        Path::new(&self.instance_root).join("libraries").to_string_lossy().to_string()
+        Path::new(&self.instance_root)
+            .join("libraries")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn jar_mods_dir(&self) -> String {
-        Path::new(&self.instance_root).join("jarmods").to_string_lossy().to_string()
+        Path::new(&self.instance_root)
+            .join("jarmods")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn mods_root(&self) -> String {
-        Path::new(&self.game_root()).join("mods").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("mods")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn core_mods_dir(&self) -> String {
-        Path::new(&self.game_root()).join("coremods").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("coremods")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn resource_packs_dir(&self) -> String {
-        Path::new(&self.game_root()).join("resourcepacks").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("resourcepacks")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn texture_packs_dir(&self) -> String {
-        Path::new(&self.game_root()).join("texturepacks").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("texturepacks")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn shader_packs_dir(&self) -> String {
-        Path::new(&self.game_root()).join("shaderpacks").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("shaderpacks")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn world_dir(&self) -> String {
-        Path::new(&self.game_root()).join("saves").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("saves")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn resources_dir(&self) -> String {
-        Path::new(&self.game_root()).join("resources").to_string_lossy().to_string()
+        Path::new(&self.game_root())
+            .join("resources")
+            .to_string_lossy()
+            .to_string()
     }
 
     pub fn get_class_path(&self) -> Vec<String> {
@@ -233,7 +304,9 @@ impl Instance {
                 }
             }
             if let Some(ref mj) = profile.main_jar {
-                let path = Path::new("versions").join(mj.name.version()).join(format!("{}.jar", mj.name.version()));
+                let path = Path::new("versions")
+                    .join(mj.name.version())
+                    .join(format!("{}.jar", mj.name.version()));
                 jars.push(path.to_string_lossy().to_string());
             }
         }
@@ -241,7 +314,8 @@ impl Instance {
     }
 
     pub fn get_main_class(&self) -> String {
-        self.components.get_profile()
+        self.components
+            .get_profile()
             .and_then(|p| p.main_class.clone())
             .unwrap_or_else(|| "net.minecraft.client.Minecraft".to_string())
     }
@@ -297,14 +371,35 @@ impl Instance {
         let mut out = HashMap::new();
         out.insert("INST_NAME".to_string(), self.name.clone());
         out.insert("INST_ID".to_string(), self.instance_root.clone());
-        out.insert("INST_DIR".to_string(), Path::new(&self.instance_root).canonicalize().unwrap_or_else(|_| Path::new(&self.instance_root).to_path_buf()).to_string_lossy().to_string());
-        out.insert("INST_MC_DIR".to_string(), Path::new(&self.game_root()).canonicalize().unwrap_or_else(|_| Path::new(&self.game_root()).to_path_buf()).to_string_lossy().to_string());
+        out.insert(
+            "INST_DIR".to_string(),
+            Path::new(&self.instance_root)
+                .canonicalize()
+                .unwrap_or_else(|_| Path::new(&self.instance_root).to_path_buf())
+                .to_string_lossy()
+                .to_string(),
+        );
+        out.insert(
+            "INST_MC_DIR".to_string(),
+            Path::new(&self.game_root())
+                .canonicalize()
+                .unwrap_or_else(|_| Path::new(&self.game_root()).to_path_buf())
+                .to_string_lossy()
+                .to_string(),
+        );
         out.insert("INST_JAVA".to_string(), self.java_path.clone());
-        out.insert("INST_JAVA_ARGS".to_string(), self.java_arguments().join(" "));
+        out.insert(
+            "INST_JAVA_ARGS".to_string(),
+            self.java_arguments().join(" "),
+        );
         out
     }
 
-    pub fn get_launch_script(&self, session: Option<&crate::AuthSession>, server: Option<&crate::MinecraftServerTarget>) -> String {
+    pub fn get_launch_script(
+        &self,
+        session: Option<&crate::AuthSession>,
+        server: Option<&crate::MinecraftServerTarget>,
+    ) -> String {
         let profile = match self.components.get_profile() {
             Some(p) => p,
             None => return String::new(),
@@ -332,7 +427,10 @@ impl Instance {
         if self.launch_maximized {
             script.push_str("windowParams max\n");
         } else {
-            script.push_str(&format!("windowParams {}x{}\n", self.window_width, self.window_height));
+            script.push_str(&format!(
+                "windowParams {}x{}\n",
+                self.window_width, self.window_height
+            ));
         }
 
         if let Some(s) = session {
@@ -356,7 +454,11 @@ impl Instance {
         script
     }
 
-    pub fn process_minecraft_args(&self, session: Option<&crate::AuthSession>, _server: Option<&crate::MinecraftServerTarget>) -> Vec<String> {
+    pub fn process_minecraft_args(
+        &self,
+        session: Option<&crate::AuthSession>,
+        _server: Option<&crate::MinecraftServerTarget>,
+    ) -> Vec<String> {
         let profile = match self.components.get_profile() {
             Some(p) => p,
             None => return Vec::new(),
@@ -383,19 +485,34 @@ impl Instance {
         }
 
         token_mapping.insert("profile_name".to_string(), self.name.clone());
-        token_mapping.insert("version_name".to_string(), profile.minecraft_version.clone().unwrap_or_default());
-        token_mapping.insert("version_type".to_string(), profile.type_.clone().unwrap_or_else(|| "release".to_string()));
+        token_mapping.insert(
+            "version_name".to_string(),
+            profile.minecraft_version.clone().unwrap_or_default(),
+        );
+        token_mapping.insert(
+            "version_type".to_string(),
+            profile
+                .type_
+                .clone()
+                .unwrap_or_else(|| "release".to_string()),
+        );
 
-        let abs_root_dir = Path::new(&self.game_root()).canonicalize()
+        let abs_root_dir = Path::new(&self.game_root())
+            .canonicalize()
             .unwrap_or_else(|_| Path::new(&self.game_root()).to_path_buf())
-            .to_string_lossy().to_string();
+            .to_string_lossy()
+            .to_string();
         token_mapping.insert("game_directory".to_string(), abs_root_dir);
 
-        token_mapping.insert("game_assets".to_string(), assets_utils::get_assets_dir(&profile.assets, &self.resources_dir()));
+        token_mapping.insert(
+            "game_assets".to_string(),
+            assets_utils::get_assets_dir(&profile.assets, &self.resources_dir()),
+        );
         token_mapping.insert("assets_root".to_string(), "assets".to_string());
         token_mapping.insert("assets_index_name".to_string(), profile.assets.clone());
 
-        let parts: Vec<String> = args_pattern.split(' ')
+        let parts: Vec<String> = args_pattern
+            .split(' ')
             .filter(|s| !s.is_empty())
             .map(|s| replace_tokens(s, &token_mapping))
             .collect();
@@ -455,13 +572,17 @@ impl MinecraftServerTarget {
     pub fn parse(full_address: &str) -> Self {
         let parts: Vec<&str> = full_address.split(':').collect();
         let address = parts[0].to_string();
-        let port = parts.get(1)
+        let port = parts
+            .get(1)
             .and_then(|p| p.parse::<u16>().ok())
             .unwrap_or(25565);
         MinecraftServerTarget { address, port }
     }
 
     pub fn new(address: &str, port: u16) -> Self {
-        MinecraftServerTarget { address: address.to_string(), port }
+        MinecraftServerTarget {
+            address: address.to_string(),
+            port,
+        }
     }
 }

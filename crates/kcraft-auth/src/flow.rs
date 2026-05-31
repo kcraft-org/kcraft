@@ -1,5 +1,5 @@
+use crate::{AuthError, AuthFlow, Result};
 use kcraft_core::account::{AccountData, AccountTaskState, Validity};
-use crate::{AuthFlow, Result, AuthError};
 
 pub enum FlowKind {
     Offline(crate::OfflineFlow),
@@ -46,7 +46,9 @@ pub fn dispatch_refresh(data: &mut AccountData) -> Result<AccountTaskState> {
         }
         kcraft_core::account::AccountType::AuthlibInjector => {
             if data.authlib_injector_base_url.is_empty() {
-                return Err(AuthError::Auth("Authlib-Injector base URL not set".to_string()));
+                return Err(AuthError::Auth(
+                    "Authlib-Injector base URL not set".to_string(),
+                ));
             }
             let mut flow = crate::AuthlibInjectorFlow::new_refresh(
                 data.profile_name().to_string(),

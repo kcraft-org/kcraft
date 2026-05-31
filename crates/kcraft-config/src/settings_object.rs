@@ -27,8 +27,7 @@ impl SettingsStorage for IniSettingsStorage {
         if !self.path.exists() {
             return Ok(HashMap::new());
         }
-        let ini = IniFile::load(&self.path)
-            .map_err(ConfigError::Parse)?;
+        let ini = IniFile::load(&self.path).map_err(ConfigError::Parse)?;
         Ok(ini.raw_values().clone())
     }
 
@@ -37,8 +36,7 @@ impl SettingsStorage for IniSettingsStorage {
         for (k, v) in values {
             ini.set(k, v);
         }
-        ini.save(&self.path)
-            .map_err(ConfigError::Parse)?;
+        ini.save(&self.path).map_err(ConfigError::Parse)?;
         Ok(())
     }
 }
@@ -77,7 +75,10 @@ impl SettingsObject {
     ) -> Setting {
         let setting = Setting::new(synonyms.clone(), default_value);
         let id = setting.id().to_string();
-        self.settings.write().unwrap().insert(id.clone(), setting.clone());
+        self.settings
+            .write()
+            .unwrap()
+            .insert(id.clone(), setting.clone());
         setting
     }
 
@@ -96,7 +97,9 @@ impl SettingsObject {
     pub fn get<T: crate::SettingValue + 'static + Clone>(&self, id: &str) -> Result<T> {
         let raw = self.raw_values.read().unwrap();
         let setting = self.settings.read().unwrap();
-        let s = setting.get(id).ok_or_else(|| ConfigError::SettingNotFound(id.to_string()))?;
+        let s = setting
+            .get(id)
+            .ok_or_else(|| ConfigError::SettingNotFound(id.to_string()))?;
 
         for key in s.config_keys() {
             if let Some(val) = raw.get(key) {
@@ -112,11 +115,20 @@ impl SettingsObject {
 
     pub fn set(&self, id: &str, value: &str) -> Result<()> {
         let setting = self.settings.read().unwrap();
-        let s = setting.get(id).ok_or_else(|| ConfigError::SettingNotFound(id.to_string()))?;
-        let key = s.config_keys().first().cloned().unwrap_or_else(|| id.to_string());
+        let s = setting
+            .get(id)
+            .ok_or_else(|| ConfigError::SettingNotFound(id.to_string()))?;
+        let key = s
+            .config_keys()
+            .first()
+            .cloned()
+            .unwrap_or_else(|| id.to_string());
         drop(setting);
 
-        self.raw_values.write().unwrap().insert(key.clone(), value.to_string());
+        self.raw_values
+            .write()
+            .unwrap()
+            .insert(key.clone(), value.to_string());
         self.maybe_save();
         Ok(())
     }
@@ -127,7 +139,9 @@ impl SettingsObject {
 
     pub fn reset(&self, id: &str) -> Result<()> {
         let setting = self.settings.read().unwrap();
-        let s = setting.get(id).ok_or_else(|| ConfigError::SettingNotFound(id.to_string()))?;
+        let s = setting
+            .get(id)
+            .ok_or_else(|| ConfigError::SettingNotFound(id.to_string()))?;
         for key in s.config_keys() {
             self.raw_values.write().unwrap().remove(key);
         }
@@ -180,19 +194,22 @@ impl SettingsObject {
 }
 
 fn parse_value<T: crate::SettingValue + 'static>(val: &str) -> Result<T> {
-    let value: Box<dyn std::any::Any> = if std::any::TypeId::of::<T>() == std::any::TypeId::of::<String>() {
-        Box::new(val.to_string())
-    } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<bool>() {
-        Box::new(val.parse::<bool>().unwrap_or(false))
-    } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<i32>() {
-        Box::new(val.parse::<i32>().unwrap_or(0))
-    } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<i64>() {
-        Box::new(val.parse::<i64>().unwrap_or(0))
-    } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<f64>() {
-        Box::new(val.parse::<f64>().unwrap_or(0.0))
-    } else {
-        return Err(ConfigError::TypeMismatch(std::any::type_name::<T>().to_string()));
-    };
+    let value: Box<dyn std::any::Any> =
+        if std::any::TypeId::of::<T>() == std::any::TypeId::of::<String>() {
+            Box::new(val.to_string())
+        } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<bool>() {
+            Box::new(val.parse::<bool>().unwrap_or(false))
+        } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<i32>() {
+            Box::new(val.parse::<i32>().unwrap_or(0))
+        } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<i64>() {
+            Box::new(val.parse::<i64>().unwrap_or(0))
+        } else if std::any::TypeId::of::<T>() == std::any::TypeId::of::<f64>() {
+            Box::new(val.parse::<f64>().unwrap_or(0.0))
+        } else {
+            return Err(ConfigError::TypeMismatch(
+                std::any::type_name::<T>().to_string(),
+            ));
+        };
     let boxed: Box<dyn std::any::Any> = value;
     let result = boxed.downcast::<T>().map(|b| *b);
     result.map_err(|_| ConfigError::TypeMismatch(std::any::type_name::<T>().to_string()))

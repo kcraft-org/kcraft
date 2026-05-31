@@ -43,8 +43,16 @@ pub fn flame_load_indexed_pack(obj: &serde_json::Value) -> IndexedPack {
 
     if let Some(authors) = obj.get("authors").and_then(|v| v.as_array()) {
         for author in authors {
-            let name = author.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
-            let url = author.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string();
+            let name = author
+                .get("name")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let url = author
+                .get("url")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
             pack.authors.push(ModpackAuthor { name, url });
         }
     }
@@ -53,10 +61,16 @@ pub fn flame_load_indexed_pack(obj: &serde_json::Value) -> IndexedPack {
 }
 
 pub fn flame_load_body(obj: &serde_json::Value) -> String {
-    obj.get("body").and_then(|v| v.as_str()).unwrap_or("").to_string()
+    obj.get("body")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string()
 }
 
-pub fn flame_load_indexed_pack_version(obj: &serde_json::Value, load_changelog: bool) -> IndexedVersion {
+pub fn flame_load_indexed_pack_version(
+    obj: &serde_json::Value,
+    load_changelog: bool,
+) -> IndexedVersion {
     let mut ver = IndexedVersion::new();
 
     if let Some(id) = obj.get("modId").and_then(|v| v.as_i64()) {
@@ -124,10 +138,10 @@ pub fn flame_load_indexed_pack_versions(versions: &mut IndexedPack, arr: &[serde
 }
 
 pub fn flame_load_manifest(filepath: &str) -> Result<FlameManifest, String> {
-    let content = std::fs::read_to_string(filepath)
-        .map_err(|e| format!("Cannot read manifest: {}", e))?;
-    let json: serde_json::Value = serde_json::from_str(&content)
-        .map_err(|e| format!("Cannot parse manifest: {}", e))?;
+    let content =
+        std::fs::read_to_string(filepath).map_err(|e| format!("Cannot read manifest: {}", e))?;
+    let json: serde_json::Value =
+        serde_json::from_str(&content).map_err(|e| format!("Cannot parse manifest: {}", e))?;
 
     let mut manifest = FlameManifest::new();
 
@@ -161,11 +175,16 @@ pub fn flame_load_manifest(filepath: &str) -> Result<FlameManifest, String> {
         for file in files {
             let project_id = file.get("projectID").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
             let file_id = file.get("fileID").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
-            let required = file.get("required").and_then(|v| v.as_bool()).unwrap_or(true);
+            let required = file
+                .get("required")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true);
 
             let mut pack_file = FlamePackFile::new(project_id, file_id);
             pack_file.required = required;
-            manifest.files.insert(manifest.files.len() as i32, pack_file);
+            manifest
+                .files
+                .insert(manifest.files.len() as i32, pack_file);
         }
     }
 
@@ -189,7 +208,8 @@ pub struct FlamePackFile {
 impl FlamePackFile {
     pub fn new(project_id: i32, file_id: i32) -> Self {
         FlamePackFile {
-            project_id, file_id,
+            project_id,
+            file_id,
             required: true,
             hash: String::new(),
             website_url: String::new(),
@@ -233,12 +253,16 @@ impl FlameManifest {
 }
 
 impl Default for FlameManifest {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub fn flame_api_search_url(args: &crate::modplatform::SearchArgs) -> String {
-    let mut url = format!("{}/mods/search?gameId=432&classId=6&index={}&pageSize=25",
-                          FLAME_BASE_URL, args.offset);
+    let mut url = format!(
+        "{}/mods/search?gameId=432&classId=6&index={}&pageSize=25",
+        FLAME_BASE_URL, args.offset
+    );
     if !args.search.is_empty() {
         url.push_str(&format!("&searchFilter={}", urlencoding(&args.search)));
     }
@@ -255,7 +279,8 @@ pub fn flame_api_search_url(args: &crate::modplatform::SearchArgs) -> String {
     if let Some(loader) = args.loaders.first() {
         let loader_id = match loader {
             crate::modplatform::ModLoaderType::Forge => "1",
-            crate::modplatform::ModLoaderType::Fabric | crate::modplatform::ModLoaderType::Quilt => "4",
+            crate::modplatform::ModLoaderType::Fabric
+            | crate::modplatform::ModLoaderType::Quilt => "4",
             crate::modplatform::ModLoaderType::NeoForge => "6",
             _ => "",
         };

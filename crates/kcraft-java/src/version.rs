@@ -39,26 +39,40 @@ impl JavaVersion {
 
         if let Some(caps) = pattern.captures(&self.raw) {
             self.parseable = true;
-            self.major = caps.name("major")
+            self.major = caps
+                .name("major")
                 .and_then(|m| m.as_str().parse().ok())
                 .unwrap_or(0);
-            self.minor = caps.name("minor")
+            self.minor = caps
+                .name("minor")
                 .and_then(|m| m.as_str().parse().ok())
                 .unwrap_or(0);
-            self.security = caps.name("security")
+            self.security = caps
+                .name("security")
                 .and_then(|m| m.as_str().parse().ok())
                 .unwrap_or(0);
-            self.prerelease = caps.name("prerelease")
+            self.prerelease = caps
+                .name("prerelease")
                 .map(|m| m.as_str().to_string())
                 .unwrap_or_default();
         }
     }
 
-    pub fn major(&self) -> i32 { self.major }
-    pub fn minor(&self) -> i32 { self.minor }
-    pub fn security(&self) -> i32 { self.security }
-    pub fn raw(&self) -> &str { &self.raw }
-    pub fn is_parseable(&self) -> bool { self.parseable }
+    pub fn major(&self) -> i32 {
+        self.major
+    }
+    pub fn minor(&self) -> i32 {
+        self.minor
+    }
+    pub fn security(&self) -> i32 {
+        self.security
+    }
+    pub fn raw(&self) -> &str {
+        &self.raw
+    }
+    pub fn is_parseable(&self) -> bool {
+        self.parseable
+    }
 
     pub fn requires_perm_gen(&self) -> bool {
         if self.parseable {
@@ -94,7 +108,11 @@ impl Ord for JavaVersion {
         }
 
         let disc = |major: i32| -> i32 {
-            if major > 8 { -major } else { major }
+            if major > 8 {
+                -major
+            } else {
+                major
+            }
         };
 
         match disc(self.major).cmp(&disc(other.major)) {
@@ -161,7 +179,7 @@ mod tests {
         assert!(v1 < v2);
         assert!(v2 > v1);
         assert!(v1 == v5);
-        assert!(v3 < v4);  // 17 < 11 (because major > 8 is negated)
+        assert!(v3 < v4); // 17 < 11 (because major > 8 is negated)
     }
 
     #[test]
