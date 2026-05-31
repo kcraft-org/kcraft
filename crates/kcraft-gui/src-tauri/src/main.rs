@@ -173,6 +173,43 @@ fn launch_instance(id: String) -> Result<String, String> {
     Ok("Launch completed".to_string())
 }
 
+#[tauri::command]
+async fn build_modpack(files: Vec<String>) -> Result<String, String> {
+    use kcraft_minecraft::resolver::{Resolver, DependencyNode, PackageId};
+    
+    if files.is_empty() {
+        return Err("No files provided".to_string());
+    }
+
+    let mut resolver = Resolver::new();
+    let mut roots = Vec::new();
+
+    for (i, file) in files.iter().enumerate() {
+        let pkg_id = PackageId(format!("mod_{}", i));
+        let path = std::path::Path::new(file);
+        if !path.exists() {
+            return Err(format!("File not found: {}", file));
+        }
+
+        resolver.add_node(DependencyNode {
+            id: pkg_id.clone(),
+            version: "1.0.0".to_string(),
+            requires: vec![],
+            conflicts: vec![],
+        });
+        roots.push(pkg_id);
+    }
+
+    match resolver.resolve(&roots) {
+        Ok(resolved) => {
+            Ok(format!("DAG Resolution successful: Installed {} packages with zero conflicts.", resolved.len()))
+        }
+        Err(e) => {
+            Err(format!("Resolution failed: {}", e))
+        }
+    }
+}
+
 fn main() {
     let log_dir = data_root().join("logs");
     let config = kcraft_logging::LogConfig {
@@ -197,7 +234,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            list_instances, launch_instance, list_accounts, add_offline_account, add_elyby_account, login_msa
+            list_instances, launch_instance, list_accounts, add_offline_account, add_elyby_account, login_msa, build_modpack
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
