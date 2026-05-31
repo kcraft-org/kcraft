@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        default: 'Debug'
+        type: string
+      version:
+        description: Version identifier
+        type: string
+        required: false
+    secrets:
+      SPARKLE_ED25519_KEY:
+        required: false
+
+jobs:
+  rust:
+    uses: ./.github/workflows/rust.yml
+    with:
+      build_type: ${{ github.event.inputs.build_type || 'Debug' }}
+      version: ${{ inputs.version }}
