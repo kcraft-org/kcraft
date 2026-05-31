@@ -1,12 +1,11 @@
 {
   "productName": "KCraft",
   "version": "1.0.0",
-  "identifier": "org.kcraft.app",
+  "identifier": "org.kcraft.launcher",
   "build": {
     "frontendDist": "../frontend/.output/public",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "cd ../frontend && npm run dev",
-    "beforeBuildCommand": "cd ../frontend && npm run generate"
+    "beforeDevCommand": "cd ../frontend && npm run dev"
   },
   "app": {
     "windows": [

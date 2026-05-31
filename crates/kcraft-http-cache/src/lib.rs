@@ -154,7 +154,10 @@ impl HttpMetaCache {
                         if let Ok(data) = std::fs::read(&full_path) {
                             use md5::Digest;
                             let hash = md5::Md5::digest(&data);
-                            let md5_hex = hash.iter().map(|b| format!("{:02x}", b)).collect::<String>();
+                            let md5_hex = hash
+                                .iter()
+                                .map(|b| format!("{:02x}", b))
+                                .collect::<String>();
                             if md5_hex != entry.md5sum {
                                 drop(bases);
                                 return self.stale_entry(base_id, path);
