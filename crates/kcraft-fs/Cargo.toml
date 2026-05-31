@@ -1,0 +1,15 @@
+[package]
+name = "kcraft-fs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tracing = { workspace = true }
+thiserror = { workspace = true }
+tempfile = { workspace = true }
+walkdir = { workspace = true }
+path-clean = { workspace = true }
+filetime = { workspace = true }
+which = { workspace = true }
+serde = { workspace = true }

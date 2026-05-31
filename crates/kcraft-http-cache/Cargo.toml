@@ -1,0 +1,16 @@
+[package]
+name = "kcraft-http-cache"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+md-5 = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+url = { workspace = true }
+kcraft-core = { path = "../kcraft-core" }
+kcraft-fs = { path = "../kcraft-fs" }
