@@ -37,7 +37,7 @@
     "updater": {
       "pubkey": "UPDATE_PUBKEY_HERE",
       "endpoints": [
-        "https://kcraft.org/releases/{{target}}/{{current_version}}"
+        "https://github.com/kcraft-org/kcraft/releases/latest/download/latest.json"
       ]
     }
   }
