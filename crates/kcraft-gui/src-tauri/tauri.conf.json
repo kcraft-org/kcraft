@@ -32,5 +32,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "UPDATE_PUBKEY_HERE",
+      "endpoints": [
+        "https://kcraft.org/releases/{{target}}/{{current_version}}"
+      ]
+    }
   }
 }

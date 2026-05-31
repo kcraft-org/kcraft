@@ -18,6 +18,7 @@ kcraft-java.workspace = true
 kcraft-minecraft.workspace = true
 kcraft-auth = { path = "../../kcraft-auth" }
 dirs = "6"
+tauri-plugin-updater = "2.0.0"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
