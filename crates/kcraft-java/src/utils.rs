@@ -30,7 +30,9 @@ pub fn get_default_java() -> JavaInstall {
 fn add_javas_from_env(mut javas: Vec<String>) -> Vec<String> {
     if let Ok(env) = std::env::var("KCRAFT_JAVA_PATHS") {
         #[cfg(target_os = "windows")]
-        let paths: Vec<&str> = env.replace('\\', "/").split(';').collect();
+        let env_normalized = env.replace('\\', "/");
+        #[cfg(target_os = "windows")]
+        let paths: Vec<&str> = env_normalized.split(';').collect();
         #[cfg(not(target_os = "windows"))]
         let paths: Vec<&str> = env.split(':').collect();
 

@@ -57,7 +57,8 @@ impl Default for BuildConfig {
             build_platform: Self::detect_platform(),
             user_agent: "KCraft/1.0".to_string(),
             user_agent_uncached: "KCraft/1.0".to_string(),
-            meta_url: "https://raw.githubusercontent.com/kcraft-org/kcraft-meta/master/v1/".to_string(),
+            meta_url: "https://raw.githubusercontent.com/kcraft-org/kcraft-meta/master/v1/"
+                .to_string(),
             msa_client_id: String::new(),
             flame_api_key: String::new(),
             imgur_client_id: String::new(),
