@@ -19,7 +19,11 @@ impl Default for LogConfig {
             #[cfg(target_os = "linux")]
             {
                 if let Ok(home) = std::env::var("HOME") {
-                    PathBuf::from(home).join(".local").join("share").join("kcraft").join("logs")
+                    PathBuf::from(home)
+                        .join(".local")
+                        .join("share")
+                        .join("kcraft")
+                        .join("logs")
                 } else {
                     PathBuf::from("kcraft_logs")
                 }
@@ -80,17 +84,17 @@ impl LogManager {
     }
 
     pub fn init(self) {
-        let level_filter: tracing_subscriber::filter::LevelFilter =
-            self.config.log_level.parse().unwrap_or(tracing_subscriber::filter::LevelFilter::DEBUG);
+        let level_filter: tracing_subscriber::filter::LevelFilter = self
+            .config
+            .log_level
+            .parse()
+            .unwrap_or(tracing_subscriber::filter::LevelFilter::DEBUG);
 
         let layer = LogLayer {
             manager: std::sync::Arc::new(self),
         };
 
-        Registry::default()
-            .with(layer)
-            .with(level_filter)
-            .init();
+        Registry::default().with(layer).with(level_filter).init();
     }
 }
 

@@ -39,7 +39,10 @@ impl MojangAssetIndexInfo {
         let url = if id == "legacy" {
             "https://piston-meta.mojang.com/mc/assets/legacy/c0fd82e8ce9fbc93119e40d96d5a4e62cfa3f729/legacy.json".to_string()
         } else {
-            format!("https://s3.amazonaws.com/Minecraft.Download/indexes/{}.json", id)
+            format!(
+                "https://s3.amazonaws.com/Minecraft.Download/indexes/{}.json",
+                id
+            )
         };
         MojangAssetIndexInfo {
             id,

@@ -1,12 +1,12 @@
-pub mod version;
+pub mod checker;
 pub mod install;
 pub mod utils;
-pub mod checker;
+pub mod version;
 
-pub use version::*;
+pub use checker::*;
 pub use install::*;
 pub use utils::*;
-pub use checker::*;
+pub use version::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum JavaError {

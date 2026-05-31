@@ -40,11 +40,19 @@ impl Default for RuntimeContext {
 
 fn current_system() -> &'static str {
     #[cfg(target_os = "linux")]
-    { "linux" }
+    {
+        "linux"
+    }
     #[cfg(target_os = "macos")]
-    { "osx" }
+    {
+        "osx"
+    }
     #[cfg(target_os = "windows")]
-    { "windows" }
+    {
+        "windows"
+    }
     #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
-    { "unknown" }
+    {
+        "unknown"
+    }
 }

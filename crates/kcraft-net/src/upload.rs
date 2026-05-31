@@ -66,10 +66,7 @@ impl Upload {
         let status = response.status();
         if !status.is_success() {
             self.state = TaskState::Failed;
-            return Err(NetError::HttpError(
-                status.as_u16(),
-                status.to_string(),
-            ));
+            return Err(NetError::HttpError(status.as_u16(), status.to_string()));
         }
 
         let bytes = response.bytes().await.map_err(NetError::from)?;

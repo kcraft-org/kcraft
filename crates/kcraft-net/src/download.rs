@@ -6,7 +6,7 @@ use reqwest::Client;
 use tracing::warn;
 use url::Url;
 
-use crate::sink::{FileSink, MetaCacheSink, ByteArraySink, Sink};
+use crate::sink::{ByteArraySink, FileSink, MetaCacheSink, Sink};
 use crate::validator::Validator;
 use crate::{NetError, NetMode, Result, TaskState};
 use kcraft_core::BUILD_CONFIG;
@@ -36,10 +36,7 @@ impl Download {
         }
     }
 
-    pub fn make_cached(
-        url: Url,
-        entry: MetaEntryPtr,
-    ) -> Self {
+    pub fn make_cached(url: Url, entry: MetaEntryPtr) -> Self {
         let path = {
             let e = entry.read().unwrap();
             PathBuf::from(&e.base_path).join(&e.relative_path)
@@ -152,7 +149,9 @@ impl Download {
                     if val.contains("max-age=") {
                         if let Some(pos) = val.find("max-age=") {
                             let age_str = &val[pos + 8..];
-                            let age_end = age_str.find(|c: char| !c.is_ascii_digit()).unwrap_or(age_str.len());
+                            let age_end = age_str
+                                .find(|c: char| !c.is_ascii_digit())
+                                .unwrap_or(age_str.len());
                             if let Ok(max_age) = age_str[..age_end].parse::<i64>() {
                                 sink.set_cache_control(Some(max_age));
                             }
@@ -173,10 +172,7 @@ impl Download {
         let status = response.status();
         if !status.is_success() {
             self.state = TaskState::Failed;
-            return Err(NetError::HttpError(
-                status.as_u16(),
-                status.to_string(),
-            ));
+            return Err(NetError::HttpError(status.as_u16(), status.to_string()));
         }
 
         let bytes = response.bytes().await.map_err(NetError::from)?;

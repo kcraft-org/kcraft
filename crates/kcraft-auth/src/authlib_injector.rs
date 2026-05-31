@@ -1,9 +1,9 @@
-use kcraft_core::account::{AccountData, AccountType, AccountTaskState, AccountState};
+use kcraft_core::account::{AccountData, AccountState, AccountTaskState, AccountType};
 use tracing::info;
 
-use crate::yggdrasil::{YggdrasilFlow, get_yggdrasil_base_url};
 use crate::parsers;
-use crate::{AuthFlow, AuthError, Result};
+use crate::yggdrasil::{get_yggdrasil_base_url, YggdrasilFlow};
+use crate::{AuthError, AuthFlow, Result};
 
 pub struct AuthlibInjectorFlow {
     username: String,
@@ -51,7 +51,9 @@ impl AuthFlow for AuthlibInjectorFlow {
         let mut ygg_flow = if let Some(ref password) = self.password {
             let mut flow = YggdrasilFlow::new_login(password.clone());
             flow.set_base_url(api_location.clone());
-            data.yggdrasil_token.extra.insert("userName".to_string(), self.username.clone());
+            data.yggdrasil_token
+                .extra
+                .insert("userName".to_string(), self.username.clone());
             flow
         } else {
             let mut flow = YggdrasilFlow::new_refresh();
@@ -67,7 +69,10 @@ impl AuthFlow for AuthlibInjectorFlow {
 
         let profile_id = data.profile_id().to_string();
         if !profile_id.is_empty() {
-            let url = format!("{}/session/minecraft/profile/{}", session_server, profile_id);
+            let url = format!(
+                "{}/session/minecraft/profile/{}",
+                session_server, profile_id
+            );
             let client = reqwest::blocking::Client::new();
             let response = client
                 .get(&url)
@@ -75,14 +80,19 @@ impl AuthFlow for AuthlibInjectorFlow {
                 .map_err(|e| AuthError::Network(e.to_string()))?;
 
             if response.status().is_success() {
-                let bytes = response.bytes().map_err(|e| AuthError::Network(e.to_string()))?;
+                let bytes = response
+                    .bytes()
+                    .map_err(|e| AuthError::Network(e.to_string()))?;
                 if let Some(profile) = parsers::parse_minecraft_profile_mojang(&bytes) {
                     data.minecraft_profile = profile;
                 }
             }
         }
 
-        info!("Authlib-Injector auth successful for {} at {}", self.username, self.base_url);
+        info!(
+            "Authlib-Injector auth successful for {} at {}",
+            self.username, self.base_url
+        );
         data.account_state = AccountState::Online;
         Ok(AccountTaskState::Succeeded)
     }

@@ -118,10 +118,7 @@ impl JavaChecker {
         let status = output.status;
 
         if !status.success() {
-            tracing::warn!(
-                "Java checker failed with exit code {:?}",
-                status.code()
-            );
+            tracing::warn!("Java checker failed with exit code {:?}", status.code());
             return result;
         }
 
@@ -164,7 +161,11 @@ impl JavaChecker {
 
         result.validity = JavaValidity::Valid;
         result.is_64bit = is_64;
-        result.mojang_platform = if is_64 { "64".to_string() } else { "32".to_string() };
+        result.mojang_platform = if is_64 {
+            "64".to_string()
+        } else {
+            "32".to_string()
+        };
         result.real_platform = os_arch;
         result.java_version = JavaVersion::new(&java_version_str);
         result.java_vendor = java_vendor;
@@ -205,7 +206,10 @@ pub fn get_java_check_path() -> String {
 fn clean_environment() -> HashMap<String, String> {
     let mut env = HashMap::new();
     for (key, value) in std::env::vars_os() {
-        env.insert(key.to_string_lossy().to_string(), value.to_string_lossy().to_string());
+        env.insert(
+            key.to_string_lossy().to_string(),
+            value.to_string_lossy().to_string(),
+        );
     }
     env
 }

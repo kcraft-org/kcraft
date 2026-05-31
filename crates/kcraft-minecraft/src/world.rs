@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum GameType {
     Unknown = -1,
     #[default]
@@ -23,7 +22,6 @@ impl GameType {
         }
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct World {
@@ -61,16 +59,36 @@ impl World {
         world
     }
 
-    pub fn folder_name(&self) -> &str { &self.folder_name }
-    pub fn name(&self) -> &str { &self.actual_name }
-    pub fn icon_file(&self) -> &str { &self.icon_file }
-    pub fn bytes(&self) -> i64 { self.size }
-    pub fn last_played(&self) -> i64 { self.last_played }
-    pub fn game_type(&self) -> GameType { self.game_type }
-    pub fn seed(&self) -> i64 { self.random_seed }
-    pub fn is_valid(&self) -> bool { self.is_valid }
-    pub fn is_on_fs(&self) -> bool { self.container_path.is_dir() }
-    pub fn container(&self) -> &Path { &self.container_path }
+    pub fn folder_name(&self) -> &str {
+        &self.folder_name
+    }
+    pub fn name(&self) -> &str {
+        &self.actual_name
+    }
+    pub fn icon_file(&self) -> &str {
+        &self.icon_file
+    }
+    pub fn bytes(&self) -> i64 {
+        self.size
+    }
+    pub fn last_played(&self) -> i64 {
+        self.last_played
+    }
+    pub fn game_type(&self) -> GameType {
+        self.game_type
+    }
+    pub fn seed(&self) -> i64 {
+        self.random_seed
+    }
+    pub fn is_valid(&self) -> bool {
+        self.is_valid
+    }
+    pub fn is_on_fs(&self) -> bool {
+        self.container_path.is_dir()
+    }
+    pub fn container(&self) -> &Path {
+        &self.container_path
+    }
 
     pub fn destroy(&mut self) -> bool {
         if self.container_path.exists() {
@@ -86,7 +104,11 @@ impl World {
     }
 
     pub fn rename(&mut self, to: &str) -> bool {
-        let new_path = self.container_path.parent().unwrap_or(Path::new(".")).join(to);
+        let new_path = self
+            .container_path
+            .parent()
+            .unwrap_or(Path::new("."))
+            .join(to);
         if std::fs::rename(&self.container_path, &new_path).is_ok() {
             self.container_path = new_path;
             self.folder_name = to.to_string();
@@ -107,7 +129,8 @@ impl World {
     }
 
     fn read_from_fs(&mut self, path: &Path) {
-        let folder_name = path.file_name()
+        let folder_name = path
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("")
             .to_string();
@@ -130,7 +153,8 @@ impl World {
     }
 
     fn read_from_zip(&mut self, path: &Path) {
-        self.folder_name = path.file_stem()
+        self.folder_name = path
+            .file_stem()
             .and_then(|n| n.to_str())
             .unwrap_or("")
             .to_string();
@@ -163,7 +187,9 @@ impl World {
     fn load_from_level_dat(&mut self, data: &[u8]) {
         // level.dat is a GZip'd NBT file
         // For now, do a basic scan for known strings/values
-        if data.len() < 4 { return; }
+        if data.len() < 4 {
+            return;
+        }
 
         // Try to decompress with gzip
         use std::io::Read;
@@ -181,14 +207,16 @@ impl World {
                 let line = &content[start..start + end];
                 if let Some(name_start) = line.find('\'') {
                     if let Some(name_end) = line[name_start + 1..].find('\'') {
-                        self.actual_name = line[name_start + 1..name_start + 1 + name_end].to_string();
+                        self.actual_name =
+                            line[name_start + 1..name_start + 1 + name_end].to_string();
                     }
                 }
             }
         }
 
         if self.actual_name.is_empty() {
-            self.actual_name = content.lines()
+            self.actual_name = content
+                .lines()
                 .find(|l| l.contains("LevelName"))
                 .and_then(|l| {
                     let parts: Vec<&str> = l.split(' ').collect();
@@ -276,7 +304,9 @@ impl WorldList {
         wl
     }
 
-    pub fn worlds(&self) -> &[World] { &self.worlds }
+    pub fn worlds(&self) -> &[World] {
+        &self.worlds
+    }
 
     pub fn load(&mut self) {
         self.worlds.clear();
@@ -324,6 +354,10 @@ impl WorldList {
         }
     }
 
-    pub fn len(&self) -> usize { self.worlds.len() }
-    pub fn is_empty(&self) -> bool { self.worlds.is_empty() }
+    pub fn len(&self) -> usize {
+        self.worlds.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.worlds.is_empty()
+    }
 }

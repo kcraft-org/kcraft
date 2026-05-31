@@ -69,8 +69,11 @@ pub fn update_timestamp(path: impl AsRef<Path>) -> Result<()> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|e| FsError::Io(io::Error::other(e)))?;
-    filetime::set_file_mtime(path.as_ref(), filetime::FileTime::from_unix_time(now.as_secs() as i64, 0))
-        .map_err(FsError::Io)
+    filetime::set_file_mtime(
+        path.as_ref(),
+        filetime::FileTime::from_unix_time(now.as_secs() as i64, 0),
+    )
+    .map_err(FsError::Io)
 }
 
 pub fn delete(path: impl AsRef<Path>) -> Result<()> {
@@ -97,11 +100,7 @@ pub fn copy(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> Result<()> {
 
 pub type PathPredicate = Box<dyn Fn(&Path) -> bool>;
 
-pub fn copy_dir_recursive(
-    src: &Path,
-    dst: &Path,
-    blacklist: &[PathPredicate],
-) -> Result<()> {
+pub fn copy_dir_recursive(src: &Path, dst: &Path, blacklist: &[PathPredicate]) -> Result<()> {
     ensure_folder_exists(dst)?;
     for entry in walkdir::WalkDir::new(src) {
         let entry = entry?;

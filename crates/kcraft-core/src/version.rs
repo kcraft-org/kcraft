@@ -77,10 +77,7 @@ impl PartialOrd for Section {
 
 impl Version {
     pub fn new(raw: String) -> Self {
-        let sections = raw
-            .split('.')
-            .map(Section::parse)
-            .collect();
+        let sections = raw.split('.').map(Section::parse).collect();
         Version { raw, sections }
     }
 
@@ -98,8 +95,6 @@ impl Version {
         }
         Ok(Version::new(input.to_string()))
     }
-
-
 }
 
 impl FromStr for Version {

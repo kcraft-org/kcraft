@@ -24,7 +24,11 @@ pub struct ModDownloadTask {
 }
 
 impl ModDownloadTask {
-    pub fn new(pack: IndexedPack, version: IndexedVersion, mods_dir: impl Into<std::path::PathBuf>) -> Self {
+    pub fn new(
+        pack: IndexedPack,
+        version: IndexedVersion,
+        mods_dir: impl Into<std::path::PathBuf>,
+    ) -> Self {
         ModDownloadTask {
             pack,
             version,
@@ -32,7 +36,11 @@ impl ModDownloadTask {
         }
     }
 
-    pub fn from_indexed(pack: IndexedPack, version: IndexedVersion, mods_dir: impl Into<std::path::PathBuf>) -> Self {
+    pub fn from_indexed(
+        pack: IndexedPack,
+        version: IndexedVersion,
+        mods_dir: impl Into<std::path::PathBuf>,
+    ) -> Self {
         Self::new(pack, version, mods_dir)
     }
 
@@ -66,9 +74,9 @@ impl ModDownloadTask {
         };
 
         let dest_path = self.mods_dir.join(&file_name);
-        
-        use std::hash::{Hash, Hasher};
+
         use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
 
         let mut hasher = DefaultHasher::new();
         self.version.download_url.hash(&mut hasher);
@@ -86,16 +94,18 @@ impl ModDownloadTask {
         let cache_file = cache_dir.join(format!("{:x}_{}", hash, file_name));
 
         if !cache_file.exists() {
-            let response = reqwest::get(url.as_str()).await
-                .map_err(|e| ModDownloadError::Network(kcraft_net::NetError::Network(e.to_string())))?;
+            let response = reqwest::get(url.as_str()).await.map_err(|e| {
+                ModDownloadError::Network(kcraft_net::NetError::Network(e.to_string()))
+            })?;
 
             let status = response.status();
             if !status.is_success() {
                 return Err(ModDownloadError::DownloadFailed(status.as_u16()));
             }
 
-            let bytes = response.bytes().await
-                .map_err(|e| ModDownloadError::Network(kcraft_net::NetError::Network(e.to_string())))?;
+            let bytes = response.bytes().await.map_err(|e| {
+                ModDownloadError::Network(kcraft_net::NetError::Network(e.to_string()))
+            })?;
 
             let tmp_cache = cache_file.with_extension("tmp");
             fs::write(&tmp_cache, &bytes)?;
@@ -105,7 +115,7 @@ impl ModDownloadTask {
         if let Some(parent) = dest_path.parent() {
             let _ = fs::create_dir_all(parent);
         }
-        
+
         // Attempt hardlink, fallback to copy
         if fs::hard_link(&cache_file, &dest_path).is_err() {
             fs::copy(&cache_file, &dest_path)?;

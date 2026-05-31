@@ -114,14 +114,17 @@ impl LaunchProfile {
     }
 
     pub fn get_libraries_for_os(&self, os: &OpSys) -> Vec<Library> {
-        let mut result: Vec<Library> = self.libraries.iter()
+        let mut result: Vec<Library> = self
+            .libraries
+            .iter()
             .filter(|lib| lib.is_active(os) && !lib.is_native())
             .cloned()
             .collect();
         result.extend(
-            self.native_libraries.iter()
+            self.native_libraries
+                .iter()
                 .filter(|lib| lib.is_active(os))
-                .cloned()
+                .cloned(),
         );
         result
     }
@@ -140,7 +143,8 @@ impl LaunchProfile {
     }
 
     pub fn get_native_jars(&self, os: &OpSys) -> Vec<String> {
-        self.native_libraries.iter()
+        self.native_libraries
+            .iter()
             .filter(|lib| lib.is_active(os))
             .map(|lib| lib.filename_for(os))
             .collect()

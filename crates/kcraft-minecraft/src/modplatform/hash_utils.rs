@@ -1,7 +1,7 @@
 use std::io::Read;
 use std::path::Path;
 
-use sha1::{Sha1, Digest};
+use sha1::{Digest, Sha1};
 use sha2::Sha512;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,16 +12,19 @@ pub enum HashAlgorithm {
 }
 
 pub fn hash_file(path: &Path, algorithm: HashAlgorithm) -> Result<String, String> {
-    let mut file = std::fs::File::open(path)
-        .map_err(|e| format!("Cannot open file: {}", e))?;
+    let mut file = std::fs::File::open(path).map_err(|e| format!("Cannot open file: {}", e))?;
 
     match algorithm {
         HashAlgorithm::Sha1 => {
             let mut hasher = Sha1::new();
             let mut buf = [0u8; 8192];
             loop {
-                let n = file.read(&mut buf).map_err(|e| format!("Read error: {}", e))?;
-                if n == 0 { break; }
+                let n = file
+                    .read(&mut buf)
+                    .map_err(|e| format!("Read error: {}", e))?;
+                if n == 0 {
+                    break;
+                }
                 hasher.update(&buf[..n]);
             }
             Ok(format!("{:x}", hasher.finalize()))
@@ -30,15 +33,20 @@ pub fn hash_file(path: &Path, algorithm: HashAlgorithm) -> Result<String, String
             let mut hasher = Sha512::new();
             let mut buf = [0u8; 8192];
             loop {
-                let n = file.read(&mut buf).map_err(|e| format!("Read error: {}", e))?;
-                if n == 0 { break; }
+                let n = file
+                    .read(&mut buf)
+                    .map_err(|e| format!("Read error: {}", e))?;
+                if n == 0 {
+                    break;
+                }
                 hasher.update(&buf[..n]);
             }
             Ok(format!("{:x}", hasher.finalize()))
         }
         HashAlgorithm::Murmur2 => {
             let mut data = Vec::new();
-            file.read_to_end(&mut data).map_err(|e| format!("Read error: {}", e))?;
+            file.read_to_end(&mut data)
+                .map_err(|e| format!("Read error: {}", e))?;
             Ok(murmur2_hash(&data))
         }
     }
@@ -61,7 +69,8 @@ pub fn hash_data(data: &[u8], algorithm: HashAlgorithm) -> String {
 }
 
 fn murmur2_hash(data: &[u8]) -> String {
-    let filtered: Vec<u8> = data.iter()
+    let filtered: Vec<u8> = data
+        .iter()
         .filter(|&&b| b != b'\t' && b != b'\n' && b != b'\r' && b != b' ')
         .copied()
         .collect();
@@ -119,7 +128,9 @@ fn murmur2_hash(data: &[u8]) -> String {
 pub fn create_hasher(algorithm: HashAlgorithm) -> Box<dyn Hasher> {
     match algorithm {
         HashAlgorithm::Sha1 => Box::new(Sha1Hasher { inner: Sha1::new() }),
-        HashAlgorithm::Sha512 => Box::new(Sha512Hasher { inner: Sha512::new() }),
+        HashAlgorithm::Sha512 => Box::new(Sha512Hasher {
+            inner: Sha512::new(),
+        }),
         HashAlgorithm::Murmur2 => Box::new(Murmur2Hasher::new()),
     }
 }
@@ -134,8 +145,12 @@ struct Sha1Hasher {
 }
 
 impl Hasher for Sha1Hasher {
-    fn update(&mut self, data: &[u8]) { self.inner.update(data); }
-    fn finalize(&self) -> String { format!("{:x}", self.inner.clone().finalize()) }
+    fn update(&mut self, data: &[u8]) {
+        self.inner.update(data);
+    }
+    fn finalize(&self) -> String {
+        format!("{:x}", self.inner.clone().finalize())
+    }
 }
 
 struct Sha512Hasher {
@@ -143,8 +158,12 @@ struct Sha512Hasher {
 }
 
 impl Hasher for Sha512Hasher {
-    fn update(&mut self, data: &[u8]) { self.inner.update(data); }
-    fn finalize(&self) -> String { format!("{:x}", self.inner.clone().finalize()) }
+    fn update(&mut self, data: &[u8]) {
+        self.inner.update(data);
+    }
+    fn finalize(&self) -> String {
+        format!("{:x}", self.inner.clone().finalize())
+    }
 }
 
 struct Murmur2Hasher {
@@ -152,10 +171,16 @@ struct Murmur2Hasher {
 }
 
 impl Murmur2Hasher {
-    fn new() -> Self { Murmur2Hasher { data: Vec::new() } }
+    fn new() -> Self {
+        Murmur2Hasher { data: Vec::new() }
+    }
 }
 
 impl Hasher for Murmur2Hasher {
-    fn update(&mut self, data: &[u8]) { self.data.extend_from_slice(data); }
-    fn finalize(&self) -> String { murmur2_hash(&self.data) }
+    fn update(&mut self, data: &[u8]) {
+        self.data.extend_from_slice(data);
+    }
+    fn finalize(&self) -> String {
+        murmur2_hash(&self.data)
+    }
 }

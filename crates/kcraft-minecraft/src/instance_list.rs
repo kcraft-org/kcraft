@@ -14,7 +14,9 @@ pub struct InstancePtr {
 
 impl InstancePtr {
     pub fn new(instance: Instance) -> Self {
-        InstancePtr { inner: std::sync::Arc::new(std::sync::RwLock::new(instance)) }
+        InstancePtr {
+            inner: std::sync::Arc::new(std::sync::RwLock::new(instance)),
+        }
     }
 
     pub fn read(&self) -> std::sync::RwLockReadGuard<'_, Instance> {
@@ -65,20 +67,25 @@ impl InstanceList {
         }
     }
 
-    pub fn count(&self) -> usize { self.instances.len() }
+    pub fn count(&self) -> usize {
+        self.instances.len()
+    }
 
     pub fn at(&self, i: usize) -> Option<InstancePtr> {
         self.instances.get(i).cloned()
     }
 
     pub fn get_instance_by_id(&self, id: &str) -> Option<InstancePtr> {
-        self.instances.iter()
+        self.instances
+            .iter()
             .find(|inst| inst.read().id() == id)
             .cloned()
     }
 
     pub fn get_instance_index_by_id(&self, id: &str) -> Option<usize> {
-        self.instances.iter().position(|inst| inst.read().id() == id)
+        self.instances
+            .iter()
+            .position(|inst| inst.read().id() == id)
     }
 
     pub fn get_groups(&self) -> HashSet<String> {
@@ -125,7 +132,9 @@ impl InstanceList {
     fn load_instance(&self, id: &InstanceId) -> Option<Instance> {
         let inst_path = Path::new(&self.inst_dir).join(id);
         let cfg_path = inst_path.join("instance.cfg");
-        if !cfg_path.exists() { return None; }
+        if !cfg_path.exists() {
+            return None;
+        }
 
         let content = std::fs::read_to_string(&cfg_path).ok()?;
         let mut ini = kcraft_core::INIFile::new();
@@ -134,26 +143,68 @@ impl InstanceList {
         let name = ini.get("name").unwrap_or("Unnamed Instance").to_string();
         let mut instance = Instance::new(&inst_path.to_string_lossy(), &name);
 
-        if let Some(v) = ini.get("InstanceType") { if v != "OneSix" && !v.is_empty() { instance.has_broken_version = true; } }
-        if let Some(v) = ini.get("iconKey") { instance.icon_key = v.to_string(); }
-        if let Some(v) = ini.get("notes") { instance.notes = v.to_string(); }
-        if let Some(v) = ini.get("totalTimePlayed") { instance.total_time_played = v.parse().unwrap_or(0); }
-        if let Some(v) = ini.get("lastLaunchTime") { instance.last_launch_time = v.parse().unwrap_or(0); }
-        if let Some(v) = ini.get("JavaPath") { instance.java_path = v.to_string(); }
-        if let Some(v) = ini.get("JavaVersion") { instance.java_version = v.to_string(); }
-        if let Some(v) = ini.get("MinMemAlloc") { instance.min_mem = v.parse().unwrap_or(512); }
-        if let Some(v) = ini.get("MaxMemAlloc") { instance.max_mem = v.parse().unwrap_or(2048); }
-        if let Some(v) = ini.get("PermGen") { instance.perm_gen = v.parse().unwrap_or(64); }
-        if let Some(v) = ini.get("JvmArgs") { instance.jvm_args = v.to_string(); }
-        if let Some(v) = ini.get("ManagedPack") { instance.managed_pack = v == "true"; }
-        if let Some(v) = ini.get("ManagedPackType") { instance.managed_pack_type = v.to_string(); }
-        if let Some(v) = ini.get("ManagedPackID") { instance.managed_pack_id = v.to_string(); }
-        if let Some(v) = ini.get("ManagedPackName") { instance.managed_pack_name = v.to_string(); }
-        if let Some(v) = ini.get("ManagedPackVersionID") { instance.managed_pack_version_id = v.to_string(); }
-        if let Some(v) = ini.get("ManagedPackVersionName") { instance.managed_pack_version_name = v.to_string(); }
-        if let Some(v) = ini.get("hasBrokenVersion") { instance.has_broken_version = v == "true"; }
-        if let Some(v) = ini.get("hasUpdate") { instance.has_update = v == "true"; }
-        if let Some(v) = ini.get("crashed") { instance.crashed = v == "true"; }
+        if let Some(v) = ini.get("InstanceType") {
+            if v != "OneSix" && !v.is_empty() {
+                instance.has_broken_version = true;
+            }
+        }
+        if let Some(v) = ini.get("iconKey") {
+            instance.icon_key = v.to_string();
+        }
+        if let Some(v) = ini.get("notes") {
+            instance.notes = v.to_string();
+        }
+        if let Some(v) = ini.get("totalTimePlayed") {
+            instance.total_time_played = v.parse().unwrap_or(0);
+        }
+        if let Some(v) = ini.get("lastLaunchTime") {
+            instance.last_launch_time = v.parse().unwrap_or(0);
+        }
+        if let Some(v) = ini.get("JavaPath") {
+            instance.java_path = v.to_string();
+        }
+        if let Some(v) = ini.get("JavaVersion") {
+            instance.java_version = v.to_string();
+        }
+        if let Some(v) = ini.get("MinMemAlloc") {
+            instance.min_mem = v.parse().unwrap_or(512);
+        }
+        if let Some(v) = ini.get("MaxMemAlloc") {
+            instance.max_mem = v.parse().unwrap_or(2048);
+        }
+        if let Some(v) = ini.get("PermGen") {
+            instance.perm_gen = v.parse().unwrap_or(64);
+        }
+        if let Some(v) = ini.get("JvmArgs") {
+            instance.jvm_args = v.to_string();
+        }
+        if let Some(v) = ini.get("ManagedPack") {
+            instance.managed_pack = v == "true";
+        }
+        if let Some(v) = ini.get("ManagedPackType") {
+            instance.managed_pack_type = v.to_string();
+        }
+        if let Some(v) = ini.get("ManagedPackID") {
+            instance.managed_pack_id = v.to_string();
+        }
+        if let Some(v) = ini.get("ManagedPackName") {
+            instance.managed_pack_name = v.to_string();
+        }
+        if let Some(v) = ini.get("ManagedPackVersionID") {
+            instance.managed_pack_version_id = v.to_string();
+        }
+        if let Some(v) = ini.get("ManagedPackVersionName") {
+            instance.managed_pack_version_name = v.to_string();
+        }
+        if let Some(v) = ini.get("hasBrokenVersion") {
+            instance.has_broken_version = v == "true";
+        }
+        if let Some(v) = ini.get("hasUpdate") {
+            instance.has_update = v == "true";
+        }
+        if let Some(v) = ini.get("crashed") {
+            instance.crashed = v == "true";
+        }
 
         instance.components.load_components();
 
@@ -164,9 +215,8 @@ impl InstanceList {
         self.load_group_list();
         let discovered = self.discover_instances();
 
-        let existing: HashSet<String> = self.instances.iter()
-            .map(|inst| inst.read().id())
-            .collect();
+        let existing: HashSet<String> =
+            self.instances.iter().map(|inst| inst.read().id()).collect();
 
         for id in &discovered {
             if !existing.contains(id.as_str()) {
@@ -176,9 +226,8 @@ impl InstanceList {
             }
         }
 
-        self.instances.retain(|inst| {
-            discovered.contains(&inst.read().id())
-        });
+        self.instances
+            .retain(|inst| discovered.contains(&inst.read().id()));
 
         self.dirty = true;
         Ok(())
@@ -187,19 +236,27 @@ impl InstanceList {
     fn load_group_list(&mut self) {
         let groups_path = Path::new(&self.inst_dir).join("../instgroups.json");
         let content = match std::fs::read_to_string(&groups_path) {
-            Ok(c) => c, Err(_) => return,
+            Ok(c) => c,
+            Err(_) => return,
         };
         let json: serde_json::Value = match serde_json::from_str(&content) {
-            Ok(v) => v, Err(_) => return,
+            Ok(v) => v,
+            Err(_) => return,
         };
         if let Some(groups) = json.get("groups").and_then(|v| v.as_object()) {
             for (group_name, group_data) in groups {
                 if let Some(instances) = group_data.get("instances").and_then(|v| v.as_array()) {
-                    let hidden = group_data.get("hidden").and_then(|v| v.as_bool()).unwrap_or(false);
-                    if hidden { self.collapsed_groups.insert(group_name.clone()); }
+                    let hidden = group_data
+                        .get("hidden")
+                        .and_then(|v| v.as_bool())
+                        .unwrap_or(false);
+                    if hidden {
+                        self.collapsed_groups.insert(group_name.clone());
+                    }
                     for inst_val in instances {
                         if let Some(id) = inst_val.as_str() {
-                            self.instance_group_index.insert(id.to_string(), group_name.clone());
+                            self.instance_group_index
+                                .insert(id.to_string(), group_name.clone());
                         }
                     }
                 }
@@ -213,18 +270,24 @@ impl InstanceList {
         let mut groups = serde_json::Map::new();
         for group_name in &self.group_name_cache {
             let mut group_obj = serde_json::Map::new();
-            group_obj.insert("hidden".to_string(), serde_json::Value::Bool(
-                self.collapsed_groups.contains(group_name)
-            ));
+            group_obj.insert(
+                "hidden".to_string(),
+                serde_json::Value::Bool(self.collapsed_groups.contains(group_name)),
+            );
             let mut inst_list = Vec::new();
             for (id, g) in &self.instance_group_index {
-                if g == group_name { inst_list.push(serde_json::Value::String(id.clone())); }
+                if g == group_name {
+                    inst_list.push(serde_json::Value::String(id.clone()));
+                }
             }
             group_obj.insert("instances".to_string(), serde_json::Value::Array(inst_list));
             groups.insert(group_name.clone(), serde_json::Value::Object(group_obj));
         }
         let mut root = serde_json::Map::new();
-        root.insert("formatVersion".to_string(), serde_json::Value::Number(1.into()));
+        root.insert(
+            "formatVersion".to_string(),
+            serde_json::Value::Number(1.into()),
+        );
         root.insert("groups".to_string(), serde_json::Value::Object(groups));
         if let Ok(json) = serde_json::to_string_pretty(&root) {
             let _ = std::fs::write(&groups_path, json);
@@ -232,7 +295,9 @@ impl InstanceList {
     }
 
     pub fn save_now(&mut self) {
-        if !self.dirty { return; }
+        if !self.dirty {
+            return;
+        }
         for inst in &self.instances {
             inst.read().save_now();
         }
@@ -253,7 +318,13 @@ impl InstanceList {
         }
     }
 
-    pub fn commit_staged_instance(&mut self, key_path: &str, name: &str, group_name: &str, should_override: bool) -> bool {
+    pub fn commit_staged_instance(
+        &mut self,
+        key_path: &str,
+        name: &str,
+        group_name: &str,
+        should_override: bool,
+    ) -> bool {
         let key = Path::new(key_path);
         let id = match key.file_name() {
             Some(n) => n.to_string_lossy().to_string(),
@@ -268,11 +339,17 @@ impl InstanceList {
                 return false;
             }
         }
-        if std::fs::rename(key_path, &final_path).is_err() { return false; }
-        let mut instance = match self.load_instance(&id) { Some(i) => i, None => return false };
+        if std::fs::rename(key_path, &final_path).is_err() {
+            return false;
+        }
+        let mut instance = match self.load_instance(&id) {
+            Some(i) => i,
+            None => return false,
+        };
         instance.name = name.to_string();
         if !group_name.is_empty() {
-            self.instance_group_index.insert(id.clone(), group_name.to_string());
+            self.instance_group_index
+                .insert(id.clone(), group_name.to_string());
             self.group_name_cache.insert(group_name.to_string());
         }
         self.instances.push(InstancePtr::new(instance));
@@ -282,12 +359,22 @@ impl InstanceList {
 
     pub fn destroy_staging_path(&self, key_path: &str) -> bool {
         let path = Path::new(key_path);
-        if path.exists() { std::fs::remove_dir_all(key_path).is_ok() } else { true }
+        if path.exists() {
+            std::fs::remove_dir_all(key_path).is_ok()
+        } else {
+            true
+        }
     }
 
     pub fn trash_instance(&mut self, id: &InstanceId) -> bool {
-        let pos = self.instances.iter().position(|inst| inst.read().id() == *id);
-        let inst = match pos { Some(p) => self.instances.remove(p), None => return false };
+        let pos = self
+            .instances
+            .iter()
+            .position(|inst| inst.read().id() == *id);
+        let inst = match pos {
+            Some(p) => self.instances.remove(p),
+            None => return false,
+        };
         let inst_path = inst.read().instance_root.clone();
         let trash_dir = Path::new(&self.inst_dir).join(".LAUNCHER_TRASH");
         let _ = std::fs::create_dir_all(&trash_dir);
@@ -303,21 +390,32 @@ impl InstanceList {
             });
             self.dirty = true;
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
-    pub fn trashed_something(&self) -> bool { !self.trash_history.is_empty() }
+    pub fn trashed_something(&self) -> bool {
+        !self.trash_history.is_empty()
+    }
 
     pub fn undo_trash_instance(&mut self) -> bool {
-        let item = match self.trash_history.pop_back() { Some(i) => i, None => return false };
+        let item = match self.trash_history.pop_back() {
+            Some(i) => i,
+            None => return false,
+        };
         if std::fs::rename(&item.trash_path, &item.poly_path).is_ok() {
             if !item.group_name.is_empty() {
-                self.instance_group_index.insert(item.id.clone(), item.group_name.clone());
+                self.instance_group_index
+                    .insert(item.id.clone(), item.group_name.clone());
             }
-            self.instances.push(InstancePtr::new(Instance::new(&item.poly_path, "")));
+            self.instances
+                .push(InstancePtr::new(Instance::new(&item.poly_path, "")));
             self.dirty = true;
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn delete_instance(&mut self, id: &InstanceId) {
@@ -340,8 +438,11 @@ impl InstanceList {
     }
 
     pub fn set_group_collapsed(&mut self, group_name: &str, collapsed: bool) {
-        if collapsed { self.collapsed_groups.insert(group_name.to_string()); }
-        else { self.collapsed_groups.remove(group_name); }
+        if collapsed {
+            self.collapsed_groups.insert(group_name.to_string());
+        } else {
+            self.collapsed_groups.remove(group_name);
+        }
         self.dirty = true;
     }
 }
@@ -352,7 +453,9 @@ pub struct InstanceStaging {
 }
 
 impl InstanceStaging {
-    pub fn staging_path(&self) -> &str { &self.staging_path }
+    pub fn staging_path(&self) -> &str {
+        &self.staging_path
+    }
 
     pub fn execute(&mut self) -> Result<(), String> {
         self.task.set_staging_path(&self.staging_path);

@@ -124,11 +124,15 @@ impl Library {
     }
 
     pub fn download_info(&self) -> Option<&crate::mojang_download_info::MojangDownloadInfo> {
-        self.mojang_downloads.as_ref().and_then(|dls| dls.artifact.as_ref())
+        self.mojang_downloads
+            .as_ref()
+            .and_then(|dls| dls.artifact.as_ref())
     }
 
     pub fn storage_prefix(&self) -> String {
-        self.storage_prefix.clone().unwrap_or_else(default_storage_prefix)
+        self.storage_prefix
+            .clone()
+            .unwrap_or_else(default_storage_prefix)
     }
 
     pub fn storage_suffix(&self, os: &OpSys) -> String {
@@ -152,11 +156,16 @@ impl Library {
         if self.is_native() {
             let compat = self.get_compatible_native(os);
             let prefix = self.storage_prefix();
-            let suffix = self.name.to_path(compat.as_ref().map(|s| {
-                let mut spec = self.name.clone();
-                spec.set_classifier(s.clone());
-                spec.get_file_name()
-            }).as_deref());
+            let suffix = self.name.to_path(
+                compat
+                    .as_ref()
+                    .map(|s| {
+                        let mut spec = self.name.clone();
+                        spec.set_classifier(s.clone());
+                        spec.get_file_name()
+                    })
+                    .as_deref(),
+            );
             let path = format!("{}/{}", prefix, suffix);
 
             // Check if it's 32-bit or 64-bit

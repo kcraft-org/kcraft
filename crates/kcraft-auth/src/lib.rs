@@ -1,21 +1,21 @@
-pub mod offline;
-pub mod msa;
-pub mod yggdrasil;
-pub mod authlib_injector;
 pub mod account_list;
+pub mod authlib_injector;
 pub mod flow;
+pub mod msa;
+pub mod offline;
 pub mod parsers;
+pub mod yggdrasil;
 
-pub use offline::*;
-pub use msa::*;
-pub use yggdrasil::*;
-pub use authlib_injector::*;
 pub use account_list::*;
+pub use authlib_injector::*;
 pub use flow::*;
+pub use msa::*;
+pub use offline::*;
 pub use parsers::*;
+pub use yggdrasil::*;
 
+use kcraft_core::account::{AccountData, AccountTaskState};
 use thiserror::Error;
-use kcraft_core::account::{AccountTaskState, AccountData};
 
 #[derive(Debug, Error)]
 pub enum AuthError {

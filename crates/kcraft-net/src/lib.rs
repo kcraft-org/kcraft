@@ -1,13 +1,13 @@
 mod download;
-mod upload;
 mod net_job;
 mod sink;
+mod upload;
 mod validator;
 
 pub use download::*;
-pub use upload::*;
 pub use net_job::*;
 pub use sink::*;
+pub use upload::*;
 pub use validator::*;
 
 use thiserror::Error;

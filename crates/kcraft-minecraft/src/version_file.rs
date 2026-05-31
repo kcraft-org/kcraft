@@ -88,10 +88,10 @@ pub struct MojangVersionFormat;
 pub struct OneSixVersionFormat;
 
 mod mojang_serde {
-    use serde::{self, Deserialize};
-    use crate::VersionFile;
-    use crate::Library;
     use crate::rule::rules_from_json;
+    use crate::Library;
+    use crate::VersionFile;
+    use serde::{self, Deserialize};
 
     #[derive(Deserialize)]
     #[allow(dead_code)]
@@ -201,12 +201,15 @@ mod mojang_serde {
                 let mut cls_map = std::collections::HashMap::new();
                 for (key, val) in classifiers {
                     let art: MojangArtifactJson = serde_json::from_value(val.clone()).ok()?;
-                    cls_map.insert(key.clone(), crate::mojang_download_info::MojangDownloadInfo {
-                        path: art.path,
-                        url: art.url,
-                        sha1: art.sha1,
-                        size: art.size,
-                    });
+                    cls_map.insert(
+                        key.clone(),
+                        crate::mojang_download_info::MojangDownloadInfo {
+                            path: art.path,
+                            url: art.url,
+                            sha1: art.sha1,
+                            size: art.size,
+                        },
+                    );
                 }
                 dl_info.classifiers = Some(cls_map);
             }
@@ -226,7 +229,9 @@ mod mojang_serde {
         vf.main_class = json.main_class;
         vf.minimum_launcher_version = json.minimum_launcher_version.unwrap_or(-1);
         vf.release_time = json.release_time.and_then(|t| {
-            chrono::DateTime::parse_from_rfc3339(&t).ok().map(|dt| dt.with_timezone(&chrono::Utc))
+            chrono::DateTime::parse_from_rfc3339(&t)
+                .ok()
+                .map(|dt| dt.with_timezone(&chrono::Utc))
         });
         vf.type_ = json.type_;
         vf.assets = json.assets;

@@ -48,10 +48,12 @@ jobs:
           cache-dependency-path: 'crates/kcraft-gui/frontend/package-lock.json'
 
       - name: Build Frontend
+        working-directory: crates/kcraft-gui/frontend
+        env:
+          NUXT_TELEMETRY_DISABLED: 1
         run: |
-          cd crates/kcraft-gui/frontend
           npm ci
-          npm run build
+          npm run generate
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable

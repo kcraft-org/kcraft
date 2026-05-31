@@ -44,19 +44,29 @@ impl std::fmt::Display for Value {
 }
 
 impl From<&str> for Value {
-    fn from(s: &str) -> Self { Value::String(s.to_string()) }
+    fn from(s: &str) -> Self {
+        Value::String(s.to_string())
+    }
 }
 impl From<String> for Value {
-    fn from(s: String) -> Self { Value::String(s) }
+    fn from(s: String) -> Self {
+        Value::String(s)
+    }
 }
 impl From<bool> for Value {
-    fn from(b: bool) -> Self { Value::Bool(b) }
+    fn from(b: bool) -> Self {
+        Value::Bool(b)
+    }
 }
 impl From<i64> for Value {
-    fn from(i: i64) -> Self { Value::Int(i) }
+    fn from(i: i64) -> Self {
+        Value::Int(i)
+    }
 }
 impl From<i32> for Value {
-    fn from(i: i32) -> Self { Value::Int(i as i64) }
+    fn from(i: i32) -> Self {
+        Value::Int(i as i64)
+    }
 }
 
 #[derive(Debug)]
@@ -65,13 +75,19 @@ pub struct INIFile {
 }
 
 impl INIFile {
-    pub fn new() -> Self { INIFile { data: HashMap::new() } }
+    pub fn new() -> Self {
+        INIFile {
+            data: HashMap::new(),
+        }
+    }
 
     pub fn load(&mut self, content: &str) {
         self.data.clear();
         for line in content.lines() {
             let line = Self::strip_comment(line).trim();
-            if line.is_empty() { continue; }
+            if line.is_empty() {
+                continue;
+            }
             if let Some(eq_pos) = line.find('=') {
                 let key = line[..eq_pos].trim();
                 let value = Self::unescape(line[eq_pos + 1..].trim());
@@ -101,16 +117,30 @@ impl INIFile {
         Ok(())
     }
 
-    pub fn get(&self, key: &str) -> Option<&str> { self.data.get(key).map(|s| s.as_str()) }
-    pub fn set(&mut self, key: &str, value: &str) { self.data.insert(key.to_string(), value.to_string()); }
-    pub fn remove(&mut self, key: &str) { self.data.remove(key); }
+    pub fn get(&self, key: &str) -> Option<&str> {
+        self.data.get(key).map(|s| s.as_str())
+    }
+    pub fn set(&mut self, key: &str, value: &str) {
+        self.data.insert(key.to_string(), value.to_string());
+    }
+    pub fn remove(&mut self, key: &str) {
+        self.data.remove(key);
+    }
 
     fn strip_comment(line: &str) -> &str {
         let mut in_escape = false;
         for (i, c) in line.char_indices() {
-            if in_escape { in_escape = false; continue; }
-            if c == '\\' { in_escape = true; continue; }
-            if c == '#' { return &line[..i]; }
+            if in_escape {
+                in_escape = false;
+                continue;
+            }
+            if c == '\\' {
+                in_escape = true;
+                continue;
+            }
+            if c == '#' {
+                return &line[..i];
+            }
         }
         line
     }
@@ -125,10 +155,15 @@ impl INIFile {
                     Some('t') => result.push('\t'),
                     Some('\\') => result.push('\\'),
                     Some('#') => result.push('#'),
-                    Some(c) => { result.push('\\'); result.push(c); }
+                    Some(c) => {
+                        result.push('\\');
+                        result.push(c);
+                    }
                     None => result.push('\\'),
                 }
-            } else { result.push(c); }
+            } else {
+                result.push(c);
+            }
         }
         result
     }
@@ -136,13 +171,23 @@ impl INIFile {
     fn escape(s: &str) -> String {
         let mut result = String::with_capacity(s.len());
         for c in s.chars() {
-            match c { '\n' => result.push_str("\\n"), '\t' => result.push_str("\\t"), '\\' => result.push_str("\\\\"), '#' => result.push_str("\\#"), c => result.push(c) }
+            match c {
+                '\n' => result.push_str("\\n"),
+                '\t' => result.push_str("\\t"),
+                '\\' => result.push_str("\\\\"),
+                '#' => result.push_str("\\#"),
+                c => result.push(c),
+            }
         }
         result
     }
 }
 
-impl Default for INIFile { fn default() -> Self { Self::new() } }
+impl Default for INIFile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 type IniHandle = Arc<Mutex<IniState>>;
 
@@ -161,7 +206,9 @@ struct IniState {
 
 impl fmt::Debug for INISettingsObject {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("INISettingsObject").field("file_path", &self.file_path).finish()
+        f.debug_struct("INISettingsObject")
+            .field("file_path", &self.file_path)
+            .finish()
     }
 }
 
@@ -195,11 +242,15 @@ impl INISettingsObject {
         }
     }
 
-    pub fn file_path(&self) -> &Path { &self.file_path }
+    pub fn file_path(&self) -> &Path {
+        &self.file_path
+    }
 
     pub fn reload(&self) {
         let mut state = self.ini.lock().unwrap();
-        let mut ini = INIFile { data: std::mem::take(&mut state.data) };
+        let mut ini = INIFile {
+            data: std::mem::take(&mut state.data),
+        };
         let _ = ini.load_file(&state.file_path);
         state.data = ini.data;
     }
@@ -219,7 +270,9 @@ impl INISettingsObject {
     }
 
     fn flush(state: &IniState) {
-        let ini = INIFile { data: state.data.clone() };
+        let ini = INIFile {
+            data: state.data.clone(),
+        };
         let _ = ini.save_file(&state.file_path);
     }
 
@@ -268,16 +321,25 @@ impl fmt::Debug for Setting {
 
 impl Setting {
     pub fn new(synonyms: Vec<String>, def_val: Value) -> Self {
-        Setting { synonyms: synonyms.clone(), def_val, ini: None, keys: synonyms }
+        Setting {
+            synonyms: synonyms.clone(),
+            def_val,
+            ini: None,
+            keys: synonyms,
+        }
     }
 
     pub fn id(&self) -> &str {
         self.synonyms.first().map(|s| s.as_str()).unwrap_or("")
     }
 
-    pub fn config_keys(&self) -> &[String] { &self.synonyms }
+    pub fn config_keys(&self) -> &[String] {
+        &self.synonyms
+    }
 
-    pub fn def_value(&self) -> Value { self.def_val.clone() }
+    pub fn def_value(&self) -> Value {
+        self.def_val.clone()
+    }
 
     pub fn get(&self) -> Value {
         match &self.ini {

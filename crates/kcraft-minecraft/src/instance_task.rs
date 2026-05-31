@@ -19,10 +19,14 @@ impl InstanceName {
     }
 
     pub fn modified_name(&self) -> String {
-        self.modified_name.clone().unwrap_or_else(|| self.original_name.clone())
+        self.modified_name
+            .clone()
+            .unwrap_or_else(|| self.original_name.clone())
     }
 
-    pub fn original_name(&self) -> &str { &self.original_name }
+    pub fn original_name(&self) -> &str {
+        &self.original_name
+    }
 
     pub fn name(&self) -> String {
         match &self.modified_name {
@@ -31,7 +35,9 @@ impl InstanceName {
         }
     }
 
-    pub fn version(&self) -> &str { &self.original_version }
+    pub fn version(&self) -> &str {
+        &self.original_version
+    }
 
     pub fn set_name(&mut self, name: &str) {
         self.modified_name = Some(name.to_string());
@@ -58,16 +64,36 @@ impl InstanceTask {
         }
     }
 
-    pub fn set_staging_path(&mut self, path: &str) { self.staging_path = path.to_string(); }
-    pub fn staging_path(&self) -> &str { &self.staging_path }
-    pub fn set_icon(&mut self, icon: &str) { self.inst_icon = icon.to_string(); }
-    pub fn icon(&self) -> &str { &self.inst_icon }
-    pub fn set_group(&mut self, group: &str) { self.inst_group = group.to_string(); }
-    pub fn group(&self) -> &str { &self.inst_group }
-    pub fn should_override(&self) -> bool { self.override_existing }
-    pub fn set_override(&mut self, override_: bool) { self.override_existing = override_; }
-    pub fn name(&self) -> String { self.instance_name.modified_name() }
-    pub fn set_instance_name(&mut self, name: &str) { self.instance_name.set_name(name); }
+    pub fn set_staging_path(&mut self, path: &str) {
+        self.staging_path = path.to_string();
+    }
+    pub fn staging_path(&self) -> &str {
+        &self.staging_path
+    }
+    pub fn set_icon(&mut self, icon: &str) {
+        self.inst_icon = icon.to_string();
+    }
+    pub fn icon(&self) -> &str {
+        &self.inst_icon
+    }
+    pub fn set_group(&mut self, group: &str) {
+        self.inst_group = group.to_string();
+    }
+    pub fn group(&self) -> &str {
+        &self.inst_group
+    }
+    pub fn should_override(&self) -> bool {
+        self.override_existing
+    }
+    pub fn set_override(&mut self, override_: bool) {
+        self.override_existing = override_;
+    }
+    pub fn name(&self) -> String {
+        self.instance_name.modified_name()
+    }
+    pub fn set_instance_name(&mut self, name: &str) {
+        self.instance_name.set_name(name);
+    }
 
     pub fn execute(&mut self) -> Result<(), String> {
         Err("Not implemented".to_string())
@@ -89,17 +115,31 @@ impl InstanceCreationTask {
         }
     }
 
-    pub fn task(&self) -> &InstanceTask { &self.base }
-    pub fn task_mut(&mut self) -> &mut InstanceTask { &mut self.base }
-    pub fn get_error(&self) -> &str { &self.error_message }
+    pub fn task(&self) -> &InstanceTask {
+        &self.base
+    }
+    pub fn task_mut(&mut self) -> &mut InstanceTask {
+        &mut self.base
+    }
+    pub fn get_error(&self) -> &str {
+        &self.error_message
+    }
 
-    pub fn update_instance(&mut self) -> bool { false }
+    pub fn update_instance(&mut self) -> bool {
+        false
+    }
 
-    pub fn create_instance(&mut self) -> bool { false }
+    pub fn create_instance(&mut self) -> bool {
+        false
+    }
 
     pub fn execute(&mut self) -> Result<(), String> {
-        if self.update_instance() { return Ok(()); }
-        if self.create_instance() { return Ok(()); }
+        if self.update_instance() {
+            return Ok(());
+        }
+        if self.create_instance() {
+            return Ok(());
+        }
         if self.base.should_override() {
             for path in &self.files_to_remove {
                 let _ = std::fs::remove_file(path);
@@ -263,7 +303,10 @@ impl InstanceImportTask {
 
     pub fn execute(&mut self) -> Result<(), String> {
         if self.source_url.starts_with("file://") || self.source_url.starts_with('/') {
-            let path = self.source_url.strip_prefix("file://").unwrap_or(&self.source_url);
+            let path = self
+                .source_url
+                .strip_prefix("file://")
+                .unwrap_or(&self.source_url);
             self.archive_path = path.to_string();
             self.process_zip_pack()
         } else {
@@ -319,18 +362,16 @@ impl InstanceImportTask {
 
     fn process_multimc(&self, archive: &mut zip::ZipArchive<std::fs::File>) -> Result<(), String> {
         let staging = Path::new(self.base.staging_path());
-        extract_zip(archive, staging)
-            .map_err(|e| format!("Extraction failed: {}", e))
+        extract_zip(archive, staging).map_err(|e| format!("Extraction failed: {}", e))
     }
 
     fn process_technic(&self, archive: &mut zip::ZipArchive<std::fs::File>) -> Result<(), String> {
         let staging = Path::new(self.base.staging_path());
         let game_dir = staging.join("minecraft");
         let _ = std::fs::create_dir_all(&game_dir);
-        
-        extract_zip(archive, &game_dir)
-            .map_err(|e| format!("Extraction failed: {}", e))?;
-        
+
+        extract_zip(archive, &game_dir).map_err(|e| format!("Extraction failed: {}", e))?;
+
         let cfg_path = staging.join("instance.cfg");
         let mut ini = kcraft_core::INIFile::new();
         ini.set("InstanceType", "OneSix");
@@ -379,18 +420,21 @@ impl InstanceImportTask {
             }
         }
 
-        let name = manifest_val.as_ref()
+        let name = manifest_val
+            .as_ref()
             .and_then(|v| v.get("name"))
             .and_then(|v| v.as_str())
             .unwrap_or("CurseForge Pack");
 
-        let mc_version = manifest_val.as_ref()
+        let mc_version = manifest_val
+            .as_ref()
             .and_then(|v| v.get("minecraft"))
             .and_then(|v| v.get("version"))
             .and_then(|v| v.as_str())
             .unwrap_or("1.20.1");
 
-        let loader = manifest_val.as_ref()
+        let loader = manifest_val
+            .as_ref()
             .and_then(|v| v.get("minecraft"))
             .and_then(|v| v.get("modLoaders"))
             .and_then(|v| v.as_array())
@@ -400,7 +444,9 @@ impl InstanceImportTask {
             .unwrap_or("");
 
         for i in 0..archive.len() {
-            let mut entry = archive.by_index(i).map_err(|e| format!("Entry error: {}", e))?;
+            let mut entry = archive
+                .by_index(i)
+                .map_err(|e| format!("Entry error: {}", e))?;
             let entry_name = entry.name().to_string();
             if entry_name.starts_with("overrides/") {
                 let relative_path = entry_name.strip_prefix("overrides/").unwrap();
@@ -441,9 +487,15 @@ impl InstanceImportTask {
 
         if !loader.is_empty() {
             let (loader_uid, loader_ver) = if loader.starts_with("forge-") {
-                ("net.minecraftforge", loader.strip_prefix("forge-").unwrap_or(loader))
+                (
+                    "net.minecraftforge",
+                    loader.strip_prefix("forge-").unwrap_or(loader),
+                )
             } else if loader.starts_with("fabric-") {
-                ("net.fabricmc.fabric-loader", loader.strip_prefix("fabric-").unwrap_or(loader))
+                (
+                    "net.fabricmc.fabric-loader",
+                    loader.strip_prefix("fabric-").unwrap_or(loader),
+                )
             } else {
                 ("net.minecraftforge", loader)
             };
@@ -470,7 +522,9 @@ impl InstanceImportTask {
         let mut index_i = None;
         for i in 0..archive.len() {
             if let Ok(entry) = archive.by_index(i) {
-                if entry.name() == "modrinth.index.json" || entry.name().ends_with("/modrinth.index.json") {
+                if entry.name() == "modrinth.index.json"
+                    || entry.name().ends_with("/modrinth.index.json")
+                {
                     index_i = Some(i);
                     break;
                 }
@@ -488,31 +542,37 @@ impl InstanceImportTask {
             }
         }
 
-        let name = index_val.as_ref()
+        let name = index_val
+            .as_ref()
             .and_then(|v| v.get("name"))
             .and_then(|v| v.as_str())
             .unwrap_or("Modrinth Pack");
 
-        let mc_version = index_val.as_ref()
+        let mc_version = index_val
+            .as_ref()
             .and_then(|v| v.get("dependencies"))
             .and_then(|d| d.get("minecraft"))
             .and_then(|v| v.as_str())
             .unwrap_or("1.20.1");
 
-        let fabric_loader = index_val.as_ref()
+        let fabric_loader = index_val
+            .as_ref()
             .and_then(|v| v.get("dependencies"))
             .and_then(|d| d.get("fabric-loader"))
             .and_then(|v| v.as_str())
             .unwrap_or("");
 
-        let forge_loader = index_val.as_ref()
+        let forge_loader = index_val
+            .as_ref()
             .and_then(|v| v.get("dependencies"))
             .and_then(|d| d.get("forge"))
             .and_then(|v| v.as_str())
             .unwrap_or("");
 
         for i in 0..archive.len() {
-            let mut entry = archive.by_index(i).map_err(|e| format!("Entry error: {}", e))?;
+            let mut entry = archive
+                .by_index(i)
+                .map_err(|e| format!("Entry error: {}", e))?;
             let entry_name = entry.name().to_string();
             let relative_path = if entry_name.starts_with("overrides/") {
                 entry_name.strip_prefix("overrides/")
@@ -621,7 +681,9 @@ fn copy_dir(src: &Path, dst: &Path, matcher: Option<&str>) -> Result<(), String>
 
 fn extract_zip(archive: &mut zip::ZipArchive<std::fs::File>, dst: &Path) -> Result<(), String> {
     for i in 0..archive.len() {
-        let mut entry = archive.by_index(i).map_err(|e| format!("Entry error: {}", e))?;
+        let mut entry = archive
+            .by_index(i)
+            .map_err(|e| format!("Entry error: {}", e))?;
         let entry_path = entry.name().to_string();
         let out_path = dst.join(&entry_path);
 
@@ -629,15 +691,20 @@ fn extract_zip(archive: &mut zip::ZipArchive<std::fs::File>, dst: &Path) -> Resu
             std::fs::create_dir_all(&out_path).map_err(|e| format!("Cannot create dir: {}", e))?;
         } else {
             if let Some(parent) = out_path.parent() {
-                std::fs::create_dir_all(parent).map_err(|e| format!("Cannot create parent: {}", e))?;
+                std::fs::create_dir_all(parent)
+                    .map_err(|e| format!("Cannot create parent: {}", e))?;
             }
             let mut outfile = std::fs::File::create(&out_path)
                 .map_err(|e| format!("Cannot create file: {}", e))?;
             use std::io::Read;
             let mut data = Vec::new();
-            entry.read_to_end(&mut data).map_err(|e| format!("Read error: {}", e))?;
+            entry
+                .read_to_end(&mut data)
+                .map_err(|e| format!("Read error: {}", e))?;
             use std::io::Write;
-            outfile.write_all(&data).map_err(|e| format!("Write error: {}", e))?;
+            outfile
+                .write_all(&data)
+                .map_err(|e| format!("Write error: {}", e))?;
         }
     }
     Ok(())

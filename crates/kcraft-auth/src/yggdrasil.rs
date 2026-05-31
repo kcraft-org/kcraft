@@ -1,9 +1,8 @@
-
 use kcraft_core::account::{AccountData, AccountTaskState, Validity};
 use tracing::info;
 
 use crate::parsers;
-use crate::{AuthFlow, AuthError, Result};
+use crate::{AuthError, AuthFlow, Result};
 
 pub struct YggdrasilFlow {
     password: Option<String>,
@@ -30,12 +29,22 @@ impl YggdrasilFlow {
     }
 
     fn authenticate(&self, data: &mut AccountData) -> Result<AccountTaskState> {
-        let password = self.password.as_deref().ok_or_else(|| {
-            AuthError::Auth("Password required for Yggdrasil login".to_string())
-        })?;
+        let password = self
+            .password
+            .as_deref()
+            .ok_or_else(|| AuthError::Auth("Password required for Yggdrasil login".to_string()))?;
 
-        let username = data.yggdrasil_token.extra.get("userName").cloned().unwrap_or_default();
-        let client_token = data.yggdrasil_token.extra.get("clientToken").cloned()
+        let username = data
+            .yggdrasil_token
+            .extra
+            .get("userName")
+            .cloned()
+            .unwrap_or_default();
+        let client_token = data
+            .yggdrasil_token
+            .extra
+            .get("clientToken")
+            .cloned()
             .unwrap_or_else(|| uuid::Uuid::new_v4().to_string().replace('-', ""));
 
         let body = serde_json::json!({
@@ -125,7 +134,11 @@ impl YggdrasilFlow {
             AuthError::InvalidResponse(format!("Failed to parse Yggdrasil response: {}", e))
         })?;
 
-        let ygg_token = data.yggdrasil_token.extra.get("clientToken").cloned()
+        let ygg_token = data
+            .yggdrasil_token
+            .extra
+            .get("clientToken")
+            .cloned()
             .unwrap_or_else(|| client_token.clone());
 
         let token = parsers::parse_yggdrasil_response(&json, &ygg_token).ok_or_else(|| {

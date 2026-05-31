@@ -1,17 +1,17 @@
-pub mod mod_index;
-pub mod flame;
-pub mod modrinth;
-pub mod technic;
 pub mod atlauncher;
-pub mod ftb;
-pub mod packwiz;
-pub mod hash_utils;
 pub mod download_task;
+pub mod flame;
+pub mod ftb;
+pub mod hash_utils;
+pub mod mod_index;
+pub mod modrinth;
+pub mod packwiz;
+pub mod technic;
 
-pub use mod_index::*;
 pub use flame::*;
-pub use modrinth::*;
 pub use hash_utils::*;
+pub use mod_index::*;
+pub use modrinth::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum Provider {
@@ -21,11 +21,17 @@ pub enum Provider {
 
 impl Provider {
     pub fn name(&self) -> &'static str {
-        match self { Provider::Modrinth => "modrinth", Provider::Flame => "curseforge" }
+        match self {
+            Provider::Modrinth => "modrinth",
+            Provider::Flame => "curseforge",
+        }
     }
 
     pub fn readable_name(&self) -> &'static str {
-        match self { Provider::Modrinth => "Modrinth", Provider::Flame => "CurseForge" }
+        match self {
+            Provider::Modrinth => "Modrinth",
+            Provider::Flame => "CurseForge",
+        }
     }
 
     pub fn from_name(name: &str) -> Self {
@@ -73,7 +79,13 @@ pub struct SearchArgs {
 
 impl Default for SearchArgs {
     fn default() -> Self {
-        SearchArgs { offset: 0, search: String::new(), sorting: "relevance".to_string(), loaders: Vec::new(), versions: Vec::new() }
+        SearchArgs {
+            offset: 0,
+            search: String::new(),
+            sorting: "relevance".to_string(),
+            loaders: Vec::new(),
+            versions: Vec::new(),
+        }
     }
 }
 

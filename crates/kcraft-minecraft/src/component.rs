@@ -160,11 +160,15 @@ impl PackProfile {
         }
         let new_index = match direction {
             MoveDirection::Up => {
-                if index == 0 { return; }
+                if index == 0 {
+                    return;
+                }
                 index - 1
             }
             MoveDirection::Down => {
-                if index >= self.components.len() - 1 { return; }
+                if index >= self.components.len() - 1 {
+                    return;
+                }
                 index + 1
             }
         };
@@ -189,7 +193,8 @@ impl PackProfile {
     }
 
     pub fn get_component_version(&self, uid: &str) -> Option<&str> {
-        self.components.iter()
+        self.components
+            .iter()
             .find(|c| c.uid == uid)
             .map(|c| c.version.as_str())
     }

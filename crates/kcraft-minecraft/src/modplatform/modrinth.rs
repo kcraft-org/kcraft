@@ -56,10 +56,24 @@ pub fn modrinth_load_extra_pack_data(obj: &serde_json::Value, pack: &mut Indexed
 
     if let Some(donations) = obj.get("donation_urls").and_then(|v| v.as_array()) {
         for d in donations {
-            let id = d.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
-            let platform = d.get("platform").and_then(|v| v.as_str()).unwrap_or("").to_string();
-            let url = d.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string();
-            pack.extra_data.donate.push(crate::modplatform::DonationData { id, platform, url });
+            let id = d
+                .get("id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let platform = d
+                .get("platform")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let url = d
+                .get("url")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            pack.extra_data
+                .donate
+                .push(crate::modplatform::DonationData { id, platform, url });
         }
     }
 
@@ -108,10 +122,14 @@ pub fn modrinth_load_indexed_pack_version(
 
     if let Some(files) = obj.get("files").and_then(|v| v.as_array()) {
         for file in files {
-            let primary = file.get("primary").and_then(|v| v.as_bool()).unwrap_or(false);
-            let is_matching = primary || _preferred_file_name.is_some_and(|pref| {
-                file.get("filename").and_then(|v| v.as_str()) == Some(pref)
-            });
+            let primary = file
+                .get("primary")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
+            let is_matching = primary
+                || _preferred_file_name.is_some_and(|pref| {
+                    file.get("filename").and_then(|v| v.as_str()) == Some(pref)
+                });
 
             if is_matching || (!primary && ver.download_url.is_empty()) {
                 if let Some(url) = file.get("url").and_then(|v| v.as_str()) {
@@ -134,7 +152,9 @@ pub fn modrinth_load_indexed_pack_version(
                         }
                     }
                 }
-                if primary { break; }
+                if primary {
+                    break;
+                }
             }
         }
     }
@@ -143,7 +163,10 @@ pub fn modrinth_load_indexed_pack_version(
 }
 
 pub fn modrinth_search_url(args: &crate::modplatform::SearchArgs) -> String {
-    let mut url = format!("{}/search?offset={}&limit=25", MODRINTH_BASE_URL, args.offset);
+    let mut url = format!(
+        "{}/search?offset={}&limit=25",
+        MODRINTH_BASE_URL, args.offset
+    );
     if !args.search.is_empty() {
         url.push_str(&format!("&query={}", urlencoding(&args.search)));
     }
@@ -153,13 +176,17 @@ pub fn modrinth_search_url(args: &crate::modplatform::SearchArgs) -> String {
 
     let mut facets: Vec<String> = Vec::new();
     if !args.loaders.is_empty() {
-        let loader_strs: Vec<String> = args.loaders.iter()
+        let loader_strs: Vec<String> = args
+            .loaders
+            .iter()
             .map(|l| format!("\"categories:{}\"", l.to_string()))
             .collect();
         facets.push(format!("[{}]", loader_strs.join(",")));
     }
     if !args.versions.is_empty() {
-        let ver_strs: Vec<String> = args.versions.iter()
+        let ver_strs: Vec<String> = args
+            .versions
+            .iter()
             .map(|v| format!("\"versions:{}\"", v))
             .collect();
         facets.push(format!("[{}]", ver_strs.join(",")));
@@ -167,7 +194,10 @@ pub fn modrinth_search_url(args: &crate::modplatform::SearchArgs) -> String {
     facets.push("[\"project_type:mod\"]".to_string());
 
     if !facets.is_empty() {
-        url.push_str(&format!("&facets={}", urlencoding(&format!("[{}]", facets.join(",")))));
+        url.push_str(&format!(
+            "&facets={}",
+            urlencoding(&format!("[{}]", facets.join(",")))
+        ));
     }
 
     url
@@ -178,24 +208,45 @@ pub fn modrinth_project_url(id: &str) -> String {
 }
 
 pub fn modrinth_projects_url(ids: &[String]) -> String {
-    let ids_json = serde_json::Value::Array(ids.iter().map(|s| serde_json::Value::String(s.clone())).collect());
-    format!("{}/projects?ids={}", MODRINTH_BASE_URL, urlencoding(&ids_json.to_string()))
+    let ids_json = serde_json::Value::Array(
+        ids.iter()
+            .map(|s| serde_json::Value::String(s.clone()))
+            .collect(),
+    );
+    format!(
+        "{}/projects?ids={}",
+        MODRINTH_BASE_URL,
+        urlencoding(&ids_json.to_string())
+    )
 }
 
 pub fn modrinth_versions_url(addon_id: &str, mc_versions: &[String], loaders: &[String]) -> String {
     let mut url = format!("{}/project/{}/version", MODRINTH_BASE_URL, addon_id);
     if !mc_versions.is_empty() {
         let versions_json = serde_json::Value::Array(
-            mc_versions.iter().map(|v| serde_json::Value::String(v.clone())).collect()
+            mc_versions
+                .iter()
+                .map(|v| serde_json::Value::String(v.clone()))
+                .collect(),
         );
-        url.push_str(&format!("?game_versions={}", urlencoding(&versions_json.to_string())));
+        url.push_str(&format!(
+            "?game_versions={}",
+            urlencoding(&versions_json.to_string())
+        ));
     }
     if !loaders.is_empty() {
         let sep = if mc_versions.is_empty() { "?" } else { "&" };
         let loaders_json = serde_json::Value::Array(
-            loaders.iter().map(|l| serde_json::Value::String(l.clone())).collect()
+            loaders
+                .iter()
+                .map(|l| serde_json::Value::String(l.clone()))
+                .collect(),
         );
-        url.push_str(&format!("{}loaders={}", sep, urlencoding(&loaders_json.to_string())));
+        url.push_str(&format!(
+            "{}loaders={}",
+            sep,
+            urlencoding(&loaders_json.to_string())
+        ));
     }
     url
 }
