@@ -40,18 +40,26 @@ async function loadAccounts() {
   }
 }
 
-async function addOfflineAccount() {
-  const name = offlineName.value.trim()
-  if (!name) return
-  isAddingOffline.value = true
+async function addOffline() {
+  if (!offlineUsername.value) return
   try {
-    await invoke("add_offline_account", { username: name })
-    offlineName.value = ''
+    await invoke("add_offline_account", { username: offlineUsername.value })
+    offlineUsername.value = ''
     await loadAccounts()
-  } catch (e) {
-    alert("Error adding offline account: " + e)
-  } finally {
-    isAddingOffline.value = false
+  } catch (err) {
+    alert(`Failed to add offline: ${err}`)
+  }
+}
+
+async function addElyby() {
+  if (!elybyUsername.value || !elybyToken.value) return
+  try {
+    await invoke("add_elyby_account", { username: elybyUsername.value, token: elybyToken.value })
+    elybyUsername.value = ''
+    elybyToken.value = ''
+    await loadAccounts()
+  } catch (err) {
+    alert(`Failed to add Ely.by: ${err}`)
   }
 }
 
@@ -142,8 +150,8 @@ onMounted(() => {
             <div class="account-info">
               <div class="account-name">{{ getAccountName(acc) }}</div>
               <div class="account-type">
-                <div :style="{ width: '6px', height: '6px', borderRadius: '50%', background: acc.type === 'MSA' ? '#10b981' : '#6366f1' }"></div>
-                {{ acc.type === "MSA" ? "Microsoft Account" : "Offline Account" }}
+                <div :style="{ width: '6px', height: '6px', borderRadius: '50%', background: acc.type === 'MSA' ? '#10b981' : (acc.type === 'AuthlibInjector' ? '#ec4899' : '#6366f1') }"></div>
+                {{ acc.type === "MSA" ? "Microsoft Account" : (acc.type === "AuthlibInjector" ? "Ely.by Account" : "Offline Account") }}
               </div>
             </div>
           </div>
@@ -163,10 +171,16 @@ onMounted(() => {
               <LogIn :size="16" /> Add Microsoft Account
             </button>
             <div class="input-group">
-              <input type="text" v-model="offlineName" placeholder="Offline Username" @keyup.enter="addOfflineAccount" />
-              <button class="btn-secondary" @click="addOfflineAccount" :disabled="isAddingOffline">
-                <div v-if="isAddingOffline" class="spinner" style="width:16px;height:16px;border-width:2px;"></div>
-                <UserPlus v-else :size="16" />
+              <input type="text" v-model="offlineUsername" placeholder="Offline Username" @keyup.enter="addOffline" />
+              <button class="btn-secondary" @click="addOffline">
+                <UserPlus :size="16" />
+              </button>
+            </div>
+            <div class="input-group" style="margin-top: 0.5rem;">
+              <input type="text" v-model="elybyUsername" placeholder="Ely.by User" />
+              <input type="password" v-model="elybyToken" placeholder="Token/Pass" @keyup.enter="addElyby" style="margin-left: 0.25rem;" />
+              <button class="btn-secondary" @click="addElyby">
+                <UserPlus :size="16" />
               </button>
             </div>
           </div>
