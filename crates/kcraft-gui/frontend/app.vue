@@ -13,8 +13,16 @@ const msaPromptVisible = ref(false)
 const msaUri = ref('')
 const msaCode = ref('----')
 
-const offlineName = ref('')
-const isAddingOffline = ref(false)
+const offlineUsername = ref('')
+const elybyUsername = ref('')
+const elybyToken = ref('')
+
+const activeTab = ref('instances') // 'instances' or 'modpacks'
+
+// Modpack Builder State
+const modpackFiles = ref([])
+const isBuildingModpack = ref(false)
+const modpackResult = ref(null)
 
 async function loadInstances() {
   isLoadingInstances.value = true
@@ -121,6 +129,43 @@ onMounted(() => {
     netJobTotal.value = data.total_actions;
   })
 })
+
+// Modpack Drag and Drop Methods
+function onDragOver(e) {
+  e.preventDefault();
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  if (e.dataTransfer.files) {
+    for (let i = 0; i < e.dataTransfer.files.length; i++) {
+      const file = e.dataTransfer.files[i];
+      if (file.name.endsWith('.jar') || file.name.endsWith('.pw.toml') || file.name.endsWith('.zip')) {
+        modpackFiles.value.push({ name: file.name, path: file.path || file.name, size: file.size });
+      }
+    }
+  }
+}
+
+function removeModpackFile(index) {
+  modpackFiles.value.splice(index, 1);
+}
+
+async function buildModpack() {
+  if (modpackFiles.value.length === 0) return;
+  isBuildingModpack.value = true;
+  modpackResult.value = null;
+  try {
+    const paths = modpackFiles.value.map(f => f.path);
+    const result = await invoke("build_modpack", { files: paths });
+    modpackResult.value = result;
+    modpackFiles.value = []; // Clear after success
+  } catch (err) {
+    alert(`Modpack build failed: ${err}`);
+  } finally {
+    isBuildingModpack.value = false;
+  }
+}
 </script>
 
 <template>
@@ -135,6 +180,11 @@ onMounted(() => {
         Refresh
       </button>
     </header>
+
+      <div class="tabs">
+        <button :class="['tab-btn', { active: activeTab === 'instances' }]" @click="activeTab = 'instances'">Instances</button>
+        <button :class="['tab-btn', { active: activeTab === 'modpacks' }]" @click="activeTab = 'modpacks'">Modpack Builder</button>
+      </div>
 
     <div class="layout">
       <aside>
@@ -198,16 +248,6 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-if="isLoadingInstances" id="loading">
-          <div class="spinner"></div>
-          <span>Loading instances...</span>
-        </div>
-        
-        <div v-else-if="instancesError" id="error" style="padding: 2rem; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 12px; color: #fca5a5;">
-          <strong>Error Loading Instances:</strong><br/>{{ instancesError }}
-        </div>
-        
-        <div v-else-if="instances.length === 0" style="grid-column: 1/-1; text-align:center; padding: 4rem; color: var(--text-secondary);">
           <PackageOpen :size="48" style="margin-bottom: 1rem; opacity: 0.5;" /><br/>
           No instances found.
         </div>
