@@ -59,13 +59,29 @@ fn list_accounts() -> Result<Vec<serde_json::Value>, String> {
 }
 
 #[tauri::command]
-fn add_offline_account(username: String) -> Result<(), String> {
-    let accounts_path = data_root().join("accounts.json");
-    let mut list = AccountList::new(accounts_path);
-    let acc = MinecraftAccount::create_offline(&username);
-    list.add_account(acc);
-    let _ = list.save();
-    Ok(())
+async fn add_offline_account(username: String) -> Result<String, String> {
+    let mut list = kcraft_auth::AccountList::load_or_default(data_root().join("accounts.json"));
+    let mut data = kcraft_core::account::AccountData::default();
+    data.account_type = kcraft_core::account::AccountType::Offline;
+    data.minecraft_profile.name = username.clone();
+    data.minecraft_profile.id = kcraft_auth::generate_offline_uuid(&username);
+    list.add_account(data);
+    list.save(data_root().join("accounts.json")).map_err(|e| e.to_string())?;
+    Ok(format!("Added Offline: {}", username))
+}
+
+#[tauri::command]
+async fn add_elyby_account(username: String, token: String) -> Result<String, String> {
+    let mut list = kcraft_auth::AccountList::load_or_default(data_root().join("accounts.json"));
+    let mut data = kcraft_core::account::AccountData::default();
+    data.account_type = kcraft_core::account::AccountType::AuthlibInjector;
+    data.authlib_injector_base_url = "https://authserver.ely.by/auth".to_string();
+    data.minecraft_profile.name = username.clone();
+    data.minecraft_profile.id = kcraft_auth::generate_offline_uuid(&username); // Mock UUID for now
+    data.yggdrasil_token.token = Some(token);
+    list.add_account(data);
+    list.save(data_root().join("accounts.json")).map_err(|e| e.to_string())?;
+    Ok(format!("Added Ely.by Account: {}", username))
 }
 
 #[tauri::command]
@@ -181,7 +197,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            list_instances, launch_instance, list_accounts, add_offline_account, login_msa
+            list_instances, launch_instance, list_accounts, add_offline_account, add_elyby_account, login_msa
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
