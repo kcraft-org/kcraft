@@ -104,7 +104,13 @@ pub fn copy_dir_recursive(src: &Path, dst: &Path, blacklist: &[PathPredicate]) -
     ensure_folder_exists(dst)?;
     for entry in walkdir::WalkDir::new(src) {
         let entry = entry?;
-        let relative = entry.path().strip_prefix(src).unwrap();
+        let relative = entry.path().strip_prefix(src).map_err(|_| {
+            FsError::InvalidPath(format!(
+                "path {} is not under src {}",
+                entry.path().display(),
+                src.display()
+            ))
+        })?;
         let dest_path = dst.join(relative);
         let should_skip = blacklist.iter().any(|f| f(entry.path()));
         if should_skip {
@@ -238,7 +244,13 @@ pub fn merge_folders(dst: impl AsRef<Path>, src: impl AsRef<Path>) -> Result<()>
     let src = src.as_ref();
     for entry in walkdir::WalkDir::new(src) {
         let entry = entry?;
-        let relative = entry.path().strip_prefix(src).unwrap();
+        let relative = entry.path().strip_prefix(src).map_err(|_| {
+            FsError::InvalidPath(format!(
+                "path {} is not under src {}",
+                entry.path().display(),
+                src.display()
+            ))
+        })?;
         let dest_path = dst.join(relative);
         if entry.file_type().is_dir() {
             ensure_folder_exists(&dest_path)?;
