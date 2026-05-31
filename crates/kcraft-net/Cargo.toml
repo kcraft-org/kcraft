@@ -13,6 +13,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 md-5 = { workspace = true }
 sha1 = { workspace = true }
+sha2 = { workspace = true }
 url = { workspace = true }
 chrono = { workspace = true }
 futures-util = "0.3"

@@ -44,6 +44,21 @@ impl HashEngine for Md5Engine {
     }
 }
 
+struct Sha256Engine(sha2::Sha256);
+
+impl HashEngine for Sha256Engine {
+    fn update(&mut self, data: &[u8]) {
+        sha2::Digest::update(&mut self.0, data);
+    }
+    fn finalize(&mut self) -> String {
+        let result = sha2::Digest::finalize_reset(&mut self.0);
+        format!("{:x}", result)
+    }
+    fn box_clone(&self) -> Box<dyn HashEngine> {
+        Box::new(Sha256Engine(sha2::Sha256::new()))
+    }
+}
+
 struct Sha1Engine(sha1::Sha1);
 
 impl HashEngine for Sha1Engine {
@@ -79,6 +94,15 @@ impl ChecksumValidator {
         }
     }
 
+    pub fn new_sha256() -> Self {
+        ChecksumValidator {
+            algorithm: HashAlgorithm::Sha256,
+            hasher: Some(Box::new(Sha256Engine(sha2::Sha256::new()))),
+            expected: None,
+            result: None,
+        }
+    }
+
     pub fn with_expected(mut self, expected: String) -> Self {
         self.expected = Some(expected);
         self
@@ -94,7 +118,7 @@ impl Validator for ChecksumValidator {
         self.hasher = Some(match self.algorithm {
             HashAlgorithm::Md5 => Box::new(Md5Engine(md5::Md5::new())),
             HashAlgorithm::Sha1 => Box::new(Sha1Engine(sha1::Sha1::new())),
-            HashAlgorithm::Sha256 => Box::new(Sha1Engine(sha1::Sha1::new())),
+            HashAlgorithm::Sha256 => Box::new(Sha256Engine(sha2::Sha256::new())),
         });
         self.result = None;
     }
@@ -117,12 +141,25 @@ impl Validator for ChecksumValidator {
         };
         self.result = Some(digest.clone());
         match &self.expected {
-            Some(expected) => &digest == expected,
+            // Use constant-time comparison to prevent timing attacks when
+            // verifying download checksums against attacker-controlled data.
+            Some(expected) => constant_time_eq(&digest, expected),
             None => true,
         }
     }
 }
 
+/// Constant-time byte comparison to prevent timing side-channel attacks.
+/// Compares two strings in O(n) time regardless of where they differ.
+fn constant_time_eq(a: &str, b: &str) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    a.bytes()
+        .zip(b.bytes())
+        .fold(0u8, |acc, (x, y)| acc | (x ^ y))
+        == 0
+}
 pub struct JsonParsingValidator<T: serde::de::DeserializeOwned> {
     data: Vec<u8>,
     result: Option<T>,
