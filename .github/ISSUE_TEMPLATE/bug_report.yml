@@ -5,12 +5,12 @@ body:
 - type: markdown
   attributes:
     value: |
-      If you need help with running Minecraft, please visit us on our Discord before making a bug report.
+      If you need help with running Minecraft, please visit us on our GitHub Discussions before making a bug report.
 
       Before submitting a bug report, please make sure you have read this *entire* form, and that:
-      * You have read the [KCraft wiki](https://kcraft.org/wiki/) and it has not answered your question.
+      * You have read the [KCraft wiki](https://github.com/kcraft-org/kcraft/wiki) and it has not answered your question.
       * Your bug is not caused by Minecraft or any mods you have installed.
-      * Your issue has not been reported before, [make sure to use the search function!](https://github.com/KCraft/KCraft/issues)
+      * Your issue has not been reported before, [make sure to use the search function!](https://github.com/kcraft-org/kcraft/issues)
 
       **Do not forget to give your issue a descriptive title.** "Bug in the instance screen" makes it hard to distinguish issues at a glance.
 - type: dropdown
@@ -28,13 +28,6 @@ body:
     label: Version of KCraft
     description: The version of KCraft used in the bug report.
     placeholder: KCraft 1.4.1
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Version of Qt
-    description: The version of Qt used in the bug report. You can find it in Help -> About KCraft -> About Qt.
-    placeholder: Qt 6.3.0
   validations:
     required: true
 - type: textarea
