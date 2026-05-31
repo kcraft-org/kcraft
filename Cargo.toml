@@ -29,7 +29,7 @@ tracing-appender = "0.2"
 thiserror = "2"
 uuid = { version = "1", features = ["v3", "v4", "serde"] }
 chrono = { version = "0.4", features = ["serde", "clock"] }
-reqwest = { version = "0.12", features = ["json", "gzip", "brotli", "cookies", "blocking"] }
+reqwest = { version = "0.13", features = ["json", "gzip", "brotli", "cookies", "blocking"] }
 tokio = { version = "1", features = ["full"] }
 url = { version = "2", features = ["serde"] }
 md-5 = "0.10"
