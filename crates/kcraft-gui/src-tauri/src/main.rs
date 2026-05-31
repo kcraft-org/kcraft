@@ -60,27 +60,47 @@ fn list_accounts() -> Result<Vec<serde_json::Value>, String> {
 
 #[tauri::command]
 async fn add_offline_account(username: String) -> Result<String, String> {
-    let mut list = kcraft_auth::AccountList::load_or_default(data_root().join("accounts.json"));
-    let mut data = kcraft_core::account::AccountData::default();
-    data.account_type = kcraft_core::account::AccountType::Offline;
-    data.minecraft_profile.name = username.clone();
-    data.minecraft_profile.id = kcraft_auth::generate_offline_uuid(&username);
-    list.add_account(data);
-    list.save(data_root().join("accounts.json")).map_err(|e| e.to_string())?;
+    let mut list = kcraft_auth::AccountList::new(data_root().join("accounts.json"));
+    let _ = list.load();
+    let profile = kcraft_core::account::MinecraftProfile {
+        name: username.clone(),
+        id: kcraft_auth::generate_offline_uuid(&username),
+        ..Default::default()
+    };
+    let data = kcraft_core::account::AccountData {
+        account_type: kcraft_core::account::AccountType::Offline,
+        minecraft_profile: profile,
+        ..Default::default()
+    };
+    list.add_account(kcraft_auth::MinecraftAccount { data, active: true });
+    list.save().map_err(|e| e.to_string())?;
     Ok(format!("Added Offline: {}", username))
 }
 
 #[tauri::command]
 async fn add_elyby_account(username: String, token: String) -> Result<String, String> {
-    let mut list = kcraft_auth::AccountList::load_or_default(data_root().join("accounts.json"));
-    let mut data = kcraft_core::account::AccountData::default();
-    data.account_type = kcraft_core::account::AccountType::AuthlibInjector;
-    data.authlib_injector_base_url = "https://authserver.ely.by/auth".to_string();
-    data.minecraft_profile.name = username.clone();
-    data.minecraft_profile.id = kcraft_auth::generate_offline_uuid(&username); // Mock UUID for now
-    data.yggdrasil_token.token = Some(token);
-    list.add_account(data);
-    list.save(data_root().join("accounts.json")).map_err(|e| e.to_string())?;
+    let mut list = kcraft_auth::AccountList::new(data_root().join("accounts.json"));
+    let _ = list.load();
+    let profile = kcraft_core::account::MinecraftProfile {
+        name: username.clone(),
+        id: kcraft_auth::generate_offline_uuid(&username),
+        ..Default::default()
+    };
+    
+    let yggdrasil_token = kcraft_core::account::Token {
+        token: Some(token),
+        ..Default::default()
+    };
+
+    let data = kcraft_core::account::AccountData {
+        account_type: kcraft_core::account::AccountType::AuthlibInjector,
+        authlib_injector_base_url: "https://authserver.ely.by/auth".to_string(),
+        minecraft_profile: profile,
+        yggdrasil_token,
+        ..Default::default()
+    };
+    list.add_account(kcraft_auth::MinecraftAccount { data, active: true });
+    list.save().map_err(|e| e.to_string())?;
     Ok(format!("Added Ely.by Account: {}", username))
 }
 
