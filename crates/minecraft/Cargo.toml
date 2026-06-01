@@ -15,11 +15,11 @@ chrono = { workspace = true }
 url = { workspace = true }
 walkdir = { workspace = true }
 once_cell = { workspace = true }
-kcraft-core = { path = "../kcraft-core" }
-kcraft-fs = { path = "../kcraft-fs" }
-kcraft-net = { path = "../kcraft-net" }
-kcraft-http-cache = { path = "../kcraft-http-cache" }
-kcraft-java = { path = "../kcraft-java" }
+kcraft-core = { path = "../core" }
+kcraft-fs = { path = "../fs" }
+kcraft-net = { path = "../net" }
+kcraft-http-cache = { path = "../http-cache" }
+kcraft-java = { path = "../java" }
 zip = { workspace = true }
 reqwest = { workspace = true, features = ["blocking"] }
 flate2 = { workspace = true }

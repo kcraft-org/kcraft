@@ -9,4 +9,4 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 thiserror = { workspace = true }
-kcraft-fs = { path = "../kcraft-fs" }
+kcraft-fs = { path = "../fs" }

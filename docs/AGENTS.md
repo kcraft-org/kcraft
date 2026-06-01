@@ -6,7 +6,7 @@ KCraft is a production-ready Minecraft launcher written entirely in Rust. It sup
 
 ## Architecture
 
-The GUI is built with Slint (native UI, no webview, no Node.js) in `crates/kcraft-gui/`. Authentication uses Microsoft OAuth2 (device code flow), offline mode, and Ely.by via `kcraft-auth`. Instance management with full launch pipeline is in `kcraft-minecraft`. Networking provides an async download engine with resume, validation, and progress in `kcraft-net`. Modpack building includes a DAG-based dependency resolver for conflict-free resolution.
+The GUI is built with Slint (native UI, no webview, no Node.js) in `crates/gui/`. Authentication uses Microsoft OAuth2 (device code flow), offline mode, and Ely.by via `kcraft-auth`. Instance management with full launch pipeline is in `kcraft-minecraft`. Networking provides an async download engine with resume, validation, and progress in `kcraft-net`. Modpack building includes a DAG-based dependency resolver for conflict-free resolution.
 
 ## AI Agent Directives
 

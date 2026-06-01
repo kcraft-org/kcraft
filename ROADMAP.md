@@ -1,3 +1,3 @@
 # Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) for the project roadmap.
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the project roadmap.

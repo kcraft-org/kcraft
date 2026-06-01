@@ -1,0 +1,17 @@
+[package]
+name = "kcraft"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kcraft-core = { path = "../core" }
+kcraft-logging = { path = "../logging" }
+kcraft-fs = { path = "../fs" }
+kcraft-config = { path = "../config" }
+kcraft-net = { path = "../net" }
+kcraft-http-cache = { path = "../http-cache" }
+kcraft-auth = { path = "../auth" }
+kcraft-minecraft = { path = "../minecraft" }
+tokio = { workspace = true }
+tracing = { workspace = true }

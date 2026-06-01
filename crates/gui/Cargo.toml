@@ -15,7 +15,7 @@ kcraft-logging.workspace = true
 kcraft-net.workspace = true
 kcraft-java.workspace = true
 kcraft-minecraft.workspace = true
-kcraft-auth = { path = "../kcraft-auth" }
+kcraft-auth = { path = "../auth" }
 
 [build-dependencies]
 slint-build = "1.16"

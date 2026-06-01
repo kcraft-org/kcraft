@@ -1,12 +1,12 @@
 # Each crate is owned by kairosci
 
-/crates/kcraft-auth/ @kairosci
-/crates/kcraft-config/ @kairosci
-/crates/kcraft-core/ @kairosci
-/crates/kcraft-fs/ @kairosci
-/crates/kcraft-gui/ @kairosci
-/crates/kcraft-http-cache/ @kairosci
-/crates/kcraft-java/ @kairosci
-/crates/kcraft-logging/ @kairosci
-/crates/kcraft-minecraft/ @kairosci
-/crates/kcraft-net/ @kairosci
+/crates/auth/ @kairosci
+/crates/config/ @kairosci
+/crates/core/ @kairosci
+/crates/fs/ @kairosci
+/crates/gui/ @kairosci
+/crates/http-cache/ @kairosci
+/crates/java/ @kairosci
+/crates/logging/ @kairosci
+/crates/minecraft/ @kairosci
+/crates/net/ @kairosci

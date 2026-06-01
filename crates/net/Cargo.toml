@@ -18,7 +18,7 @@ hex = { workspace = true }
 url = { workspace = true }
 chrono = { workspace = true }
 futures-util = "0.3"
-kcraft-core = { path = "../kcraft-core" }
-kcraft-http-cache = { path = "../kcraft-http-cache" }
-kcraft-fs = { path = "../kcraft-fs" }
+kcraft-core = { path = "../core" }
+kcraft-http-cache = { path = "../http-cache" }
+kcraft-fs = { path = "../fs" }
 lazy_static = "1.5.0"

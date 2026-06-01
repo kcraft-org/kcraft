@@ -1,5 +1,5 @@
 # Changelog
 
-See [docs/changelog.md](docs/changelog.md) for the full changelog.
+See [docs/CHANGELOG.md](docs/CHANGELOG.md) for the full changelog.
 
-Per-version files are available in [changelog/](changelog/).
+Per-version files are available in [CHANGELOG/](CHANGELOG/).
