@@ -1,16 +1,22 @@
 [workspace]
 resolver = "2"
 members = [
+    # Core
     "crates/kcraft-core",
     "crates/kcraft-logging",
     "crates/kcraft-fs",
     "crates/kcraft-config",
-    "crates/kcraft-net",
     "crates/kcraft-http-cache",
+    # Networking
+    "crates/kcraft-net",
+    # Auth
     "crates/kcraft-auth",
+    # Game
     "crates/kcraft-java",
     "crates/kcraft-minecraft",
+    # CLI entry point
     "crates/kcraft",
+    # GUI
     "crates/kcraft-gui",
 ]
 

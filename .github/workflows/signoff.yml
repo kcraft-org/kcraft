@@ -1,0 +1,29 @@
+name: DCO Sign-off Check
+
+on:
+  pull_request:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+
+jobs:
+  signoff:
+    name: Verify Signed-off-by
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check commit sign-off
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git log origin/${{ github.base_ref }}..HEAD --format="%H %s"
+          else
+            git log -1 --format="%H %s"
+          fi | while read hash msg; do
+            if ! git show -s --format="%B" "$hash" | grep -q "^Signed-off-by:"; then
+              echo "Commit $hash is missing Signed-off-by"
+              exit 1
+            fi
+          done
