@@ -1,0 +1,182 @@
+import { Button, LineEdit, ScrollView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { InstanceEntry, InstanceSettingsData, Palette } from "theme.slint";
+
+export component InstanceCard {
+    in property <InstanceEntry> instance-data;
+    callback launch();
+    callback show-details();
+    callback delete();
+
+    Rectangle {
+        background: Palette.bg-surface;
+        border-radius: Palette.radius-card;
+        border-width: 1px;
+        border-color: Palette.border-color;
+
+        VerticalLayout {
+            padding: 16px;
+            spacing: 12px;
+
+            HorizontalLayout {
+                spacing: 16px;
+
+                Rectangle {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 12px;
+                    background: Palette.border-color;
+                }
+                VerticalLayout {
+                    spacing: 4px;
+                    Text {
+                        text: instance-data.name;
+                        color: Palette.text-primary;
+                        font-size: 18px;
+                        font-weight: 600;
+                    }
+                    Text {
+                        text: instance-data.id;
+                        color: Palette.text-secondary;
+                        font-size: 14px;
+                    }
+                    Text {
+                        text: "RAM: " + instance-data.min_mem + "M / " + instance-data.max_mem + "M";
+                        color: Palette.text-secondary;
+                        font-size: 12px;
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                alignment: end;
+                spacing: 4px;
+                Button {
+                    text: "Details";
+                    clicked => { show-details(); }
+                }
+                Button {
+                    text: "Play";
+                    clicked => { launch(); }
+                }
+                Button {
+                    text: "Delete";
+                    clicked => { delete(); }
+                }
+            }
+        }
+    }
+}
+
+export component InstanceDetailsView {
+    in property <InstanceEntry> instance;
+    in property <bool> visible-details;
+    callback close();
+    callback edit-settings();
+    callback rename(string);
+    callback duplicate();
+
+    Rectangle {
+        visible: visible-details;
+        background: Palette.bg-base;
+        border-radius: Palette.radius-card;
+        border-width: 1px;
+        border-color: Palette.border-color;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 16px;
+
+            HorizontalLayout {
+                spacing: 16px;
+                Text {
+                    text: instance.name;
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Palette.text-primary;
+                }
+                HorizontalLayout { alignment: end; }
+                Button {
+                    text: "Close";
+                    clicked => { close(); }
+                }
+            }
+
+            Rectangle { height: 1px; background: Palette.border-color; }
+
+            VerticalLayout {
+                spacing: 8px;
+                Text { text: "ID: " + instance.id; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Name: " + instance.name; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Notes: " + instance.notes; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Java: " + instance.java_path; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Min RAM: " + instance.min_mem + " MB"; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Max RAM: " + instance.max_mem + " MB"; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Resolution: " + instance.window_width + "x" + instance.window_height; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Game Dir: " + instance.game_root; color: Palette.text-secondary; font-size: 14px; }
+                Text { text: "Mods Dir: " + instance.mods_root; color: Palette.text-secondary; font-size: 14px; }
+            }
+
+            HorizontalLayout {
+                alignment: end;
+                spacing: 8px;
+                Button { text: "Duplicate"; clicked => { duplicate(); } }
+                Button { text: "Settings"; clicked => { edit-settings(); } }
+            }
+        }
+    }
+}
+
+export component InstanceSettingsDialog {
+    in property <InstanceSettingsData> data;
+    in-out property <string> edit-java-path: data.java_path;
+    in-out property <string> edit-jvm-args: data.jvm_args;
+    callback save(InstanceSettingsData, string, string);
+    callback close();
+
+    Rectangle {
+        visible: data.visible;
+        background: Palette.bg-base;
+        border-radius: Palette.radius-card;
+        border-width: 1px;
+        border-color: Palette.accent;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 12px;
+
+            Text {
+                text: "Edit Instance Settings";
+                font-size: 18px;
+                font-weight: 700;
+                color: Palette.text-primary;
+            }
+
+            Text { text: "Instance: " + data.name; color: Palette.text-secondary; font-size: 14px; }
+
+            Text { text: "Java Path"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text <=> edit-java-path; }
+
+            Text { text: "Min RAM (MB)"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text: data.min_mem; }
+
+            Text { text: "Max RAM (MB)"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text: data.max_mem; }
+
+            Text { text: "Window Width"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text: data.window_width; }
+
+            Text { text: "Window Height"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text: data.window_height; }
+
+            Text { text: "JVM Args"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text <=> edit-jvm-args; }
+
+            HorizontalLayout {
+                alignment: end;
+                spacing: 8px;
+                Button { text: "Cancel"; clicked => { close(); } }
+                Button { text: "Save"; clicked => { save(data, edit-java-path, edit-jvm-args); } }
+            }
+        }
+    }
+}

@@ -1,0 +1,77 @@
+import { Button, LineEdit, ScrollView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { AccountEntry, Palette } from "theme.slint";
+
+export component AccountCard {
+    in property <AccountEntry> account-data;
+    callback delete();
+    callback set-default();
+
+    Rectangle {
+        background: Palette.bg-surface;
+        border-radius: Palette.radius-card;
+        border-width: 1px;
+        border-color: Palette.border-color;
+
+        VerticalLayout {
+            padding: 12px;
+            spacing: 8px;
+
+            HorizontalLayout {
+                spacing: 12px;
+
+                Rectangle {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    background: Palette.border-color;
+                }
+                VerticalLayout {
+                    spacing: 2px;
+                    Text {
+                        text: account-data.name;
+                        color: Palette.text-primary;
+                        font-size: 14px;
+                        font-weight: 600;
+                    }
+                    Text {
+                        text: account-data.type_name;
+                        color: Palette.text-secondary;
+                        font-size: 12px;
+                    }
+                    Text {
+                        text: "UUID: " + account-data.uuid;
+                        color: Palette.text-secondary;
+                        font-size: 10px;
+                    }
+                    HorizontalLayout {
+                        spacing: 4px;
+                        Text {
+                            text: "Status:";
+                            color: Palette.text-secondary;
+                            font-size: 10px;
+                        }
+                        Text {
+                            text: account-data.token_status;
+                            color: account-data.token_status == "Online" ? Palette.success : Palette.warning;
+                            font-size: 10px;
+                        }
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                alignment: end;
+                spacing: 4px;
+                Button {
+                    text: "Default";
+                    enabled: !(account-data.token_status == "default");
+                    clicked => { set-default(); }
+                }
+                Button {
+                    text: "Delete";
+                    clicked => { delete(); }
+                }
+            }
+        }
+    }
+}

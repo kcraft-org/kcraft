@@ -11,7 +11,7 @@ members = [
     "crates/kcraft-java",
     "crates/kcraft-minecraft",
     "crates/kcraft",
-    "crates/kcraft-gui/src-tauri",
+    "crates/kcraft-gui",
 ]
 
 [workspace.package]

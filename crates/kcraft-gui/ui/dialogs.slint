@@ -1,0 +1,138 @@
+import { Button, LineEdit, ScrollView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { ConfirmDialogData, InputDialogData, CreateInstanceData, Palette } from "theme.slint";
+
+export component ConfirmDialog {
+    in property <ConfirmDialogData> data;
+    callback confirm();
+    callback cancel();
+
+    Rectangle {
+        visible: data.visible;
+        background: Palette.bg-base;
+        border-radius: Palette.radius-card;
+        border-width: 2px;
+        border-color: data.is_destructive ? Palette.danger : Palette.accent;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 16px;
+            alignment: center;
+
+            Text {
+                text: data.title;
+                font-size: 18px;
+                font-weight: 700;
+                color: Palette.text-primary;
+            }
+            Text {
+                text: data.message;
+                color: Palette.text-secondary;
+                font-size: 14px;
+            }
+            HorizontalLayout {
+                alignment: center;
+                spacing: 12px;
+                Button {
+                    text: "Cancel";
+                    clicked => { cancel(); }
+                }
+                Button {
+                    text: data.confirm_label;
+                    clicked => { confirm(); }
+                }
+            }
+        }
+    }
+}
+
+export component InputDialog {
+    in property <InputDialogData> data;
+    in-out property <string> edit-value: data.value;
+    callback confirm(string);
+    callback cancel();
+
+    Rectangle {
+        visible: data.visible;
+        background: Palette.bg-base;
+        border-radius: Palette.radius-card;
+        border-width: 1px;
+        border-color: Palette.accent;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 12px;
+            alignment: center;
+
+            Text {
+                text: data.title;
+                font-size: 18px;
+                font-weight: 700;
+                color: Palette.text-primary;
+            }
+            Text {
+                text: data.label;
+                color: Palette.text-secondary;
+                font-size: 14px;
+            }
+            LineEdit {
+                text <=> edit-value;
+                placeholder-text: data.placeholder;
+            }
+            HorizontalLayout {
+                alignment: center;
+                spacing: 12px;
+                Button { text: "Cancel"; clicked => { cancel(); } }
+                Button { text: "Confirm"; clicked => { confirm(edit-value); } }
+            }
+        }
+    }
+}
+
+export component CreateInstanceDialog {
+    in property <CreateInstanceData> data;
+    in-out property <string> edit-name;
+    in-out property <string> edit-mc-version;
+    in-out property <string> edit-loader-type;
+    in-out property <string> edit-loader-version;
+    callback confirm(string, string, string, string);
+    callback cancel();
+
+    Rectangle {
+        visible: data.visible;
+        background: Palette.bg-base;
+        border-radius: Palette.radius-card;
+        border-width: 1px;
+        border-color: Palette.accent;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 12px;
+
+            Text {
+                text: "Create New Instance";
+                font-size: 18px;
+                font-weight: 700;
+                color: Palette.text-primary;
+            }
+
+            Text { text: "Instance Name"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text <=> edit-name; placeholder-text: "My Instance"; }
+
+            Text { text: "Minecraft Version"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text <=> edit-mc-version; placeholder-text: "1.20.1"; }
+
+            Text { text: "Mod Loader (forge, fabric, quilt, neoferge)"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text <=> edit-loader-type; placeholder-text: "forge"; }
+
+            Text { text: "Loader Version (leave blank for latest)"; color: Palette.text-secondary; font-size: 12px; }
+            LineEdit { text <=> edit-loader-version; placeholder-text: ""; }
+
+            HorizontalLayout {
+                alignment: end;
+                spacing: 8px;
+                Button { text: "Cancel"; clicked => { cancel(); } }
+                Button { text: "Create"; clicked => { confirm(edit-name, edit-mc-version, edit-loader-type, edit-loader-version); } }
+            }
+        }
+    }
+}

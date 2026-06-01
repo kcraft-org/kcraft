@@ -1,0 +1,49 @@
+import { Button, LineEdit, ScrollView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { Palette } from "theme.slint";
+
+export component ProgressBanner {
+    in property <bool> is-visible;
+    in property <string> job-name;
+    in property <int> completed;
+    in property <int> total;
+
+    Rectangle {
+        visible: is-visible;
+        background: Palette.bg-surface;
+        border-radius: 8px;
+        border-width: 1px;
+        border-color: Palette.accent;
+
+        VerticalLayout {
+            padding: 16px;
+            spacing: 8px;
+
+            HorizontalLayout {
+                spacing: 16px;
+                Text {
+                    text: job-name;
+                    color: #f8fafc;
+                    font-weight: 600;
+                }
+                Text {
+                    text: completed + " / " + total + " completed";
+                    color: Palette.text-secondary;
+                    font-size: 14px;
+                }
+            }
+
+            Rectangle {
+                height: 8px;
+                border-radius: 4px;
+                background: rgba(0, 0, 0, 0.3);
+
+                Rectangle {
+                    width: (total > 0 ? (completed * 100% / total * 1px) : 0px);
+                    height: 100%;
+                    border-radius: 4px;
+                    background: Palette.accent;
+                }
+            }
+        }
+    }
+}

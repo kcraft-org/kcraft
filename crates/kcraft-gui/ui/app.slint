@@ -1,0 +1,438 @@
+import { Button, LineEdit, ScrollView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { AccountEntry, InstanceEntry, InstanceSettingsData, ConfirmDialogData, InputDialogData, CreateInstanceData, Palette } from "theme.slint";
+import { AccountCard } from "accounts.slint";
+import { InstanceCard, InstanceDetailsView, InstanceSettingsDialog } from "instances.slint";
+import { ConfirmDialog, InputDialog, CreateInstanceDialog } from "dialogs.slint";
+import { ProgressBanner } from "progress.slint";
+import { ModpackBuilderView } from "modpack.slint";
+
+export component Sidebar {
+    in property <[AccountEntry]> accounts;
+    in property <bool> msa-is-visible;
+    in property <string> msa-uri;
+    in property <string> msa-code;
+    in-out property <string> offline-username;
+    in-out property <string> elyby-username;
+    in-out property <string> elyby-token;
+
+    callback add-msa();
+    callback add-offline(string);
+    callback add-elyby(string, string);
+    callback delete-account(int);
+    callback set-default-account(int);
+
+    Rectangle {
+        width: 320px;
+        background: rgba(15, 23, 42, 0.5);
+
+        VerticalLayout {
+            padding-left: 24px; padding-right: 24px; padding-top: 20px;
+            spacing: 0;
+
+            Text {
+                text: "Active Accounts";
+                font-size: 12px;
+                font-weight: 600;
+                color: Palette.text-secondary;
+            }
+
+            ScrollView {
+                VerticalLayout {
+                    spacing: 8px;
+                    padding-left: 16px; padding-right: 16px; padding-top: 8px; padding-bottom: 8px;
+                    for account[index] in accounts: AccountCard {
+                        account-data: account;
+                        delete() => { delete-account(index); }
+                        set-default() => { set-default-account(index); }
+                    }
+                }
+            }
+
+            Rectangle {
+                height: 1px;
+                background: Palette.border-color;
+            }
+
+            VerticalLayout {
+                padding: 24px;
+                spacing: 12px;
+
+                Text {
+                    text: "Microsoft Authentication";
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: Palette.text-secondary;
+                }
+
+                Rectangle {
+                    visible: msa-is-visible;
+                    background: Palette.bg-surface;
+                    border-radius: Palette.radius-card;
+                    border-width: 1px;
+                    border-color: Palette.accent;
+
+                    VerticalLayout {
+                        padding: 16px;
+                        spacing: 8px;
+                        alignment: center;
+
+                        Text {
+                            text: "1. Open " + msa-uri;
+                            color: Palette.text-primary;
+                            font-size: 12px;
+                        }
+                        Text { text: "2. Enter this code:"; color: Palette.text-primary; font-size: 12px; }
+                        Text {
+                            text: msa-code;
+                            color: Palette.accent;
+                            font-size: 24px;
+                            font-weight: 800;
+                        }
+                        Text {
+                            text: "Waiting for approval...";
+                            color: Palette.text-secondary;
+                            font-size: 12px;
+                        }
+                    }
+                }
+
+                Button {
+                    text: "Add Microsoft Account";
+                    clicked => { add-msa(); }
+                }
+
+                Text {
+                    text: "Offline Account";
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: Palette.text-secondary;
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    LineEdit {
+                        placeholder-text: "Username";
+                        text <=> offline-username;
+                    }
+                    Button {
+                        text: "Add";
+                        clicked => { add-offline(offline-username); }
+                    }
+                }
+
+                Text {
+                    text: "Ely.by Account";
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: Palette.text-secondary;
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    LineEdit { placeholder-text: "Username"; text <=> elyby-username; }
+                    LineEdit { placeholder-text: "Token"; text <=> elyby-token; }
+                    Button {
+                        text: "Add";
+                        clicked => { add-elyby(elyby-username, elyby-token); }
+                    }
+                }
+            }
+        }
+    }
+}
+
+export component InstancesView {
+    in property <[InstanceEntry]> instances;
+    in property <InstanceEntry> selected-instance;
+    in property <bool> loading;
+    in property <string> error-message;
+    in property <bool> show-details;
+    in-out property <InstanceSettingsData> settings-data;
+    in-out property <ConfirmDialogData> confirm-data;
+    in-out property <InputDialogData> input-data;
+    in-out property <CreateInstanceData> create-data;
+
+    callback launch-instance(string);
+    callback refresh();
+    callback show-instance-details(int);
+    callback close-details();
+    callback edit-settings();
+    callback save-settings(InstanceSettingsData, string, string);
+    callback cancel-settings();
+    callback delete-instance(string);
+    callback confirm-delete();
+    callback cancel-delete();
+    callback rename-instance(string);
+    callback confirm-rename(string);
+    callback cancel-rename();
+    callback create-instance(CreateInstanceData);
+    callback confirm-create(string, string, string, string);
+    callback cancel-create();
+    callback duplicate-instance(string);
+
+    VerticalLayout {
+        padding: 32px;
+        spacing: 24px;
+
+        if (!show-details) : VerticalLayout {
+            spacing: 24px;
+
+            if (loading) : VerticalLayout {
+                alignment: center;
+                padding: 64px;
+                spacing: 16px;
+                Text {
+                    text: "Loading instances...";
+                    color: Palette.text-secondary;
+                }
+            }
+
+            if (error-message != "") : Text {
+                text: error-message;
+                color: Palette.danger;
+            }
+
+            if (!loading && instances.length == 0 && error-message == "") : VerticalLayout {
+                alignment: center;
+                padding: 64px;
+                spacing: 16px;
+                Text {
+                    text: "No instances found.";
+                    color: Palette.text-secondary;
+                    font-size: 16px;
+                }
+            }
+
+            if (instances.length > 0) : ScrollView {
+                HorizontalLayout {
+                    spacing: 24px;
+                    for instance[index] in instances: InstanceCard {
+                        instance-data: instance;
+                        launch() => { launch-instance(instance.id); }
+                        show-details() => { show-instance-details(index); }
+                        delete() => { delete-instance(instance.id); }
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                alignment: end;
+                spacing: 8px;
+                Button {
+                    text: "Refresh";
+                    clicked => { refresh(); }
+                }
+                Button {
+                    text: "New Instance";
+                    clicked => { create-data.visible = true; }
+                }
+            }
+
+            ConfirmDialog {
+                data: confirm-data;
+                confirm() => { confirm-delete(); }
+                cancel() => { cancel-delete(); }
+            }
+
+            InputDialog {
+                data: input-data;
+                confirm(value) => { confirm-rename(value); }
+                cancel() => { cancel-rename(); }
+            }
+
+            CreateInstanceDialog {
+                data: create-data;
+                confirm(name, mc_version, loader_type, loader_version) => { confirm-create(name, mc_version, loader_type, loader_version); }
+                cancel() => { cancel-create(); }
+            }
+
+            InstanceSettingsDialog {
+                data: settings-data;
+                save(data, java_path, jvm_args) => { save-settings(data, java_path, jvm_args); }
+                close() => { cancel-settings(); }
+            }
+        }
+
+        if (show-details) : InstanceDetailsView {
+            instance: selected-instance;
+            visible-details: true;
+            close() => { close-details(); }
+            edit-settings() => { edit-settings(); }
+            rename(value) => { input-data.visible = true; input-data.value = value; }
+            duplicate() => { duplicate-instance(selected-instance.id); }
+        }
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "KCraft";
+    preferred-width: 1280px;
+    preferred-height: 860px;
+    background: Palette.bg-base;
+
+    in-out property <[AccountEntry]> accounts;
+    in-out property <[InstanceEntry]> instances;
+    in-out property <InstanceEntry> selected-instance;
+    in-out property <bool> loading;
+    in-out property <string> error-message;
+    in-out property <int> active-tab: 0;
+    in-out property <bool> msa-is-visible;
+    in-out property <string> msa-uri;
+    in-out property <string> msa-code;
+    in-out property <bool> is-dark: true;
+    in-out property <string> offline-username;
+    in-out property <string> elyby-username;
+    in-out property <string> elyby-token;
+
+    in-out property <bool> show-instance-details;
+    in-out property <ConfirmDialogData> confirm-data: { visible: false, title: "", message: "", confirm_label: "", is_destructive: false };
+    in-out property <InputDialogData> input-data: { visible: false, title: "", label: "", value: "", placeholder: "" };
+    in-out property <CreateInstanceData> create-data: { visible: false, name: "", mc_version: "", loader_type: "", loader_version: "" };
+    in-out property <InstanceSettingsData> settings-data: { visible: false, instance_id: "", name: "", java_path: "", min_mem: 0, max_mem: 0, window_width: 0, window_height: 0, jvm_args: "" };
+
+    in-out property <bool> progress-visible;
+    in-out property <string> progress-name;
+    in-out property <int> progress-completed;
+    in-out property <int> progress-total;
+
+    in-out property <string> modpack-result;
+    in-out property <[string]> modpack-selected-files;
+    in-out property <bool> modpack-analyzing;
+
+    callback refresh-instances();
+    callback launch-instance(string);
+    callback add-msa();
+    callback add-offline(string);
+    callback add-elyby(string, string);
+    callback build-modpack();
+    callback modpack-add-files();
+    callback modpack-clear-files();
+    callback delete-account(int);
+    callback set-default-account(int);
+    callback open-instance-details(int);
+    callback close-details();
+    callback edit-instance-settings();
+    callback save-instance-settings(InstanceSettingsData, string, string);
+    callback cancel-settings();
+    callback delete-instance(string);
+    callback confirm-delete();
+    callback cancel-delete();
+    callback rename-instance(string);
+    callback confirm-rename(string);
+    callback cancel-rename();
+    callback create-instance(CreateInstanceData);
+    callback confirm-create(string, string, string, string);
+    callback cancel-create();
+    callback duplicate-instance(string);
+    callback toggle-theme();
+
+    VerticalLayout {
+        padding: 0;
+        spacing: 0;
+
+        Rectangle {
+            background: rgba(30, 41, 59, 0.7);
+
+            HorizontalLayout {
+                padding-top: 16px; padding-bottom: 16px; padding-left: 32px; padding-right: 32px;
+                spacing: 16px;
+
+                Text {
+                    text: "KCraft";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Palette.accent;
+                }
+
+                HorizontalLayout { alignment: end; }
+                Button {
+                    text: is-dark ? "Light" : "Dark";
+                    clicked => { toggle-theme(); }
+                }
+            }
+        }
+
+        Rectangle {
+            background: rgba(30, 41, 59, 0.5);
+
+            HorizontalLayout {
+                padding-left: 32px; padding-right: 32px;
+                spacing: 16px;
+
+                Button {
+                    text: "Instances";
+                    clicked => { active-tab = 0; }
+                }
+
+                Button {
+                    text: "Modpack Builder";
+                    clicked => { active-tab = 1; }
+                }
+            }
+        }
+
+        ProgressBanner {
+            is-visible: progress-visible;
+            job-name: progress-name;
+            completed: progress-completed;
+            total: progress-total;
+        }
+
+        HorizontalLayout {
+            spacing: 0;
+
+            Sidebar {
+                accounts: accounts;
+                msa-is-visible: msa-is-visible;
+                msa-uri: msa-uri;
+                msa-code: msa-code;
+                offline-username: offline-username;
+                elyby-username: elyby-username;
+                elyby-token: elyby-token;
+                add-msa() => { root.add-msa(); }
+                add-offline(username) => { root.add-offline(username); }
+                add-elyby(user, token) => { root.add-elyby(user, token); }
+                delete-account(index) => { root.delete-account(index); }
+                set-default-account(index) => { root.set-default-account(index); }
+            }
+
+            if (active-tab == 0) : InstancesView {
+                instances: instances;
+                selected-instance: selected-instance;
+                loading: loading;
+                error-message: error-message;
+                show-details: show-instance-details;
+                settings-data: settings-data;
+                confirm-data: confirm-data;
+                input-data: input-data;
+                create-data: create-data;
+                launch-instance(id) => { root.launch-instance(id); }
+                refresh() => { root.refresh-instances(); }
+                show-instance-details(index) => { root.open-instance-details(index); }
+                close-details() => { root.close-details(); }
+                edit-settings() => { root.edit-instance-settings(); }
+                save-settings(data, java_path, jvm_args) => { root.save-instance-settings(data, java_path, jvm_args); }
+                cancel-settings() => { root.cancel-settings(); }
+                delete-instance(id) => { root.delete-instance(id); }
+                confirm-delete() => { root.confirm-delete(); }
+                cancel-delete() => { root.cancel-delete(); }
+                rename-instance(id) => { root.rename-instance(id); }
+                confirm-rename(value) => { root.confirm-rename(value); }
+                cancel-rename() => { root.cancel-rename(); }
+                create-instance(data) => { root.create-instance(data); }
+                confirm-create(name, mc_version, loader_type, loader_version) => { root.confirm-create(name, mc_version, loader_type, loader_version); }
+                cancel-create() => { root.cancel-create(); }
+                duplicate-instance(id) => { root.duplicate-instance(id); }
+            }
+
+            if (active-tab == 1) : ModpackBuilderView {
+                result-message: modpack-result;
+                selected-files: modpack-selected-files;
+                is-analyzing: modpack-analyzing;
+                build-modpack() => { root.build-modpack(); }
+                add-files() => { root.modpack-add-files(); }
+                clear-files() => { root.modpack-clear-files(); }
+            }
+        }
+    }
+}

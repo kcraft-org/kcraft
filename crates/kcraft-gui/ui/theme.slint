@@ -1,0 +1,71 @@
+export struct AccountEntry {
+    name: string,
+    type_name: string,
+    uuid: string,
+    token_validity: string,
+    token_status: string,
+}
+
+export struct InstanceEntry {
+    id: string,
+    name: string,
+    notes: string,
+    java_path: string,
+    min_mem: int,
+    max_mem: int,
+    window_width: int,
+    window_height: int,
+    game_root: string,
+    mods_root: string,
+}
+
+export struct ConfirmDialogData {
+    visible: bool,
+    title: string,
+    message: string,
+    confirm_label: string,
+    is_destructive: bool,
+}
+
+export struct InputDialogData {
+    visible: bool,
+    title: string,
+    label: string,
+    value: string,
+    placeholder: string,
+}
+
+export struct CreateInstanceData {
+    visible: bool,
+    name: string,
+    mc_version: string,
+    loader_type: string,
+    loader_version: string,
+}
+
+export struct InstanceSettingsData {
+    visible: bool,
+    instance_id: string,
+    name: string,
+    java_path: string,
+    min_mem: int,
+    max_mem: int,
+    window_width: int,
+    window_height: int,
+    jvm_args: string,
+}
+
+export global Palette {
+    in-out property <color> bg-base: #0f172a;
+    in-out property <color> bg-surface: #1e293b;
+    in-out property <color> bg-surface-hover: #334155;
+    in-out property <color> border-color: #334155;
+    in-out property <color> text-primary: #f8fafc;
+    in-out property <color> text-secondary: #94a3b8;
+    in-out property <color> accent: #6366f1;
+    in-out property <color> accent-hover: #4f46e5;
+    in-out property <color> danger: #ef4444;
+    in-out property <color> success: #22c55e;
+    in-out property <color> warning: #f59e0b;
+    in-out property <length> radius-card: 12px;
+}

@@ -1,0 +1,110 @@
+import { Button, LineEdit, ScrollView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { Palette } from "theme.slint";
+
+export component ModpackBuilderView {
+    in property <string> result-message;
+    in property <[string]> selected-files;
+    in property <bool> is-analyzing;
+    callback build-modpack();
+    callback add-files();
+    callback clear-files();
+
+    VerticalLayout {
+        padding: 32px;
+        spacing: 24px;
+
+        Rectangle {
+            background: Palette.bg-surface;
+            border-radius: Palette.radius-card;
+            border-width: 1px;
+            border-color: Palette.border-color;
+
+            VerticalLayout {
+                padding: 32px;
+                spacing: 24px;
+
+                Text {
+                    text: "Modpack Builder";
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: Palette.accent;
+                }
+
+                Text {
+                    text: "Build custom modpacks from JAR files and configuration.";
+                    color: Palette.text-secondary;
+                    font-size: 14px;
+                }
+
+                Rectangle {
+                    border-width: 2px;
+                    border-color: Palette.border-color;
+                    border-radius: 12px;
+                    min-height: 120px;
+                    max-height: 240px;
+                    background: rgba(0, 0, 0, 0.2);
+
+                    VerticalLayout {
+                        alignment: center;
+                        padding: 24px;
+                        spacing: 8px;
+                        Text {
+                            text: "Drag JAR files here or click to browse";
+                            color: Palette.text-secondary;
+                            font-size: 14px;
+                        }
+                        Button {
+                            text: "Browse Files";
+                            clicked => { add-files(); }
+                        }
+                        if (selected-files.length > 0) : ScrollView {
+                            VerticalLayout {
+                                for file in selected-files: Text {
+                                    text: file;
+                                    color: Palette.text-secondary;
+                                    font-size: 12px;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (result-message != "") : Rectangle {
+                    background: Palette.bg-surface;
+                    border-radius: 8px;
+                    border-width: 1px;
+                    border-color: Palette.success;
+
+                    VerticalLayout {
+                        padding: 16px;
+                        Text {
+                            text: result-message;
+                            color: Palette.text-primary;
+                            font-size: 14px;
+                        }
+                    }
+                }
+
+                if (is-analyzing) : Text {
+                    text: "Analyzing files...";
+                    color: Palette.text-secondary;
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    Button {
+                        text: "Clear Files";
+                        enabled: selected-files.length > 0;
+                        clicked => { clear-files(); }
+                    }
+                    HorizontalLayout { alignment: end; }
+                    Button {
+                        text: "Build Modpack";
+                        enabled: selected-files.length > 0 && !is-analyzing;
+                        clicked => { build-modpack(); }
+                    }
+                }
+            }
+        }
+    }
+}
