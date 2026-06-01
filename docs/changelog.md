@@ -2,4 +2,4 @@
 
 This file aggregates changelogs from the `changelog/` directory.
 
-- [v1.0.0](changelog/v1.0.0.md) — 2026-06-01
+Version 1.0.0 changelog is at changelog/v1.0.0.md (2026-06-01).

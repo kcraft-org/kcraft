@@ -6,23 +6,11 @@ KCraft is a production-ready Minecraft launcher written entirely in Rust. It sup
 
 ## Architecture
 
-- **GUI**: Slint native UI (no webview, no Node.js). `crates/kcraft-gui/`.
-- **Auth**: Microsoft OAuth2 (device code flow), Offline, Ely.by via `kcraft-auth`.
-- **Instances**: Minecraft instance management with full launch pipeline via `kcraft-minecraft`.
-- **Networking**: Async download engine with resume, validation, and progress via `kcraft-net`.
-- **Modpacks**: DAG-based dependency resolver for conflict-free modpack building.
+The GUI is built with Slint (native UI, no webview, no Node.js) in `crates/kcraft-gui/`. Authentication uses Microsoft OAuth2 (device code flow), offline mode, and Ely.by via `kcraft-auth`. Instance management with full launch pipeline is in `kcraft-minecraft`. Networking provides an async download engine with resume, validation, and progress in `kcraft-net`. Modpack building includes a DAG-based dependency resolver for conflict-free resolution.
 
 ## AI Agent Directives
 
-1. Production-ready code only — no `unimplemented!()`, `todo!()`, or `panic!()`.
-2. Before finalizing: `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test` must all pass.
-3. Use professional, objective language. No marketing fluff.
-4. All changes must be reflected in CI workflows.
-5. All commits must be signed-off.
-6. No placeholders, fallbacks, or workarounds in any code path. Every feature must be fully implemented with no stubs or conditional compilation for incomplete features.
-7. No criticalities, vulnerabilities, or unsafe code (unless strictly required and documented). Audit every dependency for known security issues.
-8. Every error path must be handled with proper user feedback, not silently swallowed.
-9. No regressions: verify existing tests pass and add new tests for new functionality.
+Production-ready code only — no `unimplemented!()`, `todo!()`, or `panic!()`. Before finalizing every change, run `cargo fmt --check`, `cargo clippy -D warnings`, and `cargo test` — all must pass. Use professional, objective language with no marketing fluff. All changes must be reflected in CI workflows and all commits must be signed-off. No placeholders, fallbacks, or workarounds in any code path — every feature must be fully implemented with no stubs or conditional compilation for incomplete features. No criticalities, vulnerabilities, or unsafe code (unless strictly required and documented). Audit every dependency for known security issues. Every error path must be handled with proper user feedback, not silently swallowed. No regressions: verify existing tests pass and add new tests for new functionality.
 
 ## Current State (Jun 1, 2026)
 

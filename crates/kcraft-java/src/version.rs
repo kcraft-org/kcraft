@@ -192,4 +192,31 @@ mod tests {
         assert!(!v2.requires_perm_gen());
         assert!(!v3.requires_perm_gen());
     }
+
+    #[test]
+    fn test_java_version_edge_cases() {
+        let v = JavaVersion::new("");
+        assert!(!v.is_parseable());
+
+        let v = JavaVersion::new("1.8.0_362");
+        assert!(v.is_parseable());
+        assert_eq!(v.major(), 8);
+        assert_eq!(v.minor(), 0);
+
+        let v = JavaVersion::new("21.0.1");
+        assert!(v.is_parseable());
+        assert_eq!(v.major(), 21);
+    }
+
+    #[test]
+    fn test_java_requires_perm_gen_boundaries() {
+        let v7 = JavaVersion::new("1.7.0");
+        assert!(v7.requires_perm_gen());
+
+        let v8 = JavaVersion::new("1.8.0");
+        assert!(!v8.requires_perm_gen());
+
+        let v9 = JavaVersion::new("9.0");
+        assert!(!v9.requires_perm_gen());
+    }
 }

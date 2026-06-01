@@ -2,8 +2,7 @@
 
 ## Prerequisites
 
-- Rust stable toolchain
-- libxkbcommon-dev, libssl-dev, libfontconfig-dev (Linux)
+You need the Rust stable toolchain and, on Linux, the packages libxkbcommon-dev, libssl-dev, and libfontconfig-dev.
 
 ## Build Commands
 

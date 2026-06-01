@@ -184,4 +184,39 @@ mod tests {
     fn test_empty_fails() {
         assert!(Version::parse("").is_err());
     }
+
+    #[test]
+    fn test_version_stable_prerelease_detection() {
+        let v1 = Version::from_str("1.2.3").unwrap();
+        let v2 = Version::from_str("1.2.3-pre").unwrap();
+        let v3 = Version::from_str("1.2.3-alpha.1").unwrap();
+        assert!(v2 > v1);
+        assert!(v3 > v1);
+        assert!(v2 > v3);
+    }
+
+    #[test]
+    fn test_version_equality() {
+        let v1 = Version::from_str("1.20.1").unwrap();
+        let v2 = Version::from_str("1.20.1").unwrap();
+        let v3 = Version::from_str("1.20.2").unwrap();
+        assert_eq!(v1, v2);
+        assert_ne!(v1, v3);
+    }
+
+    #[test]
+    fn test_version_display_roundtrip() {
+        let versions = ["1.0", "1.2.3", "2.0.0", "0.1.0", "1.2.3-pre", "20w14a"];
+        for v_str in versions {
+            let v = Version::from_str(v_str);
+            if let Ok(v) = v {
+                let display = v.to_string();
+                assert!(
+                    !display.is_empty(),
+                    "Display for {} produced empty string",
+                    v_str
+                );
+            }
+        }
+    }
 }

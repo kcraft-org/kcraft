@@ -198,4 +198,25 @@ mod tests {
         let res = resolver.resolve(&[PackageId("A".into())]);
         assert!(matches!(res, Err(ResolverError::CycleDetected(_))));
     }
+
+    #[test]
+    fn test_resolver_dependency_ordering() {
+        let mut resolver = Resolver::new();
+        resolver.add_node(DependencyNode {
+            id: PackageId("mod_a".into()),
+            version: "1.0".into(),
+            requires: vec![],
+            conflicts: vec![],
+        });
+        resolver.add_node(DependencyNode {
+            id: PackageId("mod_b".into()),
+            version: "1.0".into(),
+            requires: vec![PackageId("mod_a".into())],
+            conflicts: vec![],
+        });
+        let resolved = resolver.resolve(&[PackageId("mod_b".into())]).unwrap();
+        let mod_a_pos = resolved.iter().position(|d| d.0 == "mod_a");
+        let mod_b_pos = resolved.iter().position(|d| d.0 == "mod_b");
+        assert!(mod_a_pos < mod_b_pos, "mod_a must come before mod_b");
+    }
 }

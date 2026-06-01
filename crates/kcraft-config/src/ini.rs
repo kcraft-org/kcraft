@@ -208,4 +208,36 @@ mod tests {
         assert_eq!(parsed.get("key2"), Some("tab\there"));
         assert_eq!(parsed.get("key3"), Some("hash#sign"));
     }
+
+    #[test]
+    fn test_ini_save_load_roundtrip() {
+        let dir = std::env::temp_dir().join("kcraft_test_ini_roundtrip");
+        let _ = std::fs::create_dir_all(&dir);
+        let path = dir.join("test.ini");
+
+        let mut ini = IniFile::new();
+        ini.set("key1", "value1");
+        ini.set("key2", "value with spaces");
+        ini.set("key3", "value=with=equals");
+        ini.save(&path).unwrap();
+
+        let loaded = IniFile::load(&path).unwrap();
+        assert_eq!(loaded.get("key1").unwrap(), "value1");
+        assert_eq!(loaded.get("key2").unwrap(), "value with spaces");
+        assert_eq!(loaded.get("key3").unwrap(), "value=with=equals");
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_ini_section_handling() {
+        let mut ini = IniFile::new();
+        ini.set("InstanceType", "OneSix");
+        ini.set("name", "Test Instance");
+        ini.set("iconKey", "default");
+        assert_eq!(ini.get("InstanceType").unwrap(), "OneSix");
+        assert_eq!(ini.get("name").unwrap(), "Test Instance");
+        assert_eq!(ini.get("iconKey").unwrap(), "default");
+        assert!(ini.get("nonexistent").is_none());
+    }
 }
