@@ -11,9 +11,20 @@ use tauri::Emitter;
 use tracing::info;
 
 fn data_root() -> PathBuf {
-    dirs::data_dir()
-        .map(|d| d.join("kcrack"))
-        .unwrap_or_else(|| PathBuf::from("/tmp/kcrack"))
+    let path = dirs::data_dir().map(|d| d.join("kcrack"));
+    match path {
+        Some(p) => p,
+        None => {
+            let fallback = dirs::home_dir()
+                .map(|h| h.join(".local").join("share").join("kcrack"))
+                .unwrap_or_else(|| PathBuf::from("kcrack_data"));
+            tracing::warn!(
+                "Could not determine platform data directory, falling back to: {}",
+                fallback.display()
+            );
+            fallback
+        }
+    }
 }
 
 #[tauri::command]

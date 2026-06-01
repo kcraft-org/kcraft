@@ -373,7 +373,15 @@ impl LaunchStep for DirectJavaLaunchStep {
             .stderr(Stdio::piped());
 
         // Set environment variables
-        cmd.env("LD_LIBRARY_PATH", &native_path);
+        let existing_ld = std::env::var("LD_LIBRARY_PATH").unwrap_or_default();
+        if existing_ld.is_empty() {
+            cmd.env("LD_LIBRARY_PATH", &native_path);
+        } else {
+            cmd.env(
+                "LD_LIBRARY_PATH",
+                format!("{}:{}", native_path, existing_ld),
+            );
+        }
 
         task.log(
             &format!("Starting Minecraft: {} {}", java_path, args.join(" ")),

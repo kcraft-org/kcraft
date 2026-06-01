@@ -257,7 +257,7 @@ impl MojangVersionFormat {
 
 impl OneSixVersionFormat {
     pub fn from_json(_value: serde_json::Value) -> Option<VersionFile> {
-        // TODO: implement OneSix format parsing
+        tracing::warn!("OneSix format parsing is not yet implemented");
         None
     }
 }

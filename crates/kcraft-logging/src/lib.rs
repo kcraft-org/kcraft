@@ -56,7 +56,7 @@ impl Default for LogConfig {
         LogConfig {
             log_directory: log_dir,
             max_log_files: 5,
-            log_level: "debug".to_string(),
+            log_level: "info".to_string(),
         }
     }
 }
