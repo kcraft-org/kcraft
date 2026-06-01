@@ -1,0 +1,124 @@
+version: "1.0"
+
+minecraft:
+  cdn:
+    base_url: "https://launcher.mojang.com"
+    resources: "https://resources.download.minecraft.net"
+    assets: "https://assets.mojang.com/assets"
+    libraries: "https://libraries.minecraft.net"
+    version_manifest: "https://launcher.mojang.com/v1/products/minecraft-launcher/latest.json"
+    version_list: "https://launchermeta.mojang.com/mc/game/version_manifest_v2.json"
+  paths:
+    instances_dir: ".minecraft/instances"
+    java_dir: ".minecraft/java"
+    cache_dir: ".minecraft/cache"
+    logs_dir: ".minecraft/logs"
+    assets_dir: ".minecraft/assets"
+    libraries_dir: ".minecraft/libraries"
+    natives_dir: ".minecraft/natives"
+    game_dir: "."
+  defaults:
+    memory_min_mb: 512
+    memory_max_mb: 2048
+    jvm_args: "-XX:+UnlockExperimentalVMOptions -XX:G1NewCollectionIntervalInMs=47 -XX:G1ReservePercent=10 -XX:G1HeapWastePercent=10 -XX:InitiatingHeapOccupancyPercent=16"
+
+authentication:
+  microsoft:
+    client_id: "389b8795-5836-48ca-8d29-f6b904d52bcc"
+    redirect_uri: "http://localhost"
+    authorize_url: "https://login.live.com/oauth20_authorize.srf"
+    token_url: "https://login.live.com/oauth20_token.srf"
+    xbox_auth_url: "https://user.auth.xboxlive.com/user/authenticate"
+    xbox_xsts_url: "https://xsts.auth.xboxlive.com/xsts/authorize"
+    minecraft_auth_url: "https://api.minecraftservices.com/authentication/login_with_xbox"
+  yggdrasil:
+    base_url: "https://authserver.mojang.com"
+    authenticate: "/authenticate"
+    refresh: "/refresh"
+    validate: "/validate"
+    signout: "/signout"
+  ely_by:
+    base_url: "https://authserver.ely.by"
+    authenticate: "/authenticate"
+    refresh: "/refresh"
+    validate: "/validate"
+
+modplatforms:
+  modrinth:
+    api_base: "https://api.modrinth.com/v3"
+    cdn_base: "https://cdn.modrinth.com"
+    search_path: "/search"
+    project_path: "/project"
+    version_path: "/project/{id}/versions"
+    download_path: "/project/{id}/versions/{version_id}/files"
+    page_size: 25
+    timeout_secs: 60
+  curseforge:
+    api_base: "https://api.curseforge.com/v1"
+    client_id: "REDACTED"
+    api_key: "REDACTED"
+    minecraft_game_id: 432
+    mod_class_id: 6
+    search_path: "/mods/search"
+    get_mod: "/mods/{id}"
+    get_files: "/mods/{id}/files"
+    timeout_secs: 120
+  atlauncher:
+    api_base: "https://api.atlauncher.com/v1"
+    packs_path: "/packs"
+    pack_versions_path: "/packs/{id}/versions"
+    timeout_secs: 60
+  ftb:
+    api_base: "https://api.feed-the-beast.com"
+    modpacks_path: "/v1/modpacks/popular"
+    timeout_secs: 60
+  technic:
+    api_base: "https://api.technicpack.net"
+    modpacks_path: "/modpack/latest"
+    timeout_secs: 60
+
+network:
+  timeouts:
+    connection_secs: 10
+    read_secs: 60
+    write_secs: 120
+  cache:
+    metadata_expiry_days: 7
+    http_cache_dir: ".minecraft/http_cache"
+    max_cache_size_mb: 500
+  concurrent_downloads: 4
+  retry_attempts: 3
+
+java:
+  search_paths:
+    linux:
+      - "/usr/lib/jvm"
+      - "/usr/local/java"
+      - "~/.jdks"
+    macos:
+      - "/Library/Java/JavaVirtualMachines"
+      - "~/.jdks"
+    windows:
+      - "C:\\Program Files\\Java"
+      - "C:\\Program Files (x86)\\Java"
+      - "%PROGRAMFILES%\\Java"
+      - "%PROGRAMFILES(x86)%\\Java"
+  memory:
+    min_mb: 512
+    max_mb: 2048
+    permgen_mb: 256
+  agent:
+    authlib_injector: "https://authlib-injector.yushi.moe/download/latest.jar"
+
+launcher:
+  name: "KCraft"
+  version: "1.0.0"
+  user_agent: "KCraft/1.0.0 (Rust)"
+  data_dir: ".kcraft"
+  config_file: "kcraft.toml"
+  log_level: "info"
+  log_file: "kcraft.log"
+
+imgur:
+  client_id: "REDACTED"
+  base_url: "https://api.imgur.com/3"
