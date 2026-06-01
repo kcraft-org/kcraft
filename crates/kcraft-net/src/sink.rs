@@ -257,7 +257,7 @@ impl Sink for MetaCacheSink {
         }
 
         let digest_bytes = self.checksum.finalize_reset();
-        self.digest = Some(format!("{:x}", digest_bytes));
+        self.digest = Some(hex::encode(digest_bytes));
 
         let mut entry = self.entry.write().unwrap();
 

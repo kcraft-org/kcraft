@@ -32,8 +32,8 @@ chrono = { version = "0.4", features = ["serde", "clock"] }
 reqwest = { version = "0.13", features = ["json", "gzip", "brotli", "cookies", "blocking"] }
 tokio = { version = "1", features = ["full"] }
 url = { version = "2", features = ["serde"] }
-md-5 = "0.10"
-sha1 = "0.10"
+md-5 = "0.11"
+sha1 = "0.11"
 sha2 = "0.11"
 hex = "0.4"
 base64 = "0.22"

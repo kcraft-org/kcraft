@@ -37,7 +37,7 @@ impl HashEngine for Md5Engine {
     }
     fn finalize(&mut self) -> String {
         use md5::Digest;
-        format!("{:x}", self.0.finalize_reset())
+        hex::encode(self.0.finalize_reset())
     }
     fn box_clone(&self) -> Box<dyn HashEngine> {
         Box::new(Md5Engine(md5::Md5::new()))
@@ -51,8 +51,7 @@ impl HashEngine for Sha256Engine {
         sha2::Digest::update(&mut self.0, data);
     }
     fn finalize(&mut self) -> String {
-        let result = sha2::Digest::finalize_reset(&mut self.0);
-        format!("{:x}", result)
+        hex::encode(sha2::Digest::finalize_reset(&mut self.0))
     }
     fn box_clone(&self) -> Box<dyn HashEngine> {
         Box::new(Sha256Engine(sha2::Sha256::new()))
@@ -68,7 +67,7 @@ impl HashEngine for Sha1Engine {
     }
     fn finalize(&mut self) -> String {
         use sha1::Digest;
-        format!("{:x}", self.0.finalize_reset())
+        hex::encode(self.0.finalize_reset())
     }
     fn box_clone(&self) -> Box<dyn HashEngine> {
         Box::new(Sha1Engine(sha1::Sha1::new()))

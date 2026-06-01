@@ -1,5 +1,6 @@
 use kcraft_core::account::{AccountData, AccountState, AccountTaskState, AccountType, Validity};
 use tracing::{debug, info};
+use url::Url;
 
 use crate::parsers;
 use crate::AuthError;
@@ -128,12 +129,16 @@ impl crate::AuthStep for MsaTokenStep {
             }
 
             let client = reqwest::blocking::Client::new();
+
+            let device_code_body = url::form_urlencoded::Serializer::new(String::new())
+                .append_pair("client_id", &client_id)
+                .append_pair("scope", "XboxLive.signin offline_access")
+                .finish();
+
             let resp = client
                 .post("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode")
-                .form(&[
-                    ("client_id", &client_id),
-                    ("scope", &"XboxLive.signin offline_access".to_string()),
-                ])
+                .header("content-type", "application/x-www-form-urlencoded")
+                .body(device_code_body)
                 .send()
                 .map_err(|e| AuthError::Network(e.to_string()))?;
 
@@ -162,13 +167,16 @@ impl crate::AuthStep for MsaTokenStep {
                 }
                 std::thread::sleep(std::time::Duration::from_secs(5));
 
+                let token_body = url::form_urlencoded::Serializer::new(String::new())
+                    .append_pair("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
+                    .append_pair("client_id", &client_id)
+                    .append_pair("device_code", device_code)
+                    .finish();
+
                 let token_resp = client
                     .post("https://login.microsoftonline.com/consumers/oauth2/v2.0/token")
-                    .form(&[
-                        ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
-                        ("client_id", client_id.as_str()),
-                        ("device_code", device_code),
-                    ])
+                    .header("content-type", "application/x-www-form-urlencoded")
+                    .body(token_body)
                     .send()
                     .map_err(|e| AuthError::Network(e.to_string()))?;
 
@@ -411,12 +419,14 @@ impl crate::AuthStep for XboxProfileStep {
             .ok_or_else(|| AuthError::Auth("No Xbox API token".to_string()))?;
 
         let client = reqwest::blocking::Client::new();
+        let mut profile_url = Url::parse("https://profile.xboxlive.com/users/me/profile/settings")
+            .map_err(|e| AuthError::Network(e.to_string()))?;
+        profile_url.query_pairs_mut().append_pair(
+            "settings",
+            "GameDisplayName,PublicGamerpic,Gamerscore,Gamertag",
+        );
         let response = client
-            .get("https://profile.xboxlive.com/users/me/profile/settings")
-            .query(&[(
-                "settings",
-                "GameDisplayName,PublicGamerpic,Gamerscore,Gamertag",
-            )])
+            .get(profile_url)
             .header("Authorization", format!("XBL3.0 x={};{}", uhs, xbox_token))
             .header("x-xbl-contract-version", "3")
             .send()
@@ -470,9 +480,14 @@ impl crate::AuthStep for EntitlementsStep {
             })?;
 
         let client = reqwest::blocking::Client::new();
+        let mut entitlements_url =
+            Url::parse("https://api.minecraftservices.com/entitlements/license")
+                .map_err(|e| AuthError::Network(e.to_string()))?;
+        entitlements_url
+            .query_pairs_mut()
+            .append_pair("requestId", &uuid::Uuid::new_v4().to_string());
         let response = client
-            .get("https://api.minecraftservices.com/entitlements/license")
-            .query(&[("requestId", uuid::Uuid::new_v4().to_string())])
+            .get(entitlements_url)
             .header("Authorization", format!("Bearer {}", ygg_token))
             .send()
             .map_err(|e| AuthError::Network(e.to_string()))?;

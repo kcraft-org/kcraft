@@ -27,7 +27,7 @@ pub fn hash_file(path: &Path, algorithm: HashAlgorithm) -> Result<String, String
                 }
                 hasher.update(&buf[..n]);
             }
-            Ok(format!("{:x}", hasher.finalize()))
+            Ok(hex::encode(hasher.finalize()))
         }
         HashAlgorithm::Sha512 => {
             let mut hasher = Sha512::new();
@@ -41,7 +41,7 @@ pub fn hash_file(path: &Path, algorithm: HashAlgorithm) -> Result<String, String
                 }
                 hasher.update(&buf[..n]);
             }
-            Ok(format!("{:x}", hasher.finalize()))
+            Ok(hex::encode(hasher.finalize()))
         }
         HashAlgorithm::Murmur2 => {
             let mut data = Vec::new();
@@ -57,12 +57,12 @@ pub fn hash_data(data: &[u8], algorithm: HashAlgorithm) -> String {
         HashAlgorithm::Sha1 => {
             let mut hasher = Sha1::new();
             hasher.update(data);
-            format!("{:x}", hasher.finalize())
+            hex::encode(hasher.finalize())
         }
         HashAlgorithm::Sha512 => {
             let mut hasher = Sha512::new();
             hasher.update(data);
-            format!("{:x}", hasher.finalize())
+            hex::encode(hasher.finalize())
         }
         HashAlgorithm::Murmur2 => murmur2_hash(data),
     }
@@ -149,7 +149,7 @@ impl Hasher for Sha1Hasher {
         self.inner.update(data);
     }
     fn finalize(&self) -> String {
-        format!("{:x}", self.inner.clone().finalize())
+        hex::encode(self.inner.clone().finalize())
     }
 }
 
@@ -162,7 +162,7 @@ impl Hasher for Sha512Hasher {
         self.inner.update(data);
     }
     fn finalize(&self) -> String {
-        format!("{:x}", self.inner.clone().finalize())
+        hex::encode(self.inner.clone().finalize())
     }
 }
 
