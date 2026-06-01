@@ -16,4 +16,4 @@ kcraft-core = { path = "../core" }
 kcraft-fs = { path = "../fs" }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-winreg = "0.55"
+winreg = "0.56"
