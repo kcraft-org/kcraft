@@ -72,7 +72,7 @@ jobs:
         run: |
           version="${{ github.ref_name }}"
           version="${version#v}"
-          file="changelog/${version}.md"
+          file="CHANGELOG/V${version}.md"
           if [ -f "$file" ]; then
             body=$(cat "$file")
             delimiter="$(openssl rand -hex 16)"
