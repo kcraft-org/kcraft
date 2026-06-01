@@ -1,6 +1,6 @@
+use crate::ConfigError;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use crate::ConfigError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KraftConfig {
@@ -201,14 +201,11 @@ pub struct LauncherConfig {
 
 impl KraftConfig {
     pub fn from_yaml<P: AsRef<Path>>(path: P) -> Result<Self, ConfigError> {
-        let content = std::fs::read_to_string(path)
-            .map_err(ConfigError::Io)?;
-        serde_yaml::from_str(&content)
-            .map_err(|e| ConfigError::Parse(e.to_string()))
+        let content = std::fs::read_to_string(path).map_err(ConfigError::Io)?;
+        serde_yaml::from_str(&content).map_err(|e| ConfigError::Parse(e.to_string()))
     }
 
     pub fn to_yaml(&self) -> Result<String, ConfigError> {
-        serde_yaml::to_string(self)
-            .map_err(|e| ConfigError::Serialization(e.to_string()))
+        serde_yaml::to_string(self).map_err(|e| ConfigError::Serialization(e.to_string()))
     }
 }
