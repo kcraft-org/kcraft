@@ -1,3 +1,5 @@
+pub mod msa;
+
 use crate::data_root::data_root;
 use crate::AccountEntry;
 use kcraft_auth::{AccountList, MinecraftAccount};

@@ -67,10 +67,26 @@ jobs:
         with:
           path: artifacts
 
+      - name: Read Changelog
+        id: changelog
+        run: |
+          version="${{ github.ref_name }}"
+          version="${version#v}"
+          file="changelog/${version}.md"
+          if [ -f "$file" ]; then
+            body=$(cat "$file")
+            delimiter="$(openssl rand -hex 16)"
+            echo "body<<$delimiter" >> $GITHUB_OUTPUT
+            echo "$body" >> $GITHUB_OUTPUT
+            echo "$delimiter" >> $GITHUB_OUTPUT
+          else
+            echo "body=" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
-          draft: true
+          draft: false
           prerelease: false
-          generate_release_notes: true
+          body: ${{ steps.changelog.outputs.body }}

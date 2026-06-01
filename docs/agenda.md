@@ -19,6 +19,10 @@ KCraft is a production-ready Minecraft launcher written entirely in Rust. It sup
 3. Use professional, objective language. No marketing fluff.
 4. All changes must be reflected in CI workflows.
 5. All commits must be signed-off.
+6. No placeholders, fallbacks, or workarounds in any code path. Every feature must be fully implemented with no stubs or conditional compilation for incomplete features.
+7. No criticalities, vulnerabilities, or unsafe code (unless strictly required and documented). Audit every dependency for known security issues.
+8. Every error path must be handled with proper user feedback, not silently swallowed.
+9. No regressions: verify existing tests pass and add new tests for new functionality.
 
 ## Current State (Jun 1, 2026)
 

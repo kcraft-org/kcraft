@@ -4,7 +4,6 @@ mod accounts;
 mod data_root;
 mod instances;
 mod modpack;
-mod msa;
 mod net_events;
 
 use data_root::data_root;
@@ -30,7 +29,7 @@ fn main() {
 
     instances::setup_refresh(&app);
     instances::setup_launch(&app);
-    msa::setup_add_msa(&app);
+    accounts::msa::setup_add_msa(&app);
     accounts::setup_add_offline(&app);
     accounts::setup_add_elyby(&app);
     modpack::setup(&app);
