@@ -13,14 +13,14 @@ regex = "1"
 uuid = { workspace = true }
 chrono = { workspace = true }
 url = { workspace = true }
-walkdir = { workspace = true }
+walkdir.workspace = true
 once_cell = { workspace = true }
 kcraft-core = { path = "../core" }
 kcraft-fs = { path = "../fs" }
 kcraft-net = { path = "../net" }
 kcraft-http-cache = { path = "../http-cache" }
 kcraft-java = { path = "../java" }
-zip = { workspace = true }
+zip.workspace = true
 reqwest = { workspace = true, features = ["blocking"] }
 flate2 = { workspace = true }
 sha1 = { workspace = true }
