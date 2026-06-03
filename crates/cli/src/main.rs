@@ -1,9 +1,9 @@
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
+use app_core::build_config::BUILD_CONFIG;
 use auth::account_list::{AccountList, MinecraftAccount};
 use config::settings_object::{IniSettingsStorage, SettingsObject};
-use app_core::build_config::BUILD_CONFIG;
 use http_cache::HttpMetaCache;
 use minecraft::instance_list::InstanceList;
 use minecraft::launch::*;

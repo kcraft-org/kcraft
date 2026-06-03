@@ -192,9 +192,10 @@ impl ModUpdater {
             ModPlatform::Modrinth => {
                 let url = format!("{}/project/{}/version", MODRINTH_BASE_URL, mod_id);
                 let client = reqwest::blocking::Client::new();
-                let resp = client.get(&url).send().map_err(|e| {
-                    MinecraftError::Net(net::NetError::Network(e.to_string()))
-                })?;
+                let resp = client
+                    .get(&url)
+                    .send()
+                    .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
                 if !resp.status().is_success() {
                     return Ok(None);
                 }
@@ -225,9 +226,9 @@ impl ModUpdater {
                 if let Some(ref key) = self.api_key {
                     req = req.header("x-api-key", key);
                 }
-                let resp = req.send().map_err(|e| {
-                    MinecraftError::Net(net::NetError::Network(e.to_string()))
-                })?;
+                let resp = req
+                    .send()
+                    .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
                 if !resp.status().is_success() {
                     return Ok(None);
                 }
@@ -261,9 +262,10 @@ impl ModUpdater {
             ModPlatform::Modrinth => {
                 let url = format!("{}/project/{}/version", MODRINTH_BASE_URL, mod_id);
                 let client = reqwest::blocking::Client::new();
-                let resp = client.get(&url).send().map_err(|e| {
-                    MinecraftError::Net(net::NetError::Network(e.to_string()))
-                })?;
+                let resp = client
+                    .get(&url)
+                    .send()
+                    .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
                 if !resp.status().is_success() {
                     return Err(MinecraftError::ModUpdate(format!(
                         "Failed to query Modrinth for {}",
@@ -297,9 +299,9 @@ impl ModUpdater {
                 if let Some(ref key) = self.api_key {
                     req = req.header("x-api-key", key);
                 }
-                let resp = req.send().map_err(|e| {
-                    MinecraftError::Net(net::NetError::Network(e.to_string()))
-                })?;
+                let resp = req
+                    .send()
+                    .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
                 if !resp.status().is_success() {
                     return Err(MinecraftError::ModUpdate(format!(
                         "Failed to query CurseForge for {}",

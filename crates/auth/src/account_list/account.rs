@@ -191,26 +191,24 @@ impl MinecraftAccount {
                 if let Some(capes) = profile_obj.get("capes").and_then(|v| v.as_array()) {
                     for c in capes {
                         if let Some(co) = c.as_object() {
-                            data.minecraft_profile
-                                .capes
-                                .push(app_core::account::Cape {
-                                    id: co
-                                        .get("id")
-                                        .and_then(|v| v.as_str())
-                                        .unwrap_or("")
-                                        .to_string(),
-                                    url: co
-                                        .get("url")
-                                        .and_then(|v| v.as_str())
-                                        .unwrap_or("")
-                                        .to_string(),
-                                    alias: co
-                                        .get("alias")
-                                        .and_then(|v| v.as_str())
-                                        .unwrap_or("")
-                                        .to_string(),
-                                    data: None,
-                                });
+                            data.minecraft_profile.capes.push(app_core::account::Cape {
+                                id: co
+                                    .get("id")
+                                    .and_then(|v| v.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
+                                url: co
+                                    .get("url")
+                                    .and_then(|v| v.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
+                                alias: co
+                                    .get("alias")
+                                    .and_then(|v| v.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
+                                data: None,
+                            });
                         }
                     }
                 }

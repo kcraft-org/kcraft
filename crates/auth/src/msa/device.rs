@@ -22,9 +22,7 @@ impl crate::AuthStep for MsaDeviceCodeStep {
             data.msa_client_id = self.client_id.clone();
         }
         let client_id = if data.msa_client_id.is_empty() {
-            app_core::build_config::BUILD_CONFIG
-                .msa_client_id
-                .clone()
+            app_core::build_config::BUILD_CONFIG.msa_client_id.clone()
         } else {
             data.msa_client_id.clone()
         };

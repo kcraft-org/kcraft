@@ -2,8 +2,8 @@ pub mod msa;
 
 use crate::data_root::data_root;
 use crate::AccountEntry;
-use auth::{AccountList, MinecraftAccount};
 use app_core::account::{AccountData, AccountType, MinecraftProfile};
+use auth::{AccountList, MinecraftAccount};
 use slint::{SharedString, VecModel};
 use std::rc::Rc;
 

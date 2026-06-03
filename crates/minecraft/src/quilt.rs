@@ -93,22 +93,16 @@ impl QuiltInstaller {
                                     ::fs::ensure_folder_exists(parent)?;
                                 }
                                 let resp = reqwest::blocking::get(url).map_err(|e| {
-                                    MinecraftError::Net(net::NetError::Network(
-                                        e.to_string(),
-                                    ))
+                                    MinecraftError::Net(net::NetError::Network(e.to_string()))
                                 })?;
                                 if !resp.status().is_success() {
-                                    return Err(MinecraftError::Net(
-                                        net::NetError::HttpError(
-                                            resp.status().as_u16(),
-                                            format!("Failed to download {}", url),
-                                        ),
-                                    ));
+                                    return Err(MinecraftError::Net(net::NetError::HttpError(
+                                        resp.status().as_u16(),
+                                        format!("Failed to download {}", url),
+                                    )));
                                 }
                                 let bytes = resp.bytes().map_err(|e| {
-                                    MinecraftError::Net(net::NetError::Network(
-                                        e.to_string(),
-                                    ))
+                                    MinecraftError::Net(net::NetError::Network(e.to_string()))
                                 })?;
                                 fs::write(&dest, &bytes)?;
                             }

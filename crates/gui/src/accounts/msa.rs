@@ -1,7 +1,7 @@
 use crate::accounts;
 use crate::data_root::data_root;
-use auth::{AuthFlow, MinecraftAccount};
 use app_core::account::{AccountData, AccountTaskState};
+use auth::{AuthFlow, MinecraftAccount};
 
 use slint::ComponentHandle;
 

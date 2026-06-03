@@ -94,18 +94,19 @@ impl ModDownloadTask {
         let cache_file = cache_dir.join(format!("{:x}_{}", hash, file_name));
 
         if !cache_file.exists() {
-            let response = reqwest::get(url.as_str()).await.map_err(|e| {
-                ModDownloadError::Network(net::NetError::Network(e.to_string()))
-            })?;
+            let response = reqwest::get(url.as_str())
+                .await
+                .map_err(|e| ModDownloadError::Network(net::NetError::Network(e.to_string())))?;
 
             let status = response.status();
             if !status.is_success() {
                 return Err(ModDownloadError::DownloadFailed(status.as_u16()));
             }
 
-            let bytes = response.bytes().await.map_err(|e| {
-                ModDownloadError::Network(net::NetError::Network(e.to_string()))
-            })?;
+            let bytes = response
+                .bytes()
+                .await
+                .map_err(|e| ModDownloadError::Network(net::NetError::Network(e.to_string())))?;
 
             let tmp_cache = cache_file.with_extension("tmp");
             fs::write(&tmp_cache, &bytes)?;

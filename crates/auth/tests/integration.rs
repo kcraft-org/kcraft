@@ -1,5 +1,5 @@
-use auth::{generate_offline_uuid, AccountList, MinecraftAccount};
 use app_core::account::{AccountData, AccountType, MinecraftProfile};
+use auth::{generate_offline_uuid, AccountList, MinecraftAccount};
 
 #[test]
 fn test_account_list_save_load_roundtrip() {

@@ -1,5 +1,5 @@
-use base64::Engine;
 use app_core::account::{Cape, MinecraftProfile, Skin, Validity};
+use base64::Engine;
 
 pub fn parse_minecraft_profile(data: &[u8]) -> Option<MinecraftProfile> {
     let json: serde_json::Value = serde_json::from_slice(data).ok()?;

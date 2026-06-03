@@ -32,7 +32,7 @@ impl JvmArgs {
             format!("-Xmx{}M", self.max_memory_mb),
             format!("-Xms{}M", self.min_memory_mb),
         ];
-        
+
         let gc_flag = match self.gc_type {
             GcType::G1GC => "-XX:+UseG1GC",
             GcType::ZGC => "-XX:+UseZGC",
@@ -41,7 +41,7 @@ impl JvmArgs {
             GcType::Parallel => "-XX:+UseParallelGC",
         };
         args.push(gc_flag.to_string());
-        
+
         args.extend(self.custom_flags.iter().cloned());
         args
     }
