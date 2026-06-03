@@ -1,0 +1,10 @@
+[package]
+name = "kcraft-controller"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kcraft-core = { path = "../core" }
+tracing = { workspace = true }
+thiserror = { workspace = true }

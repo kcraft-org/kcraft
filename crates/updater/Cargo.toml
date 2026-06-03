@@ -1,0 +1,19 @@
+[package]
+name = "kcraft-updater"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kcraft-core = { path = "../core" }
+kcraft-net = { path = "../net" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+hex = { workspace = true }
+sha2 = { workspace = true }
+sha1 = { workspace = true }
+md-5 = { workspace = true }

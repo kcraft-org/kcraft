@@ -3182,6 +3182,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "kcraft-updater"
+version = "1.1.0-dev"
+dependencies = [
+ "hex",
+ "kcraft-core",
+ "kcraft-net",
+ "md-5 0.11.0",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha1",
+ "sha2",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "keyboard-types"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
