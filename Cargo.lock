@@ -483,7 +483,7 @@ dependencies = [
 
 [[package]]
 name = "auth"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "base64",
  "chrono",
@@ -1012,7 +1012,7 @@ dependencies = [
 
 [[package]]
 name = "config"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "fs",
  "serde",
@@ -1109,7 +1109,7 @@ dependencies = [
 
 [[package]]
 name = "core"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "backtrace",
  "base64",
@@ -1821,7 +1821,7 @@ dependencies = [
 
 [[package]]
 name = "fs"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "filetime",
  "path-clean",
@@ -2152,7 +2152,7 @@ checksum = "b40ca9252762c466af32d0b1002e91e4e1bc5398f77455e55474deb466355ff5"
 
 [[package]]
 name = "gui"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "auth",
  "core",
@@ -2317,7 +2317,7 @@ dependencies = [
 
 [[package]]
 name = "http-cache"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "chrono",
  "core",
@@ -3002,7 +3002,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "java"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "core",
  "flate2",
@@ -3104,7 +3104,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "auth",
  "config",
@@ -3293,7 +3293,7 @@ checksum = "616ec5685824bcc94416c6d4a7a446eea774a31efd7062c8480ba6fd06d7a6e5"
 
 [[package]]
 name = "logging"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "chrono",
  "serde",
@@ -3438,7 +3438,7 @@ checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
 name = "minecraft"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "chrono",
  "core",
@@ -3559,7 +3559,7 @@ dependencies = [
 
 [[package]]
 name = "net"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "chrono",
  "core",
@@ -6387,7 +6387,7 @@ checksum = "6d49784317cd0d1ee7ec5c716dd598ec5b4483ea832a2dced265471cc0f690ae"
 
 [[package]]
 name = "updater"
-version = "1.1.0-dev"
+version = "1.1.0"
 dependencies = [
  "core",
  "hex",
