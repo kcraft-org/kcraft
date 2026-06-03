@@ -2958,7 +2958,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "kcraft-auth",
  "kcraft-config",
@@ -2974,7 +2974,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-auth"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "base64",
  "chrono",
@@ -2995,7 +2995,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-config"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "kcraft-fs",
  "serde",
@@ -3007,7 +3007,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-core"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "base64",
  "chrono",
@@ -3020,7 +3020,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-fs"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "filetime",
  "path-clean",
@@ -3034,7 +3034,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-gui"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "dirs",
  "kcraft-auth",
@@ -3052,7 +3052,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-http-cache"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "chrono",
  "kcraft-core",
@@ -3067,7 +3067,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-java"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "kcraft-core",
  "kcraft-fs",
@@ -3083,7 +3083,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-logging"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "chrono",
  "serde",
@@ -3094,7 +3094,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-minecraft"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "chrono",
  "dirs",
@@ -3122,7 +3122,7 @@ dependencies = [
 
 [[package]]
 name = "kcraft-net"
-version = "1.0.0"
+version = "1.1.0-dev"
 dependencies = [
  "chrono",
  "futures-util",
