@@ -12,3 +12,4 @@ chrono = { workspace = true }
 thiserror = { workspace = true }
 base64 = { workspace = true }
 regex = { workspace = true }
+backtrace = "0.3"

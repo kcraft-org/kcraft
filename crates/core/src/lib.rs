@@ -1,18 +1,24 @@
 pub mod account;
 pub mod build_config;
+pub mod crash;
+pub mod portable;
 pub mod require;
 pub mod runtime;
 pub mod session;
 pub mod settings;
 pub mod task;
+pub mod theme;
 pub mod version;
 
 pub use account::*;
 pub use build_config::*;
+pub use crash::*;
+pub use portable::*;
 pub use require::*;
 pub use runtime::*;
 pub use session::*;
 pub use settings::*;
+pub use theme::*;
 pub use version::*;
 
 use serde::{Deserialize, Serialize};
@@ -30,6 +36,8 @@ pub enum CoreError {
     Serialization(String),
     #[error("Invalid input: {0}")]
     InvalidInput(String),
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
 }
 
 impl From<serde_json::Error> for CoreError {
