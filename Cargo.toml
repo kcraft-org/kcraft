@@ -18,6 +18,8 @@ members = [
     "crates/cli",
     # GUI
     "crates/gui",
+    # Updater
+    "crates/updater",
 ]
 
 [workspace.package]
@@ -63,3 +65,6 @@ kcraft-config = { path = "crates/config" }
 kcraft-net = { path = "crates/net" }
 kcraft-java = { path = "crates/java" }
 kcraft-minecraft = { path = "crates/minecraft" }
+kcraft-updater = { path = "crates/updater" }
+kcraft-controller = { path = "crates/controller" }
+kcraft-plugin = { path = "crates/plugin" }
