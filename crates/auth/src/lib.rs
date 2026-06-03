@@ -14,7 +14,7 @@ pub use offline::*;
 pub use parsers::*;
 pub use yggdrasil::*;
 
-use kcraft_core::account::{AccountData, AccountTaskState};
+use app_core::account::{AccountData, AccountTaskState};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -45,8 +45,8 @@ impl From<serde_json::Error> for AuthError {
     }
 }
 
-impl From<kcraft_core::CoreError> for AuthError {
-    fn from(e: kcraft_core::CoreError) -> Self {
+impl From<app_core::CoreError> for AuthError {
+    fn from(e: app_core::CoreError) -> Self {
         AuthError::Network(e.to_string())
     }
 }

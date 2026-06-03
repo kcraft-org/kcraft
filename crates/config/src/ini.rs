@@ -51,7 +51,7 @@ impl IniFile {
                 data.push_str(&format!("{}={}\n", key, escaped));
             }
         }
-        kcraft_fs::write(path, data.as_bytes()).map_err(|e| e.to_string())?;
+        fs::write(path, data.as_bytes()).map_err(|e| e.to_string())?;
         Ok(())
     }
 

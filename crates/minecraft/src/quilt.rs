@@ -46,9 +46,9 @@ impl QuiltInstaller {
     ) -> std::result::Result<Vec<QuiltLoaderVersion>, MinecraftError> {
         let url = format!("{}/versions/loader/{}", QUILT_META_URL, mc_version);
         let resp = reqwest::blocking::get(&url)
-            .map_err(|e| MinecraftError::Net(kcraft_net::NetError::Network(e.to_string())))?;
+            .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
         if !resp.status().is_success() {
-            return Err(MinecraftError::Net(kcraft_net::NetError::HttpError(
+            return Err(MinecraftError::Net(net::NetError::HttpError(
                 resp.status().as_u16(),
                 format!("Failed to fetch Quilt loader versions for {}", mc_version),
             )));
@@ -65,9 +65,9 @@ impl QuiltInstaller {
             QUILT_META_URL, self.mc_version, self.loader_version
         );
         let resp = reqwest::blocking::get(&url)
-            .map_err(|e| MinecraftError::Net(kcraft_net::NetError::Network(e.to_string())))?;
+            .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
         if !resp.status().is_success() {
-            return Err(MinecraftError::Net(kcraft_net::NetError::HttpError(
+            return Err(MinecraftError::Net(net::NetError::HttpError(
                 resp.status().as_u16(),
                 format!(
                     "Failed to fetch Quilt profile for {} {}",
@@ -90,27 +90,27 @@ impl QuiltInstaller {
                             let dest = libraries_dir.join(path);
                             if !dest.exists() {
                                 if let Some(parent) = dest.parent() {
-                                    kcraft_fs::ensure_folder_exists(parent)?;
+                                    ::fs::ensure_folder_exists(parent)?;
                                 }
                                 let resp = reqwest::blocking::get(url).map_err(|e| {
-                                    MinecraftError::Net(kcraft_net::NetError::Network(
+                                    MinecraftError::Net(net::NetError::Network(
                                         e.to_string(),
                                     ))
                                 })?;
                                 if !resp.status().is_success() {
                                     return Err(MinecraftError::Net(
-                                        kcraft_net::NetError::HttpError(
+                                        net::NetError::HttpError(
                                             resp.status().as_u16(),
                                             format!("Failed to download {}", url),
                                         ),
                                     ));
                                 }
                                 let bytes = resp.bytes().map_err(|e| {
-                                    MinecraftError::Net(kcraft_net::NetError::Network(
+                                    MinecraftError::Net(net::NetError::Network(
                                         e.to_string(),
                                     ))
                                 })?;
-                                kcraft_fs::write(&dest, &bytes)?;
+                                fs::write(&dest, &bytes)?;
                             }
                         }
                     }

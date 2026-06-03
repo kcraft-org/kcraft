@@ -98,7 +98,7 @@ impl ModUpdater {
         let mods_root = instance.mods_root();
         let mods_dir = Path::new(&mods_root);
         let backup_dir = mods_dir.join(".kcraft_backup");
-        kcraft_fs::ensure_folder_exists(&backup_dir)?;
+        ::fs::ensure_folder_exists(&backup_dir)?;
 
         for update in updates {
             let mod_path = Self::find_mod_file(mods_dir, &update.mod_id);
@@ -115,7 +115,7 @@ impl ModUpdater {
             let dest_path = mods_dir.join(file_name);
 
             let response = reqwest::blocking::get(&update.download_url)
-                .map_err(|e| MinecraftError::Net(kcraft_net::NetError::Network(e.to_string())))?;
+                .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
             let status = response.status();
             if !status.is_success() {
                 return Err(MinecraftError::ModUpdate(format!(
@@ -126,9 +126,9 @@ impl ModUpdater {
             }
             let bytes = response
                 .bytes()
-                .map_err(|e| MinecraftError::Net(kcraft_net::NetError::Network(e.to_string())))?;
+                .map_err(|e| MinecraftError::Net(net::NetError::Network(e.to_string())))?;
 
-            kcraft_fs::write(&dest_path, &bytes)?;
+            fs::write(&dest_path, &bytes)?;
 
             if let Some(ref old_path) = mod_path {
                 if old_path != &dest_path {
@@ -193,7 +193,7 @@ impl ModUpdater {
                 let url = format!("{}/project/{}/version", MODRINTH_BASE_URL, mod_id);
                 let client = reqwest::blocking::Client::new();
                 let resp = client.get(&url).send().map_err(|e| {
-                    MinecraftError::Net(kcraft_net::NetError::Network(e.to_string()))
+                    MinecraftError::Net(net::NetError::Network(e.to_string()))
                 })?;
                 if !resp.status().is_success() {
                     return Ok(None);
@@ -226,7 +226,7 @@ impl ModUpdater {
                     req = req.header("x-api-key", key);
                 }
                 let resp = req.send().map_err(|e| {
-                    MinecraftError::Net(kcraft_net::NetError::Network(e.to_string()))
+                    MinecraftError::Net(net::NetError::Network(e.to_string()))
                 })?;
                 if !resp.status().is_success() {
                     return Ok(None);
@@ -262,7 +262,7 @@ impl ModUpdater {
                 let url = format!("{}/project/{}/version", MODRINTH_BASE_URL, mod_id);
                 let client = reqwest::blocking::Client::new();
                 let resp = client.get(&url).send().map_err(|e| {
-                    MinecraftError::Net(kcraft_net::NetError::Network(e.to_string()))
+                    MinecraftError::Net(net::NetError::Network(e.to_string()))
                 })?;
                 if !resp.status().is_success() {
                     return Err(MinecraftError::ModUpdate(format!(
@@ -298,7 +298,7 @@ impl ModUpdater {
                     req = req.header("x-api-key", key);
                 }
                 let resp = req.send().map_err(|e| {
-                    MinecraftError::Net(kcraft_net::NetError::Network(e.to_string()))
+                    MinecraftError::Net(net::NetError::Network(e.to_string()))
                 })?;
                 if !resp.status().is_success() {
                     return Err(MinecraftError::ModUpdate(format!(

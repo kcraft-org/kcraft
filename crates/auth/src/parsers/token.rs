@@ -1,4 +1,4 @@
-use kcraft_core::account::{Token, Validity};
+use app_core::account::{Token, Validity};
 use std::collections::HashMap;
 
 pub fn parse_x_token_response(data: &[u8]) -> Option<Token> {

@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-fs"
+name = "fs"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

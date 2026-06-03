@@ -9,8 +9,8 @@ use url::Url;
 use crate::sink::{ByteArraySink, FileSink, MetaCacheSink, Sink};
 use crate::validator::Validator;
 use crate::{NetError, NetMode, Result, TaskState};
-use kcraft_core::BUILD_CONFIG;
-use kcraft_http_cache::MetaEntryPtr;
+use app_core::BUILD_CONFIG;
+use http_cache::MetaEntryPtr;
 
 pub struct Download {
     url: Url,

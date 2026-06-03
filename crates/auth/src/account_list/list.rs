@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use kcraft_core::account::Validity;
+use app_core::account::Validity;
 use tracing::debug;
 
 use crate::{AuthError, Result};
@@ -149,7 +149,7 @@ impl AccountList {
             let _ = std::fs::create_dir_all(parent);
         }
 
-        kcraft_fs::write(&self.file_path, data.as_bytes())
+        fs::write(&self.file_path, data.as_bytes())
             .map_err(|e| AuthError::Network(e.to_string()))?;
 
         debug!(

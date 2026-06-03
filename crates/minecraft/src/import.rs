@@ -39,7 +39,7 @@ impl ModpackImporter for FtbImporter {
             )));
         }
 
-        kcraft_fs::ensure_folder_exists(instances_dir)?;
+        ::fs::ensure_folder_exists(instances_dir)?;
 
         let file_stem = path
             .file_stem()
@@ -47,8 +47,8 @@ impl ModpackImporter for FtbImporter {
             .unwrap_or("imported_ftb_pack")
             .to_string();
 
-        let extract_dir = kcraft_fs::dir_name_from_string(&file_stem, instances_dir);
-        kcraft_fs::ensure_folder_exists(&extract_dir)?;
+        let extract_dir = fs::dir_name_from_string(&file_stem, instances_dir);
+        ::fs::ensure_folder_exists(&extract_dir)?;
 
         let file = std::fs::File::open(path)?;
         let mut archive = zip::ZipArchive::new(file)?;
@@ -109,8 +109,8 @@ impl ModpackImporter for FtbImporter {
             let overrides_src = extract_dir.join(&manifest.overrides);
             if overrides_src.exists() {
                 let mc_dir = extract_dir.join(".minecraft");
-                kcraft_fs::ensure_folder_exists(&mc_dir)?;
-                kcraft_fs::merge_folders(&mc_dir, &overrides_src)?;
+                ::fs::ensure_folder_exists(&mc_dir)?;
+                fs::merge_folders(&mc_dir, &overrides_src)?;
             }
         }
 
@@ -148,7 +148,7 @@ impl ModpackImporter for TechnicImporter {
             )));
         }
 
-        kcraft_fs::ensure_folder_exists(instances_dir)?;
+        ::fs::ensure_folder_exists(instances_dir)?;
 
         let file_stem = path
             .file_stem()
@@ -156,8 +156,8 @@ impl ModpackImporter for TechnicImporter {
             .unwrap_or("imported_technic_pack")
             .to_string();
 
-        let extract_dir = kcraft_fs::dir_name_from_string(&file_stem, instances_dir);
-        kcraft_fs::ensure_folder_exists(&extract_dir)?;
+        let extract_dir = fs::dir_name_from_string(&file_stem, instances_dir);
+        ::fs::ensure_folder_exists(&extract_dir)?;
 
         let file = std::fs::File::open(path)?;
         let mut archive = zip::ZipArchive::new(file)?;
@@ -170,18 +170,18 @@ impl ModpackImporter for TechnicImporter {
 
             if entry_name.starts_with("bin/modpack.jar") || entry_name.ends_with("modpack.jar") {
                 let dest = extract_dir.join("jarmods").join("modpack.jar");
-                kcraft_fs::ensure_file_path_exists(&dest)?;
+                fs::ensure_file_path_exists(&dest)?;
                 let mut data = Vec::new();
                 std::io::Read::read_to_end(&mut entry, &mut data)?;
-                kcraft_fs::write(&dest, &data)?;
+                fs::write(&dest, &data)?;
             }
 
             if entry_name == "config" {
                 let dest = extract_dir.join(".minecraft").join("config");
-                kcraft_fs::ensure_folder_exists(&dest)?;
+                ::fs::ensure_folder_exists(&dest)?;
                 let mut data = Vec::new();
                 std::io::Read::read_to_end(&mut entry, &mut data)?;
-                kcraft_fs::write(dest.join("config_backup"), &data)?;
+                fs::write(dest.join("config_backup"), &data)?;
             }
         }
 
@@ -210,12 +210,12 @@ impl ModpackImporter for TechnicImporter {
                 };
 
             if entry.is_dir() {
-                kcraft_fs::ensure_folder_exists(&dest_path)?;
+                ::fs::ensure_folder_exists(&dest_path)?;
             } else {
-                kcraft_fs::ensure_file_path_exists(&dest_path)?;
+                fs::ensure_file_path_exists(&dest_path)?;
                 let mut data = Vec::new();
                 std::io::Read::read_to_end(&mut entry, &mut data)?;
-                kcraft_fs::write(&dest_path, &data)?;
+                fs::write(&dest_path, &data)?;
             }
 
             if entry_name == "manifest.json" {

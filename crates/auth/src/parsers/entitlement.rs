@@ -1,4 +1,4 @@
-use kcraft_core::account::{MinecraftEntitlement, Validity};
+use app_core::account::{MinecraftEntitlement, Validity};
 
 pub fn parse_minecraft_entitlements(data: &[u8]) -> Option<MinecraftEntitlement> {
     let json: serde_json::Value = serde_json::from_slice(data).ok()?;

@@ -30,7 +30,7 @@ pub struct VersionEntry {
     pub sort_order: i32,
 }
 
-pub type FilterMap = HashMap<VersionRole, Box<dyn kcraft_core::filter::Filter + Send + Sync>>;
+pub type FilterMap = HashMap<VersionRole, Box<dyn app_core::filter::Filter + Send + Sync>>;
 
 pub struct VersionFilterModel {
     entries: Vec<VersionEntry>,
@@ -91,7 +91,7 @@ impl VersionFilterModel {
         }).cloned().collect();
     }
 
-    pub fn set_filter(&mut self, role: VersionRole, filter: Box<dyn kcraft_core::filter::Filter + Send + Sync>) {
+    pub fn set_filter(&mut self, role: VersionRole, filter: Box<dyn app_core::filter::Filter + Send + Sync>) {
         self.filters.insert(role, filter);
         self.apply_filters();
     }

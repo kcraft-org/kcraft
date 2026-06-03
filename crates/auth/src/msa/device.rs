@@ -1,4 +1,4 @@
-use kcraft_core::account::{AccountData, AccountTaskState, Token, Validity};
+use app_core::account::{AccountData, AccountTaskState, Token, Validity};
 use tracing::info;
 
 use crate::AuthError;
@@ -22,7 +22,7 @@ impl crate::AuthStep for MsaDeviceCodeStep {
             data.msa_client_id = self.client_id.clone();
         }
         let client_id = if data.msa_client_id.is_empty() {
-            kcraft_core::build_config::BUILD_CONFIG
+            app_core::build_config::BUILD_CONFIG
                 .msa_client_id
                 .clone()
         } else {

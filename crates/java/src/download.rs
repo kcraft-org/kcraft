@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use kcraft_net::{Download, NetMode};
+use net::{Download, NetMode};
 use serde::Deserialize;
 use url::Url;
 

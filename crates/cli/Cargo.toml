@@ -5,13 +5,13 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-kcraft-core = { path = "../core" }
-kcraft-logging = { path = "../logging" }
-kcraft-fs = { path = "../fs" }
-kcraft-config = { path = "../config" }
-kcraft-net = { path = "../net" }
-kcraft-http-cache = { path = "../http-cache" }
-kcraft-auth = { path = "../auth" }
-kcraft-minecraft = { path = "../minecraft" }
+app_core = { package = "core", path = "../core" }
+logging = { path = "../logging" }
+fs = { path = "../fs" }
+config = { path = "../config" }
+net = { path = "../net" }
+http-cache = { path = "../http-cache" }
+auth = { path = "../auth" }
+minecraft = { path = "../minecraft" }
 tokio = { workspace = true }
 tracing = { workspace = true }

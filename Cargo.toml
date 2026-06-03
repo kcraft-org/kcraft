@@ -59,12 +59,12 @@ regex = "1"
 tar = "0.4"
 
 # Local workspace crate dependencies
-kcraft-core = { path = "crates/core" }
-kcraft-logging = { path = "crates/logging" }
-kcraft-config = { path = "crates/config" }
-kcraft-net = { path = "crates/net" }
-kcraft-java = { path = "crates/java" }
-kcraft-minecraft = { path = "crates/minecraft" }
-kcraft-updater = { path = "crates/updater" }
-kcraft-controller = { path = "crates/controller" }
-kcraft-plugin = { path = "crates/plugin" }
+app_core = { package = "core", path = "crates/core" }
+logging = { path = "crates/logging" }
+config = { path = "crates/config" }
+net = { path = "crates/net" }
+java = { path = "crates/java" }
+minecraft = { path = "crates/minecraft" }
+updater = { path = "crates/updater" }
+controller = { path = "crates/controller" }
+plugin = { path = "crates/plugin" }

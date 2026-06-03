@@ -1,10 +1,10 @@
 use crate::data_root::data_root;
 use crate::InstanceEntry;
-use kcraft_auth::AccountList;
-use kcraft_core::account::AccountType;
-use kcraft_minecraft::instance::Instance;
-use kcraft_minecraft::instance_list::InstanceList;
-use kcraft_minecraft::launch::{
+use auth::AccountList;
+use app_core::account::AccountType;
+use minecraft::instance::Instance;
+use minecraft::instance_list::InstanceList;
+use minecraft::launch::{
     CheckJavaStep, CreateGameFoldersStep, DirectJavaLaunchStep, LaunchTask, PrintInstanceInfoStep,
 };
 use slint::{SharedString, VecModel};
@@ -105,7 +105,7 @@ pub fn setup_launch(app: &crate::AppWindow) {
             let mut task = LaunchTask::new(Instance::new(&inst.instance_root, &inst.name));
 
             let java = if inst.java_path.is_empty() {
-                kcraft_java::find_java_paths()
+                java::find_java_paths()
                     .first()
                     .cloned()
                     .unwrap_or_else(|| "java".to_string())
@@ -124,7 +124,7 @@ pub fn setup_launch(app: &crate::AppWindow) {
                 .default_account()
                 .or_else(|| account_list.at(0))
             {
-                let mut session = kcraft_minecraft::AuthSession::new(acc.data.profile_name());
+                let mut session = minecraft::AuthSession::new(acc.data.profile_name());
                 session.uuid = acc.data.profile_id().to_string();
                 session.player_name = acc.data.profile_name().to_string();
                 match acc.data.account_type {

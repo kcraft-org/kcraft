@@ -33,7 +33,7 @@ pub fn create_backup(
         )));
     }
 
-    kcraft_fs::ensure_folder_exists(backup_dir)?;
+    ::fs::ensure_folder_exists(backup_dir)?;
 
     let timestamp = Utc::now();
     let ts_str = timestamp.format("%Y%m%d_%H%M%S").to_string();
@@ -67,7 +67,7 @@ pub fn create_backup(
         "world_name": world_name,
         "size_bytes": size_bytes,
     });
-    kcraft_fs::write(&metadata_path, &serde_json::to_vec_pretty(&meta)?)?;
+    fs::write(&metadata_path, &serde_json::to_vec_pretty(&meta)?)?;
 
     Ok(WorldBackup {
         name: backup_filename,
@@ -102,7 +102,7 @@ pub fn list_backups(instance: &Instance) -> std::result::Result<Vec<WorldBackup>
 
             let metadata_path = path.with_extension("json");
             let (timestamp, world_name, size_bytes) = if metadata_path.exists() {
-                if let Ok(content) = kcraft_fs::read_to_string(&metadata_path) {
+                if let Ok(content) = fs::read_to_string(&metadata_path) {
                     if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&content) {
                         let ts = meta
                             .get("timestamp")

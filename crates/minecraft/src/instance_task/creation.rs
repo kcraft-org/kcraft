@@ -89,7 +89,7 @@ impl VanillaInstanceCreationTask {
         }
 
         let cfg_path = Path::new(&staging).join("instance.cfg");
-        let mut ini = kcraft_core::INIFile::new();
+        let mut ini = app_core::INIFile::new();
         ini.set("InstanceType", "OneSix");
         ini.set("name", &self.base.base.name());
         ini.set("iconKey", self.base.base.icon());

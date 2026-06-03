@@ -57,7 +57,7 @@ pub fn install_resource_pack(
 
     let rp_dir_str = instance.resource_packs_dir();
     let rp_dir = Path::new(&rp_dir_str);
-    kcraft_fs::ensure_folder_exists(rp_dir)?;
+    ::fs::ensure_folder_exists(rp_dir)?;
 
     let dest_name = source
         .file_name()
@@ -72,7 +72,7 @@ pub fn install_resource_pack(
     }
 
     if source.is_dir() {
-        kcraft_fs::copy_dir_recursive(source, &dest, &[])?;
+        fs::copy_dir_recursive(source, &dest, &[])?;
     } else {
         std::fs::copy(source, &dest)?;
     }
@@ -107,7 +107,7 @@ pub fn remove_resource_pack(
 pub fn enable_pack(instance: &Instance, name: &str) -> std::result::Result<(), MinecraftError> {
     let options_path = Path::new(&instance.game_root()).join("options.txt");
     let content = if options_path.exists() {
-        kcraft_fs::read_to_string(&options_path)?
+        fs::read_to_string(&options_path)?
     } else {
         String::new()
     };
@@ -135,7 +135,7 @@ pub fn enable_pack(instance: &Instance, name: &str) -> std::result::Result<(), M
         lines.push(format!("resourcePacks:[\"{}\"]", name));
     }
 
-    kcraft_fs::write(&options_path, lines.join("\n").as_bytes())?;
+    fs::write(&options_path, lines.join("\n").as_bytes())?;
     Ok(())
 }
 
@@ -145,7 +145,7 @@ pub fn disable_pack(instance: &Instance, name: &str) -> std::result::Result<(), 
         return Ok(());
     }
 
-    let content = kcraft_fs::read_to_string(&options_path)?;
+    let content = fs::read_to_string(&options_path)?;
     let mut lines: Vec<String> = content.lines().map(|l| l.to_string()).collect();
 
     for line in &mut lines {
@@ -159,7 +159,7 @@ pub fn disable_pack(instance: &Instance, name: &str) -> std::result::Result<(), 
         }
     }
 
-    kcraft_fs::write(&options_path, lines.join("\n").as_bytes())?;
+    fs::write(&options_path, lines.join("\n").as_bytes())?;
     Ok(())
 }
 

@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-gui"
+name = "gui"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,12 +10,12 @@ tracing.workspace = true
 dirs = "6"
 rfd = "0.17"
 tokio.workspace = true
-kcraft-core.workspace = true
-kcraft-logging.workspace = true
-kcraft-net.workspace = true
-kcraft-java.workspace = true
-kcraft-minecraft.workspace = true
-kcraft-auth = { path = "../auth" }
+app_core.workspace = true
+logging.workspace = true
+net.workspace = true
+java.workspace = true
+minecraft.workspace = true
+auth = { path = "../auth" }
 
 [build-dependencies]
 slint-build = "1.16"

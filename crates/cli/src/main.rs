@@ -1,13 +1,13 @@
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
-use kcraft_auth::account_list::{AccountList, MinecraftAccount};
-use kcraft_config::settings_object::{IniSettingsStorage, SettingsObject};
-use kcraft_core::build_config::BUILD_CONFIG;
-use kcraft_http_cache::HttpMetaCache;
-use kcraft_minecraft::instance_list::InstanceList;
-use kcraft_minecraft::launch::*;
-use kcraft_minecraft::MinecraftServerTarget;
+use auth::account_list::{AccountList, MinecraftAccount};
+use config::settings_object::{IniSettingsStorage, SettingsObject};
+use app_core::build_config::BUILD_CONFIG;
+use http_cache::HttpMetaCache;
+use minecraft::instance_list::InstanceList;
+use minecraft::launch::*;
+use minecraft::MinecraftServerTarget;
 use tracing::info;
 
 fn determine_data_path() -> PathBuf {
@@ -55,13 +55,13 @@ fn init_logging(data_path: &Path) {
     let log_dir = data_path.join("logs");
     let _ = std::fs::create_dir_all(&log_dir);
 
-    let config = kcraft_logging::LogConfig {
+    let config = logging::LogConfig {
         log_directory: log_dir,
         max_log_files: 5,
         log_level: "debug".to_string(),
     };
 
-    let log_manager = kcraft_logging::LogManager::new(config);
+    let log_manager = logging::LogManager::new(config);
     log_manager.init();
     info!("Logger initialized");
 }
@@ -204,8 +204,8 @@ fn print_instance_list(instances: &InstanceList) {
 }
 
 fn build_launch_task(
-    instance: &kcraft_minecraft::Instance,
-    session: Option<kcraft_minecraft::AuthSession>,
+    instance: &minecraft::Instance,
+    session: Option<minecraft::AuthSession>,
     server: Option<MinecraftServerTarget>,
     data_root: &str,
 ) -> LaunchTask {
@@ -321,7 +321,7 @@ async fn main() {
             accounts.default_account().cloned()
         };
 
-        let session = account.map(|a| kcraft_minecraft::AuthSession::new(a.data.profile_name()));
+        let session = account.map(|a| minecraft::AuthSession::new(a.data.profile_name()));
 
         let server = server_addr.map(|addr| MinecraftServerTarget::parse(&addr));
 

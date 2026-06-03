@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-http-cache"
+name = "http-cache"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -12,5 +12,5 @@ chrono = { workspace = true }
 tracing = { workspace = true }
 thiserror = { workspace = true }
 url = { workspace = true }
-kcraft-core = { path = "../core" }
-kcraft-fs = { path = "../fs" }
+app_core = { package = "core", path = "../core" }
+fs = { path = "../fs" }

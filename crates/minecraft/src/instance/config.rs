@@ -48,7 +48,7 @@ impl Instance {
     pub fn load_specific_settings(&mut self) {
         let cfg_path = Path::new(&self.instance_root).join("instance.cfg");
         if let Ok(content) = std::fs::read_to_string(&cfg_path) {
-            let mut ini = kcraft_core::INIFile::new();
+            let mut ini = app_core::INIFile::new();
             ini.load(&content);
 
             if let Some(v) = ini.get("name") {
@@ -111,7 +111,7 @@ impl Instance {
 
     pub fn save_now(&self) {
         let cfg_path = Path::new(&self.instance_root).join("instance.cfg");
-        let mut ini = kcraft_core::INIFile::new();
+        let mut ini = app_core::INIFile::new();
         ini.set("InstanceType", "OneSix");
         ini.set("name", &self.name);
         ini.set("iconKey", &self.icon_key);

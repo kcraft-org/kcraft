@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
 
-use kcraft_core::Version;
+use app_core::Version;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

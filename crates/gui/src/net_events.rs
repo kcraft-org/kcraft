@@ -5,7 +5,7 @@ pub fn spawn(app: &crate::AppWindow) -> std::thread::JoinHandle<()> {
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async move {
-            let mut rx = kcraft_net::NET_EVENTS.subscribe();
+            let mut rx = net::NET_EVENTS.subscribe();
             while let Ok(event) = rx.recv().await {
                 let weak = weak.clone();
                 let _ = slint::invoke_from_event_loop(move || {

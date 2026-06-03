@@ -1,4 +1,4 @@
-use kcraft_core::account::{Token, Validity};
+use app_core::account::{Token, Validity};
 
 pub(crate) fn token_to_json(token: &Token) -> serde_json::Value {
     let mut map = serde_json::Map::new();

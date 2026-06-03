@@ -1,4 +1,4 @@
-use kcraft_core::account::{AccountData, AccountTaskState, Validity};
+use app_core::account::{AccountData, AccountTaskState, Validity};
 use tracing::info;
 
 use crate::parsers;

@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-java"
+name = "java"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -12,9 +12,9 @@ walkdir = { workspace = true }
 which = { workspace = true }
 regex = "1"
 shell-words = "1"
-kcraft-core = { path = "../core" }
-kcraft-fs = { path = "../fs" }
-kcraft-net = { path = "../net" }
+app_core = { package = "core", path = "../core" }
+fs = { path = "../fs" }
+net = { path = "../net" }
 tempfile = { workspace = true }
 flate2 = { workspace = true }
 tar = "0.4"

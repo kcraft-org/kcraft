@@ -6,7 +6,7 @@ use crate::modplatform::Provider;
 #[derive(Debug, thiserror::Error)]
 pub enum ModDownloadError {
     #[error("Network error: {0}")]
-    Network(#[from] kcraft_net::NetError),
+    Network(#[from] net::NetError),
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
     #[error("Invalid URL: {0}")]
@@ -95,7 +95,7 @@ impl ModDownloadTask {
 
         if !cache_file.exists() {
             let response = reqwest::get(url.as_str()).await.map_err(|e| {
-                ModDownloadError::Network(kcraft_net::NetError::Network(e.to_string()))
+                ModDownloadError::Network(net::NetError::Network(e.to_string()))
             })?;
 
             let status = response.status();
@@ -104,7 +104,7 @@ impl ModDownloadTask {
             }
 
             let bytes = response.bytes().await.map_err(|e| {
-                ModDownloadError::Network(kcraft_net::NetError::Network(e.to_string()))
+                ModDownloadError::Network(net::NetError::Network(e.to_string()))
             })?;
 
             let tmp_cache = cache_file.with_extension("tmp");

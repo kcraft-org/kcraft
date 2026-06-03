@@ -1,4 +1,4 @@
-use kcraft_core::account::{AccountData, AccountTaskState};
+use app_core::account::{AccountData, AccountTaskState};
 use tracing::debug;
 use tracing::info;
 

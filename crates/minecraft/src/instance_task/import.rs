@@ -89,7 +89,7 @@ impl InstanceImportTask {
         extract_zip(archive, &game_dir).map_err(|e| format!("Extraction failed: {}", e))?;
 
         let cfg_path = staging.join("instance.cfg");
-        let mut ini = kcraft_core::INIFile::new();
+        let mut ini = app_core::INIFile::new();
         ini.set("InstanceType", "OneSix");
         ini.set("name", &self.base.name());
         ini.set("iconKey", self.base.icon());
@@ -187,7 +187,7 @@ impl InstanceImportTask {
         }
 
         let cfg_path = staging.join("instance.cfg");
-        let mut ini = kcraft_core::INIFile::new();
+        let mut ini = app_core::INIFile::new();
         ini.set("InstanceType", "OneSix");
         ini.set("name", name);
         ini.set("iconKey", self.base.icon());
@@ -320,7 +320,7 @@ impl InstanceImportTask {
         }
 
         let cfg_path = staging.join("instance.cfg");
-        let mut ini = kcraft_core::INIFile::new();
+        let mut ini = app_core::INIFile::new();
         ini.set("InstanceType", "OneSix");
         ini.set("name", name);
         ini.set("iconKey", self.base.icon());

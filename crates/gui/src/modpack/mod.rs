@@ -18,18 +18,18 @@ pub fn setup(app: &crate::AppWindow) {
             None => return,
         };
 
-        let mut resolver = kcraft_minecraft::resolver::Resolver::new();
+        let mut resolver = minecraft::resolver::Resolver::new();
         let mut roots = Vec::new();
 
         for (i, file) in files.iter().enumerate() {
-            let pkg_id = kcraft_minecraft::resolver::PackageId(format!("mod_{}", i));
+            let pkg_id = minecraft::resolver::PackageId(format!("mod_{}", i));
             let path = std::path::Path::new(file);
             if !path.exists() {
                 app.set_error_message(format!("File not found: {}", file.display()).into());
                 return;
             }
 
-            resolver.add_node(kcraft_minecraft::resolver::DependencyNode {
+            resolver.add_node(minecraft::resolver::DependencyNode {
                 id: pkg_id.clone(),
                 version: "1.0.0".to_string(),
                 requires: vec![],

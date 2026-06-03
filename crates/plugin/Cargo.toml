@@ -1,12 +1,12 @@
 [package]
-name = "kcraft-plugin"
+name = "plugin"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
-kcraft-core = { path = "../core" }
-kcraft-minecraft = { path = "../minecraft" }
+app_core = { package = "core", path = "../core" }
+minecraft = { path = "../minecraft" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 tracing = { workspace = true }

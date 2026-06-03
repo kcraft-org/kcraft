@@ -1,4 +1,4 @@
-use kcraft_core::account::{AccountData, AccountState, AccountType, Validity};
+use app_core::account::{AccountData, AccountState, AccountType, Validity};
 
 use crate::AuthFlow;
 
@@ -193,7 +193,7 @@ impl MinecraftAccount {
                         if let Some(co) = c.as_object() {
                             data.minecraft_profile
                                 .capes
-                                .push(kcraft_core::account::Cape {
+                                .push(app_core::account::Cape {
                                     id: co
                                         .get("id")
                                         .and_then(|v| v.as_str())

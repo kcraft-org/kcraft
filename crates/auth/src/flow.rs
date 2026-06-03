@@ -1,5 +1,5 @@
 use crate::{AuthError, AuthFlow, Result};
-use kcraft_core::account::{AccountData, AccountTaskState, Validity};
+use app_core::account::{AccountData, AccountTaskState, Validity};
 
 pub enum FlowKind {
     Offline(crate::OfflineFlow),
@@ -12,11 +12,11 @@ impl FlowKind {
     pub fn execute(&mut self, data: &mut AccountData) -> Result<AccountTaskState> {
         match self {
             FlowKind::Offline(flow) => {
-                data.account_type = kcraft_core::account::AccountType::Offline;
+                data.account_type = app_core::account::AccountType::Offline;
                 flow.execute(data)
             }
             FlowKind::Msa(flow) => {
-                data.account_type = kcraft_core::account::AccountType::Msa;
+                data.account_type = app_core::account::AccountType::Msa;
                 flow.execute(data)
             }
             FlowKind::Yggdrasil(flow) => flow.execute(data),
@@ -36,15 +36,15 @@ impl FlowKind {
 
 pub fn dispatch_refresh(data: &mut AccountData) -> Result<AccountTaskState> {
     match data.account_type {
-        kcraft_core::account::AccountType::Offline => {
+        app_core::account::AccountType::Offline => {
             let mut flow = crate::OfflineFlow::new(data.profile_name().to_string());
             flow.execute(data)
         }
-        kcraft_core::account::AccountType::Msa => {
+        app_core::account::AccountType::Msa => {
             let mut flow = crate::MsaFlow::new_silent();
             flow.execute(data)
         }
-        kcraft_core::account::AccountType::AuthlibInjector => {
+        app_core::account::AccountType::AuthlibInjector => {
             if data.authlib_injector_base_url.is_empty() {
                 return Err(AuthError::Auth(
                     "Authlib-Injector base URL not set".to_string(),

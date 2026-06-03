@@ -19,9 +19,9 @@ impl InstanceCloner {
             )));
         }
 
-        let dest_dir = kcraft_fs::dir_name_from_string(new_name, instances_dir);
+        let dest_dir = fs::dir_name_from_string(new_name, instances_dir);
 
-        kcraft_fs::ensure_folder_exists(dest_dir.parent().unwrap_or(Path::new(".")))?;
+        ::fs::ensure_folder_exists(dest_dir.parent().unwrap_or(Path::new(".")))?;
 
         let exclusions: &[&str] = &["crash-reports", "logs", "server-scripts", "server-packs"];
         process_copy(src_path, &dest_dir, exclusions)?;
@@ -45,7 +45,7 @@ pub fn process_copy(
     dst: &Path,
     filter: &[&str],
 ) -> std::result::Result<(), MinecraftError> {
-    kcraft_fs::ensure_folder_exists(dst)?;
+    ::fs::ensure_folder_exists(dst)?;
 
     for entry in walkdir::WalkDir::new(src)
         .into_iter()
@@ -70,10 +70,10 @@ pub fn process_copy(
         let dest_path = dst.join(relative);
 
         if entry.file_type().is_dir() {
-            kcraft_fs::ensure_folder_exists(&dest_path)?;
+            ::fs::ensure_folder_exists(&dest_path)?;
         } else if entry.file_type().is_file() {
             if let Some(parent) = dest_path.parent() {
-                kcraft_fs::ensure_folder_exists(parent)?;
+                ::fs::ensure_folder_exists(parent)?;
             }
             std::fs::copy(entry.path(), &dest_path)?;
         }

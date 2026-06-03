@@ -303,7 +303,7 @@ impl HttpMetaCache {
         if let Some(parent) = self.index_path.parent() {
             let _ = std::fs::create_dir_all(parent);
         }
-        kcraft_fs::write(&self.index_path, data.as_bytes())
+        fs::write(&self.index_path, data.as_bytes())
             .map_err(|e| format!("Failed to write cache index: {}", e))?;
         *self.dirty.write().unwrap() = false;
         Ok(())

@@ -6,7 +6,7 @@ use url::Url;
 
 use crate::sink::{ByteArraySink, Sink};
 use crate::{NetError, Result, TaskState};
-use kcraft_core::BUILD_CONFIG;
+use app_core::BUILD_CONFIG;
 
 pub struct Upload {
     url: Url,

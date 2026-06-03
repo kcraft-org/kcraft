@@ -1,4 +1,4 @@
-use kcraft_core::account::{AccountData, AccountState, AccountTaskState, AccountType, Validity};
+use app_core::account::{AccountData, AccountState, AccountTaskState, AccountType, Validity};
 use tracing::debug;
 use url::Url;
 

@@ -251,9 +251,9 @@ pub enum MinecraftError {
     #[error("Walkdir error: {0}")]
     Walkdir(#[from] walkdir::Error),
     #[error("File system error: {0}")]
-    Fs(#[from] kcraft_fs::FsError),
+    Fs(#[from] fs::FsError),
     #[error("Network error: {0}")]
-    Net(#[from] kcraft_net::NetError),
+    Net(#[from] net::NetError),
     #[error("Serialization error: {0}")]
     Serialization(String),
     #[error("Parse error: {0}")]
@@ -267,7 +267,7 @@ pub enum MinecraftError {
     #[error("Zip error: {0}")]
     Zip(#[from] zip::result::ZipError),
     #[error("Java error: {0}")]
-    Java(#[from] kcraft_java::JavaError),
+    Java(#[from] ::java::JavaError),
     #[error("Mod update error: {0}")]
     ModUpdate(String),
     #[error("Script execution error: {0}")]

@@ -60,7 +60,7 @@ pub fn install_shader_pack(
 
     let sp_dir_str = instance.shader_packs_dir();
     let sp_dir = Path::new(&sp_dir_str);
-    kcraft_fs::ensure_folder_exists(sp_dir)?;
+    ::fs::ensure_folder_exists(sp_dir)?;
 
     let dest_name = source
         .file_name()
@@ -75,7 +75,7 @@ pub fn install_shader_pack(
     }
 
     if source.is_dir() {
-        kcraft_fs::copy_dir_recursive(source, &dest, &[])?;
+        fs::copy_dir_recursive(source, &dest, &[])?;
     } else {
         std::fs::copy(source, &dest)?;
     }

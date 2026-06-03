@@ -25,21 +25,21 @@ pub fn export_server_pack(
     if export_dir.exists() {
         std::fs::remove_dir_all(&export_dir)?;
     }
-    kcraft_fs::ensure_folder_exists(&export_dir)?;
+    ::fs::ensure_folder_exists(&export_dir)?;
 
     // Copy mods
     let mods_root = instance.mods_root();
     let mods_src = Path::new(&mods_root);
     if mods_src.exists() {
         let mods_dst = export_dir.join("mods");
-        kcraft_fs::copy_dir_recursive(mods_src, &mods_dst, &[])?;
+        fs::copy_dir_recursive(mods_src, &mods_dst, &[])?;
     }
 
     // Copy config
     let config_src = Path::new(&instance.game_root()).join("config");
     if config_src.exists() {
         let config_dst = export_dir.join("config");
-        kcraft_fs::copy_dir_recursive(&config_src, &config_dst, &[])?;
+        fs::copy_dir_recursive(&config_src, &config_dst, &[])?;
     }
 
     // Copy default world if exists
@@ -53,7 +53,7 @@ pub fn export_server_pack(
         entries.sort_by_key(|e| e.file_name());
         if let Some(first_world) = entries.first() {
             let world_dst = export_dir.join(first_world.file_name());
-            kcraft_fs::copy_dir_recursive(&first_world.path(), &world_dst, &[])?;
+            fs::copy_dir_recursive(&first_world.path(), &world_dst, &[])?;
         }
     }
 
@@ -62,14 +62,14 @@ pub fn export_server_pack(
     let rp_src = Path::new(&rp_dir);
     if rp_src.exists() {
         let rp_dst = export_dir.join("resourcepacks");
-        kcraft_fs::copy_dir_recursive(rp_src, &rp_dst, &[])?;
+        fs::copy_dir_recursive(rp_src, &rp_dst, &[])?;
     }
 
     // Create server properties
     let props_path = export_dir.join("server.properties");
     let props =
         "motd=A KCraft Server\nmax-players=20\ngamemode=survival\nenable-command-block=true\n";
-    kcraft_fs::write(&props_path, props.as_bytes())?;
+    fs::write(&props_path, props.as_bytes())?;
 
     // Create launcher scripts
     let mc_version = instance
@@ -82,7 +82,7 @@ pub fn export_server_pack(
 
     // Create eula.txt
     let eula_path = export_dir.join("eula.txt");
-    kcraft_fs::write(&eula_path, b"eula=false\n")?;
+    fs::write(&eula_path, b"eula=false\n")?;
 
     // Zip the export
     let zip_path = output.join(format!("{}_server.zip", sanitize_name(&instance.name)));
@@ -117,7 +117,7 @@ fn write_sh_script(
     );
 
     let sh_path = export_dir.join("start.sh");
-    kcraft_fs::write(&sh_path, content.as_bytes())?;
+    fs::write(&sh_path, content.as_bytes())?;
 
     // Make executable
     #[cfg(unix)]
@@ -143,7 +143,7 @@ fn write_bat_script(
     );
 
     let bat_path = export_dir.join("start.bat");
-    kcraft_fs::write(&bat_path, content.as_bytes())?;
+    fs::write(&bat_path, content.as_bytes())?;
     Ok(())
 }
 

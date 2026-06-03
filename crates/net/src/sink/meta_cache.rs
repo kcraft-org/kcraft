@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use crate::sink::base::Sink;
 use crate::sink::file::FileSink;
 use crate::{Result, TaskState};
-use kcraft_http_cache::MetaEntryPtr;
+use http_cache::MetaEntryPtr;
 use md5::Digest;
 use tracing::debug;
 

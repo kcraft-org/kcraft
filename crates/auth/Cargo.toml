@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-auth"
+name = "auth"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -17,6 +17,6 @@ hex = { workspace = true }
 sha1 = { workspace = true }
 md-5 = { workspace = true }
 base64 = { workspace = true }
-kcraft-core = { path = "../core" }
-kcraft-net = { path = "../net" }
-kcraft-fs = { path = "../fs" }
+app_core = { package = "core", path = "../core" }
+net = { path = "../net" }
+fs = { path = "../fs" }

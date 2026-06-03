@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-minecraft"
+name = "minecraft"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,11 +15,11 @@ chrono = { workspace = true }
 url = { workspace = true }
 walkdir.workspace = true
 once_cell = { workspace = true }
-kcraft-core = { path = "../core" }
-kcraft-fs = { path = "../fs" }
-kcraft-net = { path = "../net" }
-kcraft-http-cache = { path = "../http-cache" }
-kcraft-java = { path = "../java" }
+app_core = { package = "core", path = "../core" }
+fs = { path = "../fs" }
+net = { path = "../net" }
+http-cache = { path = "../http-cache" }
+java = { path = "../java" }
 zip.workspace = true
 reqwest = { workspace = true, features = ["blocking"] }
 flate2 = { workspace = true }

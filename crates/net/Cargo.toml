@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-net"
+name = "net"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -18,7 +18,7 @@ hex = { workspace = true }
 url = { workspace = true }
 chrono = { workspace = true }
 futures-util = "0.3"
-kcraft-core = { path = "../core" }
-kcraft-http-cache = { path = "../http-cache" }
-kcraft-fs = { path = "../fs" }
+app_core = { package = "core", path = "../core" }
+http-cache = { path = "../http-cache" }
+fs = { path = "../fs" }
 lazy_static = "1.5.0"

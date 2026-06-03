@@ -1,5 +1,5 @@
 [package]
-name = "kcraft-logging"
+name = "logging"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

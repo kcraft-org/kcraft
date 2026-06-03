@@ -2,8 +2,8 @@ pub mod msa;
 
 use crate::data_root::data_root;
 use crate::AccountEntry;
-use kcraft_auth::{AccountList, MinecraftAccount};
-use kcraft_core::account::{AccountData, AccountType, MinecraftProfile};
+use auth::{AccountList, MinecraftAccount};
+use app_core::account::{AccountData, AccountType, MinecraftProfile};
 use slint::{SharedString, VecModel};
 use std::rc::Rc;
 
@@ -58,7 +58,7 @@ pub fn setup_add_offline(app: &crate::AppWindow) {
         let _ = list.load();
         let profile = MinecraftProfile {
             name: username.to_string(),
-            id: kcraft_auth::generate_offline_uuid(username.as_ref()),
+            id: auth::generate_offline_uuid(username.as_ref()),
             ..Default::default()
         };
         let data = AccountData {
@@ -84,10 +84,10 @@ pub fn setup_add_elyby(app: &crate::AppWindow) {
         let _ = list.load();
         let profile = MinecraftProfile {
             name: username.to_string(),
-            id: kcraft_auth::generate_offline_uuid(username.as_ref()),
+            id: auth::generate_offline_uuid(username.as_ref()),
             ..Default::default()
         };
-        let yggdrasil_token = kcraft_core::account::Token {
+        let yggdrasil_token = app_core::account::Token {
             token: Some(token.to_string()),
             ..Default::default()
         };

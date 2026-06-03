@@ -1,12 +1,12 @@
 [package]
-name = "kcraft-updater"
+name = "updater"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
-kcraft-core = { path = "../core" }
-kcraft-net = { path = "../net" }
+app_core = { package = "core", path = "../core" }
+net = { path = "../net" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 reqwest = { workspace = true }

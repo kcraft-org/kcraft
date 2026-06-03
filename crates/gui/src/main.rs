@@ -13,12 +13,12 @@ slint::include_modules!();
 
 fn main() {
     let log_dir = data_root().join("logs");
-    let config = kcraft_logging::LogConfig {
+    let config = logging::LogConfig {
         log_directory: log_dir,
         max_log_files: 5,
         log_level: "info".to_string(),
     };
-    kcraft_logging::LogManager::new(config).init();
+    logging::LogManager::new(config).init();
 
     info!("Starting KCraft GUI (Slint)");
 

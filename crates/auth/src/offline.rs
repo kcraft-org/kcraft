@@ -1,5 +1,5 @@
 use crate::{AuthFlow, Result};
-use kcraft_core::account::{
+use app_core::account::{
     AccountData, AccountState, AccountTaskState, AccountType, MinecraftEntitlement,
     MinecraftProfile, Skin, Token, Validity,
 };

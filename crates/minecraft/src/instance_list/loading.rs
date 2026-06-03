@@ -34,7 +34,7 @@ impl InstanceList {
         }
 
         let content = std::fs::read_to_string(&cfg_path).ok()?;
-        let mut ini = kcraft_core::INIFile::new();
+        let mut ini = app_core::INIFile::new();
         ini.load(&content);
 
         let name = ini.get("name").unwrap_or("Unnamed Instance").to_string();

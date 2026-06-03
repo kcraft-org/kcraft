@@ -1,7 +1,7 @@
 use crate::accounts;
 use crate::data_root::data_root;
-use kcraft_auth::{AuthFlow, MinecraftAccount};
-use kcraft_core::account::{AccountData, AccountTaskState};
+use auth::{AuthFlow, MinecraftAccount};
+use app_core::account::{AccountData, AccountTaskState};
 
 use slint::ComponentHandle;
 
@@ -14,7 +14,7 @@ pub fn setup_add_msa(app: &crate::AppWindow) {
 
         let weak = weak.clone();
         std::thread::spawn(move || {
-            let mut flow = kcraft_auth::MsaFlow::new_interactive(String::new());
+            let mut flow = auth::MsaFlow::new_interactive(String::new());
 
             let weak2 = weak.clone();
             flow.set_verification_callback(move |uri, code, _expires| {
@@ -53,7 +53,7 @@ pub fn setup_add_msa(app: &crate::AppWindow) {
                     match result {
                         Ok(AccountTaskState::Succeeded) => {
                             let accounts_path = data_root().join("accounts.json");
-                            let mut list = kcraft_auth::AccountList::new(accounts_path);
+                            let mut list = auth::AccountList::new(accounts_path);
                             let acc = MinecraftAccount::new(data);
                             list.add_account(acc);
                             let _ = list.save();
